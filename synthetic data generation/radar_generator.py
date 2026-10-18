@@ -195,6 +195,20 @@ def apply_transmitter_clock_noise(periods: np.ndarray, clock_bias: float = 0.0,
     return t + clock_bias - clock_offset * t - 0.5 * clock_drift * t ** 2 + jitter
 
 
+def apply_environmental_impacts(df: pd.DataFrame) -> pd.DataFrame:
+    """Apply a single shared environment effect to all PDW fields.
+
+    The environment is intentionally modeled centrally so every radar object in
+    the same environment is perturbed in the same way, without introducing
+    radar-specific handling or parameter knobs before the effect is specified.
+    """
+    if df.empty:
+        return df.copy()
+
+    out = df.copy()
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Transmitter block
 # ---------------------------------------------------------------------------
@@ -348,6 +362,7 @@ class Environment:
                 amp_noise_std=amp_noise_std,
                 aoa_noise_std=aoa_noise_std
             )
+            df = apply_environmental_impacts(df)
             dfs.append(df)
             
         if not dfs:
