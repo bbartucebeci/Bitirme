@@ -3,6 +3,12 @@ import pandas as pd
 from typing import List, Optional
 
 class Radar:
+    """Base transmitter model.
+
+    The concrete radar subclasses below define the transmitter-side pulse generation
+    patterns. Shared effects that are independent of radar type (environment and
+    receiver distortions) are applied later by the Environment block.
+    """
     def __init__(self, radar_id: str, freq_mean: float, freq_mode: str = "constant", freq_hopping_values: Optional[List[float]] = None,
                  poi: float = 1.0, multipath_prob: float = 0.0, multipath_delay_mean: float = 1.0, multipath_delay_std: float = 0.2,
                  pw_mean: float = 1.0, amp_mean: float = -50.0, aoa_mean: float = 90.0,
@@ -32,6 +38,9 @@ class Radar:
         self.scan_period = scan_period
         self.scan_phase = np.random.uniform(0, 360.0) if scan_period > 0 else 0.0
         self.aoa_drift_rate = aoa_drift_rate
+        self.clock_bias = getattr(self, "clock_bias", 0.0)
+        self.clock_linear_term = getattr(self, "clock_linear_term", 0.0)
+        self.clock_cubic_term = getattr(self, "clock_cubic_term", 0.0)
 
     def _generate_frequencies(self, num_pulses: int, freq_noise_std: float = 0.0) -> np.ndarray:
         if self.freq_mode == "constant":
@@ -66,8 +75,16 @@ class Radar:
         
         # 2. Generate frequencies BEFORE POI drop, so the internal hopper state advances correctly!
         freqs = self._generate_frequencies(num_pulses, freq_noise_std)
+
+        # 3. Apply the shared transmitter clock-noise model.
+        toas = apply_transmitter_clock_noise(
+            toas,
+            self.clock_bias,
+            self.clock_linear_term,
+            self.clock_cubic_term,
+        )
         
-        # 3. Apply Emitter-Level POI (Missing Pulses)
+        # 4. Apply Emitter-Level POI (Missing Pulses)
         if self.poi < 1.0:
             intercepted = np.random.rand(num_pulses) < self.poi
             toas = toas[intercepted]
@@ -156,7 +173,27 @@ class Radar:
         return df
 
 
+# ---------------------------------------------------------------------------
+# Shared transmitter clock-noise function
+# ---------------------------------------------------------------------------
+
+
+def apply_transmitter_clock_noise(toas: np.ndarray, clock_bias: float = 0.0,
+                                 clock_linear_term: float = 0.0,
+                                 clock_cubic_term: float = 0.0) -> np.ndarray:
+    t = np.asarray(toas, dtype=float)
+    return t + clock_bias - clock_linear_term * t - 0.5 * clock_cubic_term * t ** 2
+
+
+# ---------------------------------------------------------------------------
+# Transmitter block
+# ---------------------------------------------------------------------------
+
 class StableRadar(Radar):
+    clock_bias = 0.0
+    clock_linear_term = 1.0e-6
+    clock_cubic_term = 5.0e-14
+
     def __init__(self, radar_id: str, pri: float, freq_mean: float, **kwargs):
         super().__init__(radar_id, freq_mean, **kwargs)
         self.pri = pri
@@ -171,6 +208,10 @@ class StableRadar(Radar):
 
 
 class JitterRadar(Radar):
+    clock_bias = 2.0e-6
+    clock_linear_term = 2.0e-6
+    clock_cubic_term = 1.0e-13
+
     def __init__(self, radar_id: str, pri_mean: float, pri_jitter_std: float, freq_mean: float, **kwargs):
         super().__init__(radar_id, freq_mean, **kwargs)
         self.pri_mean = pri_mean
@@ -187,6 +228,10 @@ class JitterRadar(Radar):
 
 
 class StaggerRadar(Radar):
+    clock_bias = 5.0e-7
+    clock_linear_term = 3.0e-6
+    clock_cubic_term = 8.0e-14
+
     def __init__(self, radar_id: str, stagger_pris: List[float], freq_mean: float, **kwargs):
         super().__init__(radar_id, freq_mean, **kwargs)
         self.stagger_pris = stagger_pris
@@ -203,6 +248,10 @@ class StaggerRadar(Radar):
 
 
 class DwellAndSwitchRadar(Radar):
+    clock_bias = 1.0e-6
+    clock_linear_term = 4.0e-6
+    clock_cubic_term = 1.2e-13
+
     def __init__(self, radar_id: str, dwell_pris: List[float], pulses_per_dwell: int, freq_mean: float, **kwargs):
         super().__init__(radar_id, freq_mean, **kwargs)
         self.dwell_pris = dwell_pris
@@ -226,6 +275,10 @@ class DwellAndSwitchRadar(Radar):
 
 
 class SlidingRadar(Radar):
+    clock_bias = 1.5e-6
+    clock_linear_term = 5.0e-6
+    clock_cubic_term = 1.5e-13
+
     def __init__(self, radar_id: str, pri_start: float, pri_end: float, pulses_per_slide: int, freq_mean: float, **kwargs):
         super().__init__(radar_id, freq_mean, **kwargs)
         self.pri_start = pri_start
@@ -243,6 +296,12 @@ class SlidingRadar(Radar):
         toas = start_time + np.cumsum(pris) - pris[0]
         return self._finalize_df(toas, pris, duration, start_time, toa_noise_std, freq_noise_std, pw_noise_std, amp_noise_std, aoa_noise_std)
 
+
+# ---------------------------------------------------------------------------
+# Shared environment / receiver effects
+# This block does not depend on a specific radar type and remains independent
+# of the transmitter-only subclass definitions above.
+# ---------------------------------------------------------------------------
 
 class Environment:
     def __init__(self):
