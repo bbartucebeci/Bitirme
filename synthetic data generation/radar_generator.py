@@ -39,8 +39,10 @@ class Radar:
         self.scan_phase = np.random.uniform(0, 360.0) if scan_period > 0 else 0.0
         self.aoa_drift_rate = aoa_drift_rate
         self.clock_bias = getattr(self, "clock_bias", 0.0)
-        self.clock_linear_term = getattr(self, "clock_linear_term", 0.0)
-        self.clock_cubic_term = getattr(self, "clock_cubic_term", 0.0)
+        self.clock_offset = getattr(self, "clock_offset", 0.0)
+        self.clock_drift = getattr(self, "clock_drift", 0.0)
+        self.jitter_k = getattr(self, "jitter_k", 0.0)
+        self.jitter_std = getattr(self, "jitter_std", 0.0)
 
     def _generate_frequencies(self, num_pulses: int, freq_noise_std: float = 0.0) -> np.ndarray:
         if self.freq_mode == "constant":
@@ -76,13 +78,16 @@ class Radar:
         # 2. Generate frequencies BEFORE POI drop, so the internal hopper state advances correctly!
         freqs = self._generate_frequencies(num_pulses, freq_noise_std)
 
-        # 3. Apply the shared transmitter clock-noise model.
-        toas = apply_transmitter_clock_noise(
-            toas,
+        # 3. Apply the shared transmitter clock-noise model to the pulse timing law.
+        pris = apply_transmitter_clock_noise(
+            pris,
             self.clock_bias,
-            self.clock_linear_term,
-            self.clock_cubic_term,
+            self.clock_offset,
+            self.clock_drift,
+            self.jitter_k,
+            self.jitter_std,
         )
+        toas = start_time + np.cumsum(pris) - pris[0]
         
         # 4. Apply Emitter-Level POI (Missing Pulses)
         if self.poi < 1.0:
@@ -178,11 +183,16 @@ class Radar:
 # ---------------------------------------------------------------------------
 
 
-def apply_transmitter_clock_noise(toas: np.ndarray, clock_bias: float = 0.0,
-                                 clock_linear_term: float = 0.0,
-                                 clock_cubic_term: float = 0.0) -> np.ndarray:
-    t = np.asarray(toas, dtype=float)
-    return t + clock_bias - clock_linear_term * t - 0.5 * clock_cubic_term * t ** 2
+def apply_transmitter_clock_noise(periods: np.ndarray, clock_bias: float = 0.0,
+                                 clock_offset: float = 0.0,
+                                 clock_drift: float = 0.0,
+                                 jitter_k: float = 0.0,
+                                 jitter_std: float = 0.0) -> np.ndarray:
+    t = np.asarray(periods, dtype=float)
+    jitter = np.zeros_like(t, dtype=float)
+    for i in range(1, t.size):
+        jitter[i] = jitter_k * jitter[i - 1] + np.random.normal(0.0, jitter_std)
+    return t + clock_bias - clock_offset * t - 0.5 * clock_drift * t ** 2 + jitter
 
 
 # ---------------------------------------------------------------------------
@@ -191,8 +201,10 @@ def apply_transmitter_clock_noise(toas: np.ndarray, clock_bias: float = 0.0,
 
 class StableRadar(Radar):
     clock_bias = 0.0
-    clock_linear_term = 1.0e-6
-    clock_cubic_term = 5.0e-14
+    clock_offset = 1.0e-6
+    clock_drift = 5.0e-14
+    jitter_k = 0.0
+    jitter_std = 0.0
 
     def __init__(self, radar_id: str, pri: float, freq_mean: float, **kwargs):
         super().__init__(radar_id, freq_mean, **kwargs)
@@ -209,8 +221,10 @@ class StableRadar(Radar):
 
 class JitterRadar(Radar):
     clock_bias = 2.0e-6
-    clock_linear_term = 2.0e-6
-    clock_cubic_term = 1.0e-13
+    clock_offset = 2.0e-6
+    clock_drift = 1.0e-13
+    jitter_k = 0.9
+    jitter_std = 1.0e-7
 
     def __init__(self, radar_id: str, pri_mean: float, pri_jitter_std: float, freq_mean: float, **kwargs):
         super().__init__(radar_id, freq_mean, **kwargs)
@@ -229,8 +243,10 @@ class JitterRadar(Radar):
 
 class StaggerRadar(Radar):
     clock_bias = 5.0e-7
-    clock_linear_term = 3.0e-6
-    clock_cubic_term = 8.0e-14
+    clock_offset = 3.0e-6
+    clock_drift = 8.0e-14
+    jitter_k = 0.8
+    jitter_std = 1.5e-7
 
     def __init__(self, radar_id: str, stagger_pris: List[float], freq_mean: float, **kwargs):
         super().__init__(radar_id, freq_mean, **kwargs)
@@ -249,8 +265,10 @@ class StaggerRadar(Radar):
 
 class DwellAndSwitchRadar(Radar):
     clock_bias = 1.0e-6
-    clock_linear_term = 4.0e-6
-    clock_cubic_term = 1.2e-13
+    clock_offset = 4.0e-6
+    clock_drift = 1.2e-13
+    jitter_k = 0.7
+    jitter_std = 2.0e-7
 
     def __init__(self, radar_id: str, dwell_pris: List[float], pulses_per_dwell: int, freq_mean: float, **kwargs):
         super().__init__(radar_id, freq_mean, **kwargs)
@@ -276,8 +294,10 @@ class DwellAndSwitchRadar(Radar):
 
 class SlidingRadar(Radar):
     clock_bias = 1.5e-6
-    clock_linear_term = 5.0e-6
-    clock_cubic_term = 1.5e-13
+    clock_offset = 5.0e-6
+    clock_drift = 1.5e-13
+    jitter_k = 0.85
+    jitter_std = 2.5e-7
 
     def __init__(self, radar_id: str, pri_start: float, pri_end: float, pulses_per_slide: int, freq_mean: float, **kwargs):
         super().__init__(radar_id, freq_mean, **kwargs)
