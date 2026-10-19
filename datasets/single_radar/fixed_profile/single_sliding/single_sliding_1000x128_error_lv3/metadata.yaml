@@ -24,15 +24,15 @@ split:
   train:
     ratio: 0.7
     sequence_count: 700
-    row_count: 89837
+    row_count: 89856
   val:
     ratio: 0.1
     sequence_count: 100
-    row_count: 12810
+    row_count: 12805
   test:
     ratio: 0.2
     sequence_count: 200
-    row_count: 25632
+    row_count: 25702
 radar_parameters:
   radar_id: R_SLIDING
   pri_start_us: 850.0

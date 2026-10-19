@@ -25,15 +25,15 @@ split:
   train:
     ratio: 0.7
     sequence_count: 700
-    row_count: 89454
+    row_count: 89417
   val:
     ratio: 0.1
     sequence_count: 100
-    row_count: 12828
+    row_count: 12817
   test:
     ratio: 0.2
     sequence_count: 200
-    row_count: 25546
+    row_count: 25563
 radar_parameters:
   radar_id: R_JITTER
   pri_mean_us: 1000.0

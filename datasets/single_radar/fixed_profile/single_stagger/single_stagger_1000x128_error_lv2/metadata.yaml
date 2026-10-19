@@ -24,15 +24,15 @@ split:
   train:
     ratio: 0.7
     sequence_count: 700
-    row_count: 89783
+    row_count: 89875
   val:
     ratio: 0.1
     sequence_count: 100
-    row_count: 12837
+    row_count: 12838
   test:
     ratio: 0.2
     sequence_count: 200
-    row_count: 25662
+    row_count: 25724
 radar_parameters:
   radar_id: R_STAGGER
   stagger_pris_us:

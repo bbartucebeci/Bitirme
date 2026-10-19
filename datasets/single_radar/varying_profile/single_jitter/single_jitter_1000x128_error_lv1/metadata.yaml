@@ -1,0 +1,97 @@
+name: single_jitter_1000x128_error_lv1
+radar_type: jitter
+radars_per_environment: 1
+profile_count: 1000
+sequences_per_profile: 1
+sequence_count: 1000
+expected_pulses_per_sequence: 128
+duration_rule: 128 * this profile's mean_pri_us
+error_level: error_lv1
+error_parameters:
+  poi: 0.995
+  multipath_prob: 0.0
+  aoa_drift_rate: 0.0
+  toa_noise_std: 0.1
+  freq_noise_std: 0.1
+  pw_noise_std: 0.01
+  amp_noise_std: 0.2
+  aoa_noise_std: 0.05
+  global_drop_rate: 0.0
+  noise_rate: 1.0
+  quantize: false
+profile_sampling:
+  common:
+    mean_pri_us:
+      distribution: uniform
+      low: 800.0
+      high: 1200.0
+    freq_mean_mhz:
+      distribution: uniform
+      low: 8900.0
+      high: 9100.0
+    pw_mean_us:
+      distribution: uniform
+      low: 1.0
+      high: 2.0
+    amp_mean_dbm:
+      distribution: uniform
+      low: -65.0
+      high: -45.0
+    aoa_mean_deg:
+      distribution: uniform
+      low: 0.0
+      high: 360.0
+  pri_shape:
+    std_fraction:
+      distribution: uniform
+      low: 0.04
+      high: 0.08
+generation_seeds:
+  common_profiles: 20261019
+  pri_shape: 102
+  split: 42
+  observation_seed_base: 101000
+files:
+  profiles: profiles.csv
+  train: train/sequences.csv
+  val: val/sequences.csv
+  test: test/sequences.csv
+  individual_sequence_files: Each split contains one seq_XXXX.csv per sequence.
+split_method: profile_disjoint
+split:
+  train:
+    ratio: 0.7
+    profile_count: 700
+    sequence_count: 700
+    row_count: 89564
+  val:
+    ratio: 0.1
+    profile_count: 100
+    sequence_count: 100
+    row_count: 12801
+  test:
+    ratio: 0.2
+    profile_count: 200
+    sequence_count: 200
+    row_count: 25607
+radar_parameters:
+  radar_id: R_SINGLE
+  freq_mode: constant
+  scan_period_us: 0.0
+  individual_profile_values: profiles.csv
+environment_parameters:
+  toa_noise_std: 0.1
+  freq_noise_std: 0.1
+  pw_noise_std: 0.01
+  amp_noise_std: 0.2
+  aoa_noise_std: 0.05
+  global_drop_rate: 0.0
+  noise_rate: 1.0
+  quantize: false
+units:
+  TOA: microseconds
+  PRI: microseconds
+  Frequency: MHz
+  PW: microseconds
+  Amplitude: dBm
+  AOA: degrees

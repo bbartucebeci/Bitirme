@@ -24,15 +24,15 @@ split:
   train:
     ratio: 0.7
     sequence_count: 700
-    row_count: 90486
+    row_count: 90385
   val:
     ratio: 0.1
     sequence_count: 100
-    row_count: 12922
+    row_count: 12915
   test:
     ratio: 0.2
     sequence_count: 200
-    row_count: 25843
+    row_count: 25848
 radar_parameters:
   radar_id: R_DWELL_SWITCH
   dwell_pris_us:
