@@ -1,0 +1,68 @@
+name: single_stagger_1000x128_clean
+radar_type: stagger
+sequence_count: 1000
+expected_pulses_per_sequence: 128
+error_level: clean
+error_parameters:
+  poi: 1.0
+  multipath_prob: 0.0
+  aoa_drift_rate: 0.0
+  toa_noise_std: 0.0
+  freq_noise_std: 0.0
+  pw_noise_std: 0.0
+  amp_noise_std: 0.0
+  aoa_noise_std: 0.0
+  global_drop_rate: 0.0
+  noise_rate: 0.0
+  quantize: false
+files:
+  train: train/sequences.csv
+  val: val/sequences.csv
+  test: test/sequences.csv
+  individual_sequence_files: Each split also contains one seq_XXXX.csv per sequence.
+split:
+  train:
+    ratio: 0.7
+    sequence_count: 700
+    row_count: 90300
+  val:
+    ratio: 0.1
+    sequence_count: 100
+    row_count: 12900
+  test:
+    ratio: 0.2
+    sequence_count: 200
+    row_count: 25800
+radar_parameters:
+  radar_id: R_STAGGER
+  stagger_pris_us:
+  - 850.0
+  - 950.0
+  - 1050.0
+  - 1150.0
+  mean_pri_us: 1000.0
+  freq_mean_mhz: 9000.0
+  freq_mode: constant
+  poi: 1.0
+  multipath_prob: 0.0
+  aoa_drift_rate: 0.0
+  pw_mean_us: 1.5
+  amp_mean_dbm: -55.0
+  aoa_mean_deg: 45.0
+environment_parameters:
+  duration_us: 128000.0
+  toa_noise_std: 0.0
+  freq_noise_std: 0.0
+  pw_noise_std: 0.0
+  amp_noise_std: 0.0
+  aoa_noise_std: 0.0
+  global_drop_rate: 0.0
+  noise_rate: 0.0
+  quantize: false
+units:
+  TOA: microseconds
+  PRI: microseconds
+  Frequency: MHz
+  PW: microseconds
+  Amplitude: dBm
+  AOA: degrees

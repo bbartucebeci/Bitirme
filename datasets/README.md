@@ -1,195 +1,82 @@
 # PRI Benchmark Datasets
 
-This folder contains generated synthetic radar pulse datasets.
+Synthetic pulse sequences for stable, Gaussian-jitter, and stagger radars.
 
-Each dataset is stored in its own subfolder. For example:
+## New layout
 
-```text
-datasets/
-  single_stable_1000x128_clean/
-  single_stable_1000x128_error_lv1/
-  single_stable_1000x128_error_lv2/
-  single_stable_1000x128_error_lv3/
-```
+After running the updated generators, datasets are organized as:
 
-Each dataset folder follows the same structure:
+    datasets/
+      single_stable/
+        clean/
+        error_lv1/
+        error_lv2/
+        error_lv3/
+      single_jitter/
+        clean/
+        error_lv1/
+        error_lv2/
+        error_lv3/
+      single_stagger/
+        clean/
+        error_lv1/
+        error_lv2/
+        error_lv3/
 
-```text
-dataset_name/
-  metadata.yaml
-  train/
-    sequences.csv
-    seq_XXXX.csv
-  val/
-    sequences.csv
-    seq_XXXX.csv
-  test/
-    sequences.csv
-    seq_XXXX.csv
-```
+Each error-level folder contains metadata.yaml and three split folders:
+train, val, and test. Each split has a combined sequences.csv and
+individual seq_XXXX.csv files.
 
-## Dataset Naming
+## Older datasets
 
-Dataset names follow this pattern:
+Datasets generated before this layout remain in flat folders such as
+single_stable_1000x128_error_lv1 and
+single_jitter_1000x128_clean. The older single_stable_1000x128
+folder may also be present. These folders are not moved or deleted
+by the new generators. Read them using their existing paths.
 
-```text
-single_<radar_type>_<sequence_count>x<expected_pulses_per_sequence>_<error_level>
-```
+## Sequences and splits
 
-Example:
+Each error level has 1000 independent sequences: 700 train,
+100 validation, and 200 test. Splitting is by sequence_id, so
+pulses from one sequence cannot appear in multiple splits.
 
-```text
-single_stable_1000x128_error_lv1
-```
+The 1000x128 designation means 1000 sequences generated over a
+duration of 128 mean-PRI intervals. The observed row count can vary,
+including in clean jitter or stagger data. Missing pulses reduce the
+row count; false pulses and multipath echoes can increase it.
 
-This means:
-- one radar type: stable
-- 1000 independent sequences
-- 128 expected transmitted pulses per sequence
-- error level 1
+Do not concatenate different sequence_id values as one continuous
+radar signal. Sort each sequence by pulse_index before using it.
 
-## Error Levels
+## Error levels
 
-The error level describes how nonideal the generated radar observations are.
+clean has no added observation errors. The jitter radar still has
+intrinsic Gaussian PRI variation, and the stagger radar still has
+its repeating PRI pattern. error_lv1, error_lv2, and error_lv3
+introduce increasing nonideal effects. See each metadata.yaml for
+the exact radar and environment parameters.
 
-Current levels:
+## Reading a dataset
 
-| Level | Meaning |
-|---|---|
-| `clean` | Ideal baseline with no missing pulses, no false pulses, and no measurement noise |
-| `error_lv1` | Very close to ideal; tiny measurement noise and very small missing/false pulse effects |
-| `error_lv2` | Mild nonideal case; visible but still moderate noise and pulse errors |
-| `error_lv3` | Stronger nonideal case; more missing pulses, false pulses, multipath, and measurement noise |
+From the repository root:
 
-The exact parameters for each dataset are saved in:
+    from pathlib import Path
+    import pandas as pd
 
-```text
-metadata.yaml
-```
+    dataset = Path("datasets/single_stagger/error_lv1")
+    train = pd.read_csv(dataset / "train/sequences.csv")
+    val = pd.read_csv(dataset / "val/sequences.csv")
+    test = pd.read_csv(dataset / "test/sequences.csv")
 
-Important fields in `metadata.yaml`:
-- `error_level`
-- `error_parameters`
-- `radar_parameters`
-- `environment_parameters`
-- `split`
+    for sequence_id, sequence in train.groupby("sequence_id"):
+        sequence = sequence.sort_values("pulse_index")
+        # Process this sequence independently.
 
-## Train, Validation, and Test Splits
+For an older flat dataset, change only the dataset path, for example:
 
-Each dataset is split into:
+    dataset = Path("datasets/single_stagger_1000x128_error_lv1")
 
-```text
-train/
-val/
-test/
-```
-
-For the 1000-sequence datasets:
-
-| Split | Number of sequences |
-|---|---:|
-| train | 700 |
-| val | 100 |
-| test | 200 |
-
-The split is done by `sequence_id`, not by individual rows. This prevents leakage between train, validation, and test data.
-
-Leakage means the model accidentally sees part of the same sequence during training and testing, which makes evaluation unfair.
-
-## Combined CSV Files
-
-Each split contains a combined CSV file:
-
-```text
-train/sequences.csv
-val/sequences.csv
-test/sequences.csv
-```
-
-These files contain all sequences for that split.
-
-Example:
-
-```python
-import pandas as pd
-
-dataset_path = "datasets/single_stable_1000x128_error_lv1"
-
-train_df = pd.read_csv(f"{dataset_path}/train/sequences.csv")
-val_df = pd.read_csv(f"{dataset_path}/val/sequences.csv")
-test_df = pd.read_csv(f"{dataset_path}/test/sequences.csv")
-```
-
-## Individual Sequence CSV Files
-
-Each split folder also contains one CSV file per sequence:
-
-```text
-train/seq_0000.csv
-train/seq_0001.csv
-...
-```
-
-To read one sequence:
-
-```python
-seq_df = pd.read_csv("datasets/single_stable_1000x128_error_lv1/train/seq_0000.csv")
-```
-
-## How To Iterate Over Sequences
-
-Rows with the same `sequence_id` belong to one independent pulse sequence.
-
-Use `groupby("sequence_id")` when reading from a combined CSV:
-
-```python
-for sequence_id, seq_df in train_df.groupby("sequence_id"):
-    seq_df = seq_df.sort_values("pulse_index")
-
-    toa = seq_df["TOA"].to_numpy()
-    pri = seq_df["PRI"].to_numpy()
-    freq = seq_df["Frequency"].to_numpy()
-    pw = seq_df["PW"].to_numpy()
-    amp = seq_df["Amplitude"].to_numpy()
-    aoa = seq_df["AOA"].to_numpy()
-
-    # Use this sequence in your model or algorithm
-```
-
-Do not concatenate different `sequence_id` values as one continuous radar signal.
-
-Each `sequence_id` is an independent radar pulse train.
-
-## Important Note About Error Datasets
-
-For clean datasets, each sequence usually has exactly the expected number of pulses.
-
-For error datasets, the observed number of rows in a sequence may be different because:
-- missing pulses remove genuine radar pulses
-- false/noise pulses add extra observations
-- multipath can add echo pulses
-
-So `1000x128` means:
-
-```text
-1000 sequences, 128 expected transmitted pulses per sequence
-```
-
-It does not always mean every saved sequence has exactly 128 observed rows.
-
-## Recommended Usage
-
-For model development:
-
-```python
-train_df = pd.read_csv(f"{dataset_path}/train/sequences.csv")
-val_df = pd.read_csv(f"{dataset_path}/val/sequences.csv")
-test_df = pd.read_csv(f"{dataset_path}/test/sequences.csv")
-```
-
-Use:
-- `train` for fitting or learning
-- `val` for tuning parameters
-- `test` only for final evaluation
-
-For classical algorithms, you can use the same splits for fair comparison.
+The PRI column describes the generated pulse's source PRI.
+Measured_Delta_TOA is the difference between adjacent observed TOAs;
+missing, false, and echo pulses can affect that observed difference.
