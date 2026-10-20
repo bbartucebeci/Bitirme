@@ -1,0 +1,43 @@
+# ==============================================================================
+# PULSAR: Transmitter Oscillator Clock Noise Configuration
+# ==============================================================================
+
+# Physical oscillator parameters based on IEEE/NIST time and frequency metrology:
+#   t_observed = t + bias - offset * t - 0.5 * drift * t^2 + jitter
+#   jitter[i] = jitter_k * jitter[i-1] + N(0, jitter_std^2)
+
+stable:
+  clock_bias: 2.0e-6        # Turn-on phase error: 2.0 microseconds
+  clock_offset: 1.0e-6      # Fractional frequency offset: 1.0 ppm (1 us/s)
+  clock_drift: 5.0e-14      # Quadratic aging rate: 5e-14 s^-1
+  jitter_k: 0.90            # AR(1) phase noise temporal correlation coefficient
+  jitter_std: 1.0e-7        # 100 ns phase noise standard deviation
+
+jitter:
+  clock_bias: 2.0e-6
+  clock_offset: 2.0e-6      # 2.0 ppm
+  clock_drift: 1.0e-13      # 1e-13 s^-1
+  jitter_k: 0.90
+  jitter_std: 1.0e-7
+
+stagger:
+  clock_bias: 5.0e-7        # 0.5 microseconds
+  clock_offset: 3.0e-6      # 3.0 ppm
+  clock_drift: 8.0e-14      # 8e-14 s^-1
+  jitter_k: 0.80
+  jitter_std: 1.5e-7        # 150 ns
+
+dwell_and_switch:
+  clock_bias: 1.0e-6        # 1.0 microsecond
+  clock_offset: 4.0e-6      # 4.0 ppm
+  clock_drift: 1.2e-13      # 1.2e-13 s^-1
+  jitter_k: 0.70
+  jitter_std: 2.0e-7        # 200 ns
+
+sliding:
+  clock_bias: 1.5e-6        # 1.5 microseconds
+  clock_offset: 5.0e-6      # 5.0 ppm
+  clock_drift: 1.5e-13      # 1.5e-13 s^-1
+  jitter_k: 0.85
+  jitter_std: 2.5e-7        # 250 ns
+

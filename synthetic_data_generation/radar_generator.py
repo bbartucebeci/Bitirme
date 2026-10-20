@@ -12,7 +12,9 @@ class Radar:
     def __init__(self, radar_id: str, freq_mean: float, prop_distance: float = 0.0, freq_mode: str = "constant", freq_hopping_values: Optional[List[float]] = None,
                  poi: float = 1.0, multipath_prob: float = 0.0, multipath_delay_mean: float = 1.0, multipath_delay_std: float = 0.2,
                  pw_mean: float = 1.0, amp_mean: float = -50.0, aoa_mean: float = 90.0,
-                 scan_period: float = 0.0, aoa_drift_rate: float = 0.0, stretch_pw_on_multipath: bool = False):
+                 scan_period: float = 0.0, aoa_drift_rate: float = 0.0, stretch_pw_on_multipath: bool = False,
+                 clock_bias: Optional[float] = None, clock_offset: Optional[float] = None, clock_drift: Optional[float] = None,
+                 jitter_k: Optional[float] = None, jitter_std: Optional[float] = None, **kwargs):
         """
         Base Radar Class.
         :param pw_mean: Pulse width in microseconds.

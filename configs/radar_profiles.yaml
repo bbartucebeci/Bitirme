@@ -1,0 +1,141 @@
+# ==============================================================================
+# PULSAR: Radar Profiles & Parameter Sampling Configuration
+# ==============================================================================
+
+# --- Fixed Profile Baseline Parameters ---
+# Used when --profile-mode fixed is specified.
+fixed_profiles:
+  common:
+    radar_id: "R_SINGLE"
+    mean_pri_us: 1000.0
+    freq_mean_mhz: 9000.0
+    freq_mode: "constant"               # Options: constant, hopping, agility
+    freq_hopping_values: [8950.0, 9000.0, 9050.0, 9100.0] # Carrier pool for hopping/agility
+    pw_mean_us: 1.5
+    amp_mean_dbm: -55.0
+    aoa_mean_deg: 180.0
+  stable:
+    pri_us: 1000.0
+  jitter:
+    pri_mean_us: 1000.0
+    pri_jitter_std_us: 50.0            # 5% Gaussian jitter
+  stagger:
+    stagger_pris_us: [850.0, 1000.0, 1150.0]
+  dwell_and_switch:
+    dwell_pris_us: [850.0, 1150.0]
+    pulses_per_dwell: 8
+  sliding:
+    pri_start_us: 850.0
+    pri_end_us: 1150.0
+    pulses_per_slide: 16
+
+# --- Varying Profile Continuous Sampling Ranges ---
+# Used when --profile-mode varying is specified.
+# A new independent profile is sampled per sequence from these distributions.
+varying_profile_sampling:
+  common:
+    mean_pri_us:
+      distribution: "uniform"
+      low: 800.0
+      high: 1200.0
+    freq_mean_mhz:
+      distribution: "uniform"
+      low: 8900.0
+      high: 9100.0
+    freq_mode: "constant"              # Default mode, overrideable via CLI --freq-mode
+    freq_hopping:
+      channel_count: 4                 # Number of hopping channels
+      step_mhz: 50.0                   # Frequency separation between channels
+    pw_mean_us:
+      distribution: "uniform"
+      low: 1.0
+      high: 2.0
+    amp_mean_dbm:
+      distribution: "uniform"
+      low: -65.0
+      high: -45.0
+    aoa_mean_deg:
+      distribution: "uniform"
+      low: 0.0
+      high: 360.0
+
+  # Radar-type specific shape distributions
+  radar_specific:
+    stable:
+      # Stable radar uses mean_pri_us directly
+      pri_us: "mean_pri_us"
+    jitter:
+      std_fraction:
+        distribution: "uniform"
+        low: 0.04
+        high: 0.08
+    stagger:
+      outer_fraction:
+        distribution: "uniform"
+        low: 0.12
+        high: 0.18
+      inner_fraction:
+        distribution: "uniform"
+        low: 0.03
+        high: 0.07
+    dwell_and_switch:
+      outer_fraction:
+        distribution: "uniform"
+        low: 0.12
+        high: 0.18
+      pulses_per_dwell:
+        distribution: "choice"
+        values: [8, 10, 12]
+    sliding:
+      span_fraction:
+        distribution: "uniform"
+        low: 0.12
+        high: 0.18
+      pulses_per_slide:
+        distribution: "choice"
+        values: [12, 16, 20]
+
+# --- Interleaved Multi-Radar Scenario Parameters ---
+interleaved_scenario:
+  environment:
+    N: 150.0                           # Tropospheric radio refractivity
+    rain: 0.0                          # Rain attenuation flag / intensity
+    fog: 0.0                           # Fog attenuation intensity (0: clear, 1: light, 2: mod, 3: dense)
+    sampling_resolution: 1.0           # Minimum receiver sampling separation in microseconds
+  radars:
+    - radar_id: "R_STABLE"
+      type: "stable"
+      pri: 1000.0
+      freq_mean: 9000.0
+      freq_mode: "constant"
+      prop_distance: 800.0
+    - radar_id: "R_JITTER"
+      type: "jitter"
+      pri_mean: 1000.0
+      pri_jitter_std: 20.0
+      freq_mean: 9500.0
+      freq_mode: "agility"
+      freq_hopping_values: [9450.0, 9500.0, 9550.0]
+      prop_distance: 1200.0
+    - radar_id: "R_STAGGER"
+      type: "stagger"
+      stagger_pris: [900.0, 1000.0, 1100.0]
+      freq_mean: 9800.0
+      freq_mode: "hopping"
+      freq_hopping_values: [9750.0, 9800.0, 9850.0]
+      prop_distance: 1500.0
+    - radar_id: "R_DWELL"
+      type: "dwell_and_switch"
+      dwell_pris: [900.0, 1000.0]
+      pulses_per_dwell: 4
+      freq_mean: 9600.0
+      freq_mode: "constant"
+      prop_distance: 1100.0
+    - radar_id: "R_SLIDE"
+      type: "sliding"
+      pri_start: 1100.0
+      pri_end: 900.0
+      pulses_per_slide: 5
+      freq_mean: 9700.0
+      freq_mode: "constant"
+      prop_distance: 1300.0

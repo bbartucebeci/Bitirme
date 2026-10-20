@@ -1,0 +1,63 @@
+# ==============================================================================
+# PULSAR: Error Levels Configuration (ESM Receiver & Channel Impairments)
+# ==============================================================================
+
+# Error levels represent realistic non-ideal channel and receiver effects.
+# Missing pulses, multipath reflections, platform motion, receiver noise, and false alarms.
+
+clean:
+  description: "Ideal baseline without observation or channel errors. Intrinsic PRI modulation remains intact."
+  poi: 1.0                 # Probability of Intercept (1.0 = 0% missing pulses)
+  multipath_prob: 0.0      # Probability of ground/sea surface multipath echoes
+  aoa_drift_rate: 0.0      # Platform relative angular velocity in degrees/second
+  toa_noise_std: 0.0       # Gaussian TOA measurement noise standard deviation (microseconds)
+  freq_noise_std: 0.0      # Gaussian Frequency measurement noise std (MHz)
+  pw_noise_std: 0.0        # Gaussian Pulse Width measurement noise std (microseconds)
+  amp_noise_std: 0.0       # Gaussian Amplitude measurement noise std (dBm)
+  aoa_noise_std: 0.0       # Gaussian AOA measurement noise std (degrees)
+  global_drop_rate: 0.0    # Post-interception receiver pipeline drop rate
+  noise_rate: 0.0          # Thermal noise false alarms (pulses per second)
+  quantize: false          # Digital hardware quantization toggle
+
+error_lv1:
+  description: "Mild, high-grade ESM intercept conditions. Very close to ideal."
+  poi: 0.995               # Missing Pulse Rate (MPR) = 0.5%
+  multipath_prob: 0.0
+  aoa_drift_rate: 0.0
+  toa_noise_std: 0.1       # 100 ns timing jitter
+  freq_noise_std: 0.1      # 100 kHz frequency uncertainty
+  pw_noise_std: 0.01       # 10 ns PW uncertainty
+  amp_noise_std: 0.2       # 0.2 dB amplitude ripple
+  aoa_noise_std: 0.05      # 0.05 degree AOA bearing error
+  global_drop_rate: 0.0
+  noise_rate: 1.0          # 1 false pulse per second
+  quantize: false
+
+error_lv2:
+  description: "Moderate realistic operational ESM environment with visible multipath and motion."
+  poi: 0.99                # Missing Pulse Rate (MPR) = 1.0%
+  multipath_prob: 0.01     # 1% multipath echoes
+  aoa_drift_rate: 0.2      # 0.2 deg/s platform azimuth drift
+  toa_noise_std: 0.5       # 500 ns timing jitter
+  freq_noise_std: 0.5      # 500 kHz frequency uncertainty
+  pw_noise_std: 0.03       # 30 ns PW uncertainty
+  amp_noise_std: 0.5       # 0.5 dB amplitude variation
+  aoa_noise_std: 0.2       # 0.2 degree AOA bearing error
+  global_drop_rate: 0.005  # 0.5% receiver FIFO drop rate
+  noise_rate: 5.0          # 5 false pulses per second
+  quantize: false
+
+error_lv3:
+  description: "Dense, hostile EW scenario with severe multipath, rapid kinematics, and high noise."
+  poi: 0.98                # Missing Pulse Rate (MPR) = 2.0%
+  multipath_prob: 0.03     # 3% multipath echoes
+  aoa_drift_rate: 0.5      # 0.5 deg/s platform azimuth drift
+  toa_noise_std: 1.0       # 1.0 microsecond timing jitter
+  freq_noise_std: 1.0      # 1.0 MHz frequency uncertainty
+  pw_noise_std: 0.05       # 50 ns PW uncertainty
+  amp_noise_std: 1.0       # 1.0 dB amplitude variation
+  aoa_noise_std: 0.5       # 0.5 degree AOA bearing error
+  global_drop_rate: 0.01   # 1% receiver FIFO drop rate
+  noise_rate: 10.0         # 10 false pulses per second
+  quantize: false
+
