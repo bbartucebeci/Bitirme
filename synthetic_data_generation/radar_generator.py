@@ -3,10 +3,18 @@ import pandas as pd
 from typing import List, Optional
 
 class Radar:
-    def __init__(self, radar_id: str, freq_mean: float, freq_mode: str = "constant", freq_hopping_values: Optional[List[float]] = None,
+    """Base transmitter model.
+
+    The concrete radar subclasses below define the transmitter-side pulse generation
+    patterns. Shared effects that are independent of radar type (environment and
+    receiver distortions) are applied later by the Environment block.
+    """
+    def __init__(self, radar_id: str, freq_mean: float, prop_distance: float = 0.0, freq_mode: str = "constant", freq_hopping_values: Optional[List[float]] = None,
                  poi: float = 1.0, multipath_prob: float = 0.0, multipath_delay_mean: float = 1.0, multipath_delay_std: float = 0.2,
                  pw_mean: float = 1.0, amp_mean: float = -50.0, aoa_mean: float = 90.0,
-                 scan_period: float = 0.0, aoa_drift_rate: float = 0.0, stretch_pw_on_multipath: bool = False):
+                 scan_period: float = 0.0, aoa_drift_rate: float = 0.0, stretch_pw_on_multipath: bool = False,
+                 clock_bias: Optional[float] = None, clock_offset: Optional[float] = None, clock_drift: Optional[float] = None,
+                 jitter_k: Optional[float] = None, jitter_std: Optional[float] = None, **kwargs):
         """
         Base Radar Class.
         :param pw_mean: Pulse width in microseconds.
@@ -15,9 +23,11 @@ class Radar:
         :param scan_period: Time in microseconds for a full 360-degree antenna rotation (0 for static/non-scanning).
         :param aoa_drift_rate: Rate of change of AOA in degrees per second (simulating platform movement).
         :param stretch_pw_on_multipath: If True, echoes merge into the main pulse, stretching its PW.
+        :param prop_distance: Propagation distance in meters (used for environmental effects).
         """
         self.radar_id = radar_id
         self.freq_mean = freq_mean
+        self.prop_distance = prop_distance
         self.freq_mode = freq_mode
         self.freq_hopping_values = freq_hopping_values if freq_hopping_values else [freq_mean]
         self.poi = poi
@@ -32,6 +42,11 @@ class Radar:
         self.scan_period = scan_period
         self.scan_phase = np.random.uniform(0, 360.0) if scan_period > 0 else 0.0
         self.aoa_drift_rate = aoa_drift_rate
+        self.clock_bias = getattr(self, "clock_bias", 0.0)
+        self.clock_offset = getattr(self, "clock_offset", 0.0)
+        self.clock_drift = getattr(self, "clock_drift", 0.0)
+        self.jitter_k = getattr(self, "jitter_k", 0.0)
+        self.jitter_std = getattr(self, "jitter_std", 0.0)
 
     def _generate_frequencies(self, num_pulses: int, freq_noise_std: float = 0.0) -> np.ndarray:
         if self.freq_mode == "constant":
@@ -66,8 +81,19 @@ class Radar:
         
         # 2. Generate frequencies BEFORE POI drop, so the internal hopper state advances correctly!
         freqs = self._generate_frequencies(num_pulses, freq_noise_std)
-        
-        # 3. Apply Emitter-Level POI (Missing Pulses)
+
+        # 3. Apply the shared transmitter clock-noise model to the pulse timing law.
+        pris = apply_transmitter_clock_noise(
+            pris,
+            self.clock_bias,
+            self.clock_offset,
+            self.clock_drift,
+            self.jitter_k,
+            self.jitter_std,
+        )
+        toas = start_time + np.cumsum(pris) - pris[0]
+
+        # 4. Apply Emitter-Level POI (Missing Pulses)
         if self.poi < 1.0:
             intercepted = np.random.rand(num_pulses) < self.poi
             toas = toas[intercepted]
@@ -156,7 +182,80 @@ class Radar:
         return df
 
 
+# ---------------------------------------------------------------------------
+# Shared transmitter clock-noise function
+# ---------------------------------------------------------------------------
+
+
+def apply_transmitter_clock_noise(periods: np.ndarray, clock_bias: float = 0.0,
+                                 clock_offset: float = 0.0,
+                                 clock_drift: float = 0.0,
+                                 jitter_k: float = 0.0,
+                                 jitter_std: float = 0.0) -> np.ndarray:
+    t = np.asarray(periods, dtype=float)
+    jitter = np.zeros_like(t, dtype=float)
+    for i in range(1, t.size):
+        jitter[i] = jitter_k * jitter[i - 1] + np.random.normal(0.0, jitter_std)
+    return t + clock_bias - clock_offset * t - 0.5 * clock_drift * t ** 2 + jitter
+
+
+def apply_environmental_impacts(df: pd.DataFrame, N: float = 0.0, rain: 
+                                bool = False, fog_intensity: float = 0.0, prop_distance: float = 0.0) -> pd.DataFrame:
+    """Apply a single shared environment effect to all PDW fields.
+
+    The environment is intentionally modeled centrally so every radar object in
+    the same environment is perturbed in the same way, without introducing
+    radar-specific handling or parameter knobs before the effect is specified.
+
+    This function only models the delta of the environment effect,
+    the measurement noise has been implemented elsewhere.
+
+    N: radio refractivity
+    rain: rain intensity parameter for attenuation
+    prop_distance: Propagation distance in meters
+    fog_intensity: Fog intensity parameter for attenuation(float) (0:none, 1:light, 2:moderate, 3:dense)
+    """
+    c = 3e8  # Speed of light in m/s
+
+    radio_refractivity = 1.0 + N * 1e-6  # assumed fixed for the entire propagation path
+    TOA_shift = radio_refractivity * prop_distance / c * 1e6  # Convert to microseconds
+
+    if df.empty:
+        return df.copy()
+
+    out = df.copy()
+
+    # AOA shift: apply a common refractivity-driven angular distortion to all
+    # AOA values before the other environmental attenuation terms are applied.
+    aoa_shift = (radio_refractivity - 1.0) * out["AOA"]
+    out["AOA"] = (out["AOA"] + aoa_shift) % 360.0
+
+    if rain:
+        # Rain attenuation model (simplified)
+        rain_attenuation_db = 0.1 * prop_distance / 1000.0  # dB/km
+        out["Amplitude"] -= rain_attenuation_db
+
+    if fog_intensity > 0.0:
+        # Fog attenuation model (simplified)
+        fog_attenuation_db = 0.05 * fog_intensity * prop_distance / 1000.0  # dB/km
+        out["Amplitude"] -= fog_attenuation_db
+
+    out["TOA"] += TOA_shift
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Pulse regime block
+# ---------------------------------------------------------------------------
+
 class StableRadar(Radar):
+
+    clock_bias = 2.0e-6
+    clock_offset = 1.0e-6
+    clock_drift = 5.0e-14
+    jitter_k = 0.9
+    jitter_std = 1.0e-7
+
     def __init__(self, radar_id: str, pri: float, freq_mean: float, **kwargs):
         super().__init__(radar_id, freq_mean, **kwargs)
         self.pri = pri
@@ -171,6 +270,12 @@ class StableRadar(Radar):
 
 
 class JitterRadar(Radar):
+    clock_bias = 2.0e-6
+    clock_offset = 2.0e-6
+    clock_drift = 1.0e-13
+    jitter_k = 0.9
+    jitter_std = 1.0e-7
+
     def __init__(self, radar_id: str, pri_mean: float, pri_jitter_std: float, freq_mean: float, **kwargs):
         super().__init__(radar_id, freq_mean, **kwargs)
         self.pri_mean = pri_mean
@@ -187,6 +292,12 @@ class JitterRadar(Radar):
 
 
 class StaggerRadar(Radar):
+    clock_bias = 5.0e-7
+    clock_offset = 3.0e-6
+    clock_drift = 8.0e-14
+    jitter_k = 0.8
+    jitter_std = 1.5e-7
+
     def __init__(self, radar_id: str, stagger_pris: List[float], freq_mean: float, **kwargs):
         super().__init__(radar_id, freq_mean, **kwargs)
         self.stagger_pris = stagger_pris
@@ -203,6 +314,12 @@ class StaggerRadar(Radar):
 
 
 class DwellAndSwitchRadar(Radar):
+    clock_bias = 1.0e-6
+    clock_offset = 4.0e-6
+    clock_drift = 1.2e-13
+    jitter_k = 0.7
+    jitter_std = 2.0e-7
+
     def __init__(self, radar_id: str, dwell_pris: List[float], pulses_per_dwell: int, freq_mean: float, **kwargs):
         super().__init__(radar_id, freq_mean, **kwargs)
         self.dwell_pris = dwell_pris
@@ -226,6 +343,12 @@ class DwellAndSwitchRadar(Radar):
 
 
 class SlidingRadar(Radar):
+    clock_bias = 1.5e-6
+    clock_offset = 5.0e-6
+    clock_drift = 1.5e-13
+    jitter_k = 0.85
+    jitter_std = 2.5e-7
+
     def __init__(self, radar_id: str, pri_start: float, pri_end: float, pulses_per_slide: int, freq_mean: float, **kwargs):
         super().__init__(radar_id, freq_mean, **kwargs)
         self.pri_start = pri_start
@@ -244,9 +367,18 @@ class SlidingRadar(Radar):
         return self._finalize_df(toas, pris, duration, start_time, toa_noise_std, freq_noise_std, pw_noise_std, amp_noise_std, aoa_noise_std)
 
 
+# ---------------------------------------------------------------------------
+# Shared environment / receiver effects
+# This block does not depend on a specific radar type and remains independent
+# of the transmitter-only subclass definitions above.
+# ---------------------------------------------------------------------------
+
 class Environment:
-    def __init__(self):
+    def __init__(self, N: float = 0.0, rain: float = 0.0, fog: float = 0.0):
         self.radars = []
+        self.N = N  # radio refractivity
+        self.rain = rain  # rain intensity parameter
+        self.fog = fog  # fog intensity parameter
 
     def add_radar(self, radar: Radar):
         self.radars.append(radar)
@@ -269,6 +401,7 @@ class Environment:
                 amp_noise_std=amp_noise_std,
                 aoa_noise_std=aoa_noise_std
             )
+            df = apply_environmental_impacts(df, N=self.N, rain=self.rain, fog_intensity=self.fog, prop_distance=radar.prop_distance)
             dfs.append(df)
             
         if not dfs:
