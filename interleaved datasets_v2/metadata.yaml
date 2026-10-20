@@ -1,0 +1,43 @@
+name: interleaved_basic_1000x128
+radar_type: interleaved
+sequence_count: 1000
+expected_pulses_per_sequence: 128
+error_level: basic
+split:
+  train:
+    ratio: 0.7
+    sequence_count: 700
+    row_count: 89600
+  val:
+    ratio: 0.1
+    sequence_count: 100
+    row_count: 12800
+  test:
+    ratio: 0.2
+    sequence_count: 200
+    row_count: 25600
+radar_parameters:
+  radar_ids:
+  - R_STABLE
+  - R_JITTER
+  - R_STAGGER
+  pri_us:
+  - 1000.0
+  - 1000.0
+  - staggered
+  freq_mean_mhz:
+  - 9000.0
+  - 9500.0
+  - 9800.0
+environment_parameters:
+  duration_us: 128000.0
+  N: 150.0
+  rain: 0.0
+  fog: 0.0
+units:
+  TOA: microseconds
+  PRI: microseconds
+  Frequency: MHz
+  PW: microseconds
+  Amplitude: dBm
+  AOA: degrees
