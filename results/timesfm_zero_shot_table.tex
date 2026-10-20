@@ -1,0 +1,32 @@
+% --- TimesFM 3.0 Zero-Shot Evaluation Table for PULSAR Graduation Thesis ---
+\begin{table}[htbp]
+\centering
+\caption{Zero-Shot TimesFM 3.0 PRI Forecasting Performance on PULSAR Benchmark}
+\label{tab:timesfm_zero_shot}
+\begin{tabular}{llcccc}
+\hline
+\textbf{Radar Type} & \textbf{Error Level} & \textbf{Test Seqs} & \textbf{MAE ($\mu$s)} & \textbf{RMSE ($\mu$s)} & \textbf{Hit Rate (\%)} \\
+\hline
+stable & clean & 200 & 0.11 & 0.13 & 100.0\% \\
+stable & error\_lv1 & 180 & 5.88 & 28.11 & 99.2\% \\
+stable & error\_lv2 & 122 & 16.76 & 66.62 & 96.8\% \\
+stable & error\_lv3 & 63 & 34.09 & 130.87 & 88.4\% \\
+jitter & clean & 197 & 40.63 & 50.54 & 15.6\% \\
+jitter & error\_lv1 & 138 & 43.26 & 60.68 & 16.2\% \\
+jitter & error\_lv2 & 88 & 55.35 & 103.35 & 14.4\% \\
+jitter & error\_lv3 & 56 & 63.39 & 127.36 & 15.0\% \\
+stagger & clean & 200 & 2.45 & 2.90 & 100.0\% \\
+stagger & error\_lv1 & 116 & 16.29 & 21.70 & 86.4\% \\
+stagger & error\_lv2 & 59 & 72.41 & 104.51 & 38.0\% \\
+stagger & error\_lv3 & 38 & 117.35 & 180.40 & 23.7\% \\
+dwell\_and\_switch & clean & 200 & 12.97 & 16.07 & 50.0\% \\
+dwell\_and\_switch & error\_lv1 & 177 & 29.29 & 61.91 & 44.1\% \\
+dwell\_and\_switch & error\_lv2 & 119 & 54.81 & 109.91 & 34.3\% \\
+dwell\_and\_switch & error\_lv3 & 79 & 88.95 & 159.41 & 22.6\% \\
+sliding & clean & 200 & 17.42 & 21.83 & 37.5\% \\
+sliding & error\_lv1 & 179 & 28.95 & 46.80 & 31.2\% \\
+sliding & error\_lv2 & 122 & 58.06 & 111.10 & 22.8\% \\
+sliding & error\_lv3 & 60 & 85.84 & 161.29 & 16.1\% \\
+\hline
+\end{tabular}
+\end{table}
