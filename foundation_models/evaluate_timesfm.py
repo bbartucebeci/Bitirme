@@ -25,7 +25,7 @@ import torch
 CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent
 DATASETS_ROOT = PROJECT_ROOT / "datasets" / "single_radar" / "fixed"
-DEFAULT_RESULTS_DIR = PROJECT_ROOT / "results"
+DEFAULT_RESULTS_DIR = PROJECT_ROOT / "results" / "timesfm_zero_shot"
 
 # ---------------------------------------------------------------------------
 # TimesFM 3.0 Loader Helper
@@ -82,6 +82,9 @@ def load_test_sequences(dataset_dir: Path, max_seqs: Optional[int] = None) -> Li
             df = pd.read_csv(f)
             if "Measured_Delta_TOA" in df.columns:
                 pri_arr = df["Measured_Delta_TOA"].to_numpy(dtype=np.float32)
+                # Drop anchor index 0 if it is 0.0 to retain actual interval measurements
+                if len(pri_arr) > 1 and pri_arr[0] == 0.0:
+                    pri_arr = pri_arr[1:]
                 sequences.append((f.stem, pri_arr))
         return sequences
 
@@ -95,6 +98,8 @@ def load_test_sequences(dataset_dir: Path, max_seqs: Optional[int] = None) -> Li
         for sid in unique_ids:
             df_seq = df_all[df_all["sequence_id"] == sid].sort_values("pulse_index")
             pri_arr = df_seq["Measured_Delta_TOA"].to_numpy(dtype=np.float32)
+            if len(pri_arr) > 1 and pri_arr[0] == 0.0:
+                pri_arr = pri_arr[1:]
             sequences.append((sid, pri_arr))
         return sequences
 
@@ -112,6 +117,7 @@ def save_diagnostic_plot(
     context: np.ndarray,
     ground_truth: np.ndarray,
     predictions: np.ndarray,
+    tolerance_us: float = 10.0,
 ):
     """Renders and saves a diagnostic forecast figure."""
     context_len = len(context)
@@ -130,8 +136,25 @@ def save_diagnostic_plot(
 
     plt.axvline(x=context_len - 0.5, color="black", linestyle="--", alpha=0.6, label="Forecast Horizon Boundary")
     
-    # Error band
+    # Tactical EW Range-Gate Corridor (shaded green)
+    plt.fill_between(
+        x_horiz,
+        ground_truth - tolerance_us,
+        ground_truth + tolerance_us,
+        color="tab:green",
+        alpha=0.18,
+        label=f"Tactical Gate (±{tolerance_us:.0f} μs)",
+    )
+
+    # Red Prediction Error Gap
     plt.fill_between(x_horiz, ground_truth, predictions, color="tab:red", alpha=0.15, label="Prediction Error Gap")
+
+    # Prevent micro-scale auto-zoom illusion on flat signals (e.g. stable radar)
+    all_visible = np.concatenate([context[-show_ctx_pts:], ground_truth, predictions])
+    y_min, y_max = float(all_visible.min()), float(all_visible.max())
+    if (y_max - y_min) < 30.0:
+        y_center = (y_max + y_min) / 2.0
+        plt.ylim(y_center - 18.0, y_center + 18.0)
 
     plt.title(f"TimesFM 3.0 Zero-Shot PRI Forecast | {dataset_name} ({sequence_id})", fontsize=13, fontweight="bold")
     plt.xlabel("Pulse Index (n)")
@@ -220,6 +243,7 @@ def evaluate_dataset(
                 context,
                 ground_truth,
                 preds,
+                tolerance_us=tolerance_us,
             )
 
     if not mae_list:
@@ -255,22 +279,22 @@ def evaluate_dataset(
 # ---------------------------------------------------------------------------
 
 def export_results(results: List[Dict[str, Any]], results_dir: Path):
-    """Saves structured results to CSV, Markdown, and LaTeX."""
+    """Saves structured results to metrics.csv and readable report.md."""
     results_dir.mkdir(parents=True, exist_ok=True)
     df = pd.DataFrame(results)
 
-    # 1. Save CSV
-    csv_path = results_dir / "timesfm_zero_shot_metrics.csv"
+    # 1. Save Benchmark Metrics CSV
+    csv_path = results_dir / "metrics.csv"
     df.to_csv(csv_path, index=False)
-    print(f"\n[SAVED] CSV Metrics: {csv_path}")
+    print(f"\n[SAVED] Benchmark Metrics CSV: {csv_path}")
 
-    # 2. Save Markdown Summary Table
-    md_path = results_dir / "timesfm_zero_shot_summary.md"
+    # 2. Save Markdown Report
+    md_path = results_dir / "report.md"
     md_content = [
-        "# TimesFM 3.0 Zero-Shot Benchmark Results\n",
+        "# TimesFM 3.0 Zero-Shot Benchmark Report\n",
         f"**Evaluated on**: {time.strftime('%Y-%m-%d %H:%M:%S')}\n",
-        f"**Context Length**: {results[0]['context_length']} pulses | **Forecast Horizon**: {results[0]['horizon_length']} pulses\n",
-        "\n| Radar Type | Error Level | Seqs | MAE (μs) | RMSE (μs) | Gate Hit Rate (±10μs) |",
+        f"**Context History**: {results[0]['context_length']} pulses | **Forecast Horizon**: {results[0]['horizon_length']} pulses\n",
+        "\n| Radar Type | Error Level | Seqs | MAE (us) | RMSE (us) | Gate Hit Rate (+/-10us) |",
         "|---|---|---:|---:|---:|---:|",
     ]
     for r in results:
@@ -279,35 +303,7 @@ def export_results(results: List[Dict[str, Any]], results_dir: Path):
             f"**{r['mae_us']:.2f}** | {r['rmse_us']:.2f} | {r['gate_hit_rate_pct']:.1f}% |"
         )
     md_path.write_text("\n".join(md_content), encoding="utf-8")
-    print(f"[SAVED] Markdown Summary: {md_path}")
-
-    # 3. Save LaTeX Table for Thesis
-    tex_path = results_dir / "timesfm_zero_shot_table.tex"
-    tex_lines = [
-        "% --- TimesFM 3.0 Zero-Shot Evaluation Table for PULSAR Graduation Thesis ---",
-        "\\begin{table}[htbp]",
-        "\\centering",
-        "\\caption{Zero-Shot TimesFM 3.0 PRI Forecasting Performance on PULSAR Benchmark}",
-        "\\label{tab:timesfm_zero_shot}",
-        "\\begin{tabular}{llcccc}",
-        "\\hline",
-        "\\textbf{Radar Type} & \\textbf{Error Level} & \\textbf{Test Seqs} & \\textbf{MAE ($\\mu$s)} & \\textbf{RMSE ($\\mu$s)} & \\textbf{Hit Rate (\\%)} \\\\",
-        "\\hline",
-    ]
-    for r in results:
-        rtype = r["radar_type"].replace("_", "\\_")
-        elevel = r["error_level"].replace("_", "\\_")
-        tex_lines.append(
-            f"{rtype} & {elevel} & {r['evaluated_sequences']} & "
-            f"{r['mae_us']:.2f} & {r['rmse_us']:.2f} & {r['gate_hit_rate_pct']:.1f}\\% \\\\"
-        )
-    tex_lines.extend([
-        "\\hline",
-        "\\end{tabular}",
-        "\\end{table}",
-    ])
-    tex_path.write_text("\n".join(tex_lines), encoding="utf-8")
-    print(f"[SAVED] LaTeX Table: {tex_path}")
+    print(f"[SAVED] Benchmark Report: {md_path}")
 
 
 # ---------------------------------------------------------------------------

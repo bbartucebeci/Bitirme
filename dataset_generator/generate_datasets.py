@@ -275,8 +275,9 @@ def generate_single_radar_sequence(
     error_level: str,
     pulses_per_sequence: int = 128,
 ) -> pd.DataFrame:
+    # Target rows = 1 anchor pulse + pulses_per_sequence interval deltas
+    target_rows = pulses_per_sequence + 1
     mean_pri = profile["mean_pri_us"]
-    duration = pulses_per_sequence * mean_pri
 
     radar_cls = RADAR_CLASSES[radar_type]
     radar = radar_cls(
@@ -296,6 +297,10 @@ def generate_single_radar_sequence(
     env = Environment()
     env.add_radar(radar)
 
+    # Receiver FIFO buffer: simulate with a margin to ensure target_rows are captured
+    sim_pulses = int(np.ceil(target_rows * 1.5)) + 10
+    duration = sim_pulses * mean_pri
+
     df = env.generate(
         duration=duration,
         start_time=0.0,
@@ -309,14 +314,28 @@ def generate_single_radar_sequence(
         quantize=error_config["quantize"],
     )
 
-    if df.empty:
-        raise ValueError(f"Generated empty sequence for {sequence_id}")
+    if len(df) < target_rows:
+        sim_pulses = int(target_rows * 3.0)
+        df = env.generate(
+            duration=sim_pulses * mean_pri,
+            start_time=0.0,
+            toa_noise_std=error_config["toa_noise_std"],
+            freq_noise_std=error_config["freq_noise_std"],
+            pw_noise_std=error_config["pw_noise_std"],
+            amp_noise_std=error_config["amp_noise_std"],
+            aoa_noise_std=error_config["aoa_noise_std"],
+            global_drop_rate=error_config["global_drop_rate"],
+            noise_rate=error_config["noise_rate"],
+            quantize=error_config["quantize"],
+        )
 
-    df = df.sort_values("TOA").reset_index(drop=True)
+    # Receiver FIFO buffer: capture exactly target_rows
+    df = df.sort_values("TOA").iloc[:target_rows].copy().reset_index(drop=True)
     df["sequence_id"] = sequence_id
     df["pulse_index"] = np.arange(len(df), dtype=int)
     df["radar_type"] = radar_type
     df["error_level"] = error_level
+    df["Measured_Delta_TOA"] = df["TOA"].diff().fillna(0.0)
 
     cols = [c for c in OUTPUT_COLUMNS if c in df.columns]
     return df[cols]
