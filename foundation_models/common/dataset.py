@@ -246,7 +246,7 @@ def load_multivariate_sequence_arrays(
 
 
 def load_multivariate_dataset_sequences(
-    dataset_dir: Path,
+    dataset_dir: Path | str,
     split: str = "test",
     max_seqs: Optional[int] = None,
 ) -> List[Tuple[str, np.ndarray, np.ndarray, np.ndarray]]:
@@ -255,7 +255,7 @@ def load_multivariate_dataset_sequences(
     Returns:
         List of (sequence_id, ctx_channels (5, N), tgt_channels (5, N), mask (N,))
     """
-    split_dir = dataset_dir / split
+    split_dir = Path(dataset_dir) / split
     if not split_dir.exists():
         raise FileNotFoundError(f"Split directory not found: {split_dir}")
 

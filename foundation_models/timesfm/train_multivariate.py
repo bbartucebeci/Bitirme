@@ -222,7 +222,7 @@ def main():
 
     # 4. Training Loop
     best_val_loss = float("inf")
-    checkpoint_best = args.save_dir / "best_model"
+    checkpoint_best = PROJECT_ROOT / "models" / "timesfm_lora" / f"multivariate_{args.profile_mode}" / "best_model"
     checkpoint_best.parent.mkdir(parents=True, exist_ok=True)
 
     print("\n" + "-" * 80)

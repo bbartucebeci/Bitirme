@@ -1,9 +1,9 @@
-# PULSAR: Comprehensive TimesFM 3.0 Benchmark Summary (Univariate Fixed Profile)
+# PULSAR: Comprehensive TimesFM 3.0 Benchmark Summary [Univariate Fixed Profile]
 
-**Compiled on**: 2026-10-26 20:29:56
+**Compiled on**: 2026-10-26 22:05:46
 
-This report provides an end-to-end performance assessment of Google TimesFM 3.0 across all 5 Pulse Description Word (PDW) parameters.
-Crucially, **receiver noise pulses, false alarms, and missing gaps are filtered out**, evaluating model predictions strictly against ground-truth emitter pulses.
+Evaluates off-the-shelf Zero-Shot vs. LoRA Fine-Tuned TimesFM 3.0 across all 5 PDW parameters on fixed profile datasets.
+Non-emitter pulses and false alarms are masked out; errors reflect true emitter pulse tracking accuracy.
 
 ---
 

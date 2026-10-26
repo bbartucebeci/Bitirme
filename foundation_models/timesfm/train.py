@@ -213,7 +213,8 @@ def main():
 
     # 4. Training Loop
     best_val_loss = float("inf")
-    checkpoint_subdir = args.save_dir / param_slug / "best_model"
+    save_rel = Path(args.profile_mode) / param_slug if args.profile_mode != "fixed" else Path(param_slug)
+    checkpoint_subdir = args.save_dir / save_rel / "best_model"
     checkpoint_subdir.parent.mkdir(parents=True, exist_ok=True)
 
     print("\n" + "-" * 75)

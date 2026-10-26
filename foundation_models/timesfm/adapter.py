@@ -137,14 +137,16 @@ class TimesFMLoRAEngine:
         print(f"[CHECKPOINT] LoRA weights saved to: {save_dir}")
 
     @classmethod
-    def load_for_inference(cls, weights_dir: Optional[Path] = None, model_id: str = "google/timesfm-3.0-pytorch") -> TimesFM3Forecaster:
+    def load_for_inference(cls, weights_dir: Optional[Path | str] = None, model_id: str = "google/timesfm-3.0-pytorch") -> TimesFM3Forecaster:
         """Loads TimesFM 3.0, optionally applying and merging trained LoRA weights."""
         tfm = TimesFM3Forecaster.from_pretrained(model_id, per_core_batch_size=32)
-        if weights_dir is not None and weights_dir.exists():
-            print(f"[LOAD] Applying LoRA adapter from: {weights_dir}")
-            peft_model = PeftModel.from_pretrained(tfm.model, str(weights_dir))
-            merged_model = peft_model.merge_and_unload()
-            tfm.model = merged_model
-            print("[MERGED] LoRA weights successfully fused into native TimesFM backbone.")
+        if weights_dir is not None:
+            weights_path = Path(weights_dir)
+            if weights_path.exists():
+                print(f"[LOAD] Applying LoRA adapter from: {weights_path}")
+                peft_model = PeftModel.from_pretrained(tfm.model, str(weights_path))
+                merged_model = peft_model.merge_and_unload()
+                tfm.model = merged_model
+                print("[MERGED] LoRA weights successfully fused into native TimesFM backbone.")
         return tfm
 
