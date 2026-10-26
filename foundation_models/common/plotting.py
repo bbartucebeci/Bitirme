@@ -118,3 +118,130 @@ def save_forecast_plot(
     plt.savefig(plot_path, dpi=180)
     plt.close()
 
+
+def save_multivariate_forecast_plot(
+    plot_path: Path,
+    title: str,
+    context_5xN: np.ndarray,
+    ground_truth_5xN: np.ndarray,
+    predictions_5xN: np.ndarray,
+    tolerances: list[float] | None = None,
+    param_names: list[str] | None = None,
+    units: list[str] | None = None,
+    show_ctx_pts: int = 40,
+):
+    """Renders a synchronized 5-panel tactical dashboard forecast plot.
+
+    Panels:
+    1. Pulse Repetition Interval (PRI, us)
+    2. Carrier Frequency (RF, MHz)
+    3. Pulse Width (PW, us)
+    4. Angle of Arrival (AOA, deg)
+    5. Received Peak Power (Amplitude, dBm)
+    """
+    if tolerances is None:
+        tolerances = [10.0, 2.0, 0.1, 2.0, 2.0]
+    if param_names is None:
+        param_names = ["PRI", "Frequency", "PW", "AOA", "Amplitude"]
+    if units is None:
+        units = ["μs", "MHz", "μs", "°", "dBm"]
+
+    num_channels = context_5xN.shape[0]
+    context_len = context_5xN.shape[1]
+    horizon_len = ground_truth_5xN.shape[1]
+
+    actual_ctx_pts = min(show_ctx_pts, context_len)
+    x_ctx = np.arange(context_len - actual_ctx_pts, context_len)
+    x_horiz = np.arange(context_len, context_len + horizon_len)
+
+    fig, axes = plt.subplots(num_channels, 1, figsize=(14, 3.2 * num_channels), sharex=True)
+    if num_channels == 1:
+        axes = [axes]
+
+    for c in range(num_channels):
+        ax = axes[c]
+        p_name = param_names[c]
+        p_unit = units[c]
+        tol = tolerances[c]
+
+        ctx_c = context_5xN[c]
+        gt_c = ground_truth_5xN[c]
+        pred_c = predictions_5xN[c]
+
+        # 1. Observed Context
+        ax.plot(
+            x_ctx,
+            ctx_c[-actual_ctx_pts:],
+            "o-",
+            color="tab:blue",
+            markersize=3.5,
+            linewidth=1.2,
+            label="Observed Context" if c == 0 else None,
+        )
+
+        # 2. Ground Truth
+        ax.plot(
+            x_horiz,
+            gt_c,
+            "s-",
+            color="tab:green",
+            markersize=3.5,
+            linewidth=1.2,
+            label="Ground Truth (Emitter)" if c == 0 else None,
+        )
+
+        # 3. Model Prediction
+        ax.plot(
+            x_horiz,
+            pred_c,
+            "^--",
+            color="tab:red",
+            markersize=4.0,
+            linewidth=1.2,
+            label="Multivariate Forecast" if c == 0 else None,
+        )
+
+        # 4. Boundary
+        ax.axvline(x=context_len - 0.5, color="black", linestyle="--", alpha=0.5)
+
+        # 5. Tactical Tolerance Corridor
+        ax.fill_between(
+            x_horiz,
+            gt_c - tol,
+            gt_c + tol,
+            color="tab:green",
+            alpha=0.18,
+            label=f"Tactical Gate (±{tol:g} {p_unit})" if c == 0 else None,
+        )
+
+        # 6. Prediction Error Gap
+        ax.fill_between(
+            x_horiz,
+            gt_c,
+            pred_c,
+            color="tab:red",
+            alpha=0.15,
+        )
+
+        # Dynamic range guard
+        all_vis = np.concatenate([ctx_c[-actual_ctx_pts:], gt_c, pred_c])
+        y_min, y_max = float(all_vis.min()), float(all_vis.max())
+        min_span = max(tol * 3.0, 1.0)
+        if (y_max - y_min) < min_span:
+            y_ctr = (y_max + y_min) / 2.0
+            ax.set_ylim(y_ctr - min_span * 0.6, y_ctr + min_span * 0.6)
+
+        ax.set_ylabel(f"{p_name} ({p_unit})", fontsize=10, fontweight="bold")
+        ax.grid(True, linestyle=":", alpha=0.6)
+        if c == 0:
+            ax.legend(loc="upper right", frameon=True, fontsize=9)
+
+    axes[-1].set_xlabel("Pulse Index (n)", fontsize=11, fontweight="bold")
+    fig.suptitle(title, fontsize=13, fontweight="bold", y=0.995)
+    plt.tight_layout()
+
+    plot_path.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(plot_path, dpi=180, bbox_inches="tight")
+    plt.close()
+
+

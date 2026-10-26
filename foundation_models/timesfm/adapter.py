@@ -92,6 +92,44 @@ class TimesFMLoRAEngine:
         preds = out_logits[:, 0, :, 4]
         return preds
 
+    def forward_train_multivariate(
+        self,
+        context_tensor: torch.Tensor,
+        horizon: int = 32,
+        scales: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
+        """Differentiable forward pass for 5-channel multivariate PDW context.
+
+        Args:
+            context_tensor: (batch_size, 5, context_len) float tensor.
+            horizon: forecast horizon length.
+            scales: (5,) or (1, 5, 1) float tensor for physical normalization.
+
+        Returns:
+            Normalized point predictions tensor of shape (batch_size, 5, horizon).
+        """
+        if scales is None:
+            # PRI: 1000us, RF: 10000MHz, PW: 1.0us, AOA: 100.0deg, Amp: 50.0dBm
+            scales = torch.tensor([1000.0, 10000.0, 1.0, 100.0, 50.0], dtype=torch.float32)
+
+        scales_dev = scales.view(1, -1, 1).to(self.device)
+        ctx = (context_tensor.to(self.device) / scales_dev)
+
+        # Guard against zero-variance singularity on flat channels
+        std_val = ctx.std(dim=-1, keepdim=True)
+        is_flat = std_val < 1e-4
+        if is_flat.any():
+            ctx = torch.where(is_flat, ctx + torch.randn_like(ctx) * 1e-4, ctx)
+
+        out_logits = self.base_model.decode.__wrapped__(
+            self.peft_model,
+            ctx,
+            horizon=horizon,
+        )
+        # Shape: (batch_size, 5, horizon)
+        preds = out_logits[:, :, :horizon, 4]
+        return preds
+
     def save_lora_checkpoint(self, save_dir: Path):
         """Saves LoRA adapter weights and config."""
         save_dir.mkdir(parents=True, exist_ok=True)

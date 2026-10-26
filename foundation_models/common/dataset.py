@@ -189,3 +189,182 @@ def create_unified_pdw_dataloader(
         shuffle=shuffle,
         drop_last=False,
     )
+
+
+# ==============================================================================
+# MULTIVARIATE (5-CHANNEL) DATASET INGESTION & PIPELINE
+# ==============================================================================
+
+MULTIVARIATE_CHANNELS = ["PRI", "Frequency", "PW", "AOA", "Amplitude"]
+MULTIVARIATE_SCALES = np.array([1000.0, 10000.0, 1.0, 100.0, 50.0], dtype=np.float32)
+MULTIVARIATE_WEIGHTS = np.array([0.35, 0.25, 0.15, 0.15, 0.10], dtype=np.float32)
+MULTIVARIATE_TOLERANCES = [10.0, 2.0, 0.1, 2.0, 2.0]
+MULTIVARIATE_UNITS = ["us", "MHz", "us", "deg", "dBm"]
+
+
+def load_multivariate_sequence_arrays(
+    csv_path: Path,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Reads a PDW CSV file and extracts full 5-channel context and ground truth.
+
+    Returns:
+        Tuple of (ctx_channels, tgt_channels, emitter_mask):
+        - ctx_channels: (5, sequence_len) float32 array
+        - tgt_channels: (5, sequence_len) float32 array
+        - emitter_mask: (sequence_len,) bool array
+    """
+    df = pd.read_csv(csv_path)
+
+    if len(df) == 129 and "Measured_Delta_TOA" in df.columns and df["Measured_Delta_TOA"].iloc[0] == 0.0:
+        df = df.iloc[1:].reset_index(drop=True)
+
+    if "Radar_ID" in df.columns:
+        emitter_mask = (df["Radar_ID"].astype(str) == "R_SINGLE").to_numpy(dtype=bool)
+    else:
+        emitter_mask = np.ones(len(df), dtype=bool)
+
+    # 1. PRI (Observed Delta TOA vs Ground Truth PRI)
+    ctx_pri = df["Measured_Delta_TOA"].to_numpy(dtype=np.float32)
+    tgt_pri = df["PRI"].to_numpy(dtype=np.float32) if "PRI" in df.columns else ctx_pri.copy()
+
+    # 2. Carrier Frequency
+    rf_vals = df["Frequency"].to_numpy(dtype=np.float32)
+
+    # 3. Pulse Width
+    pw_vals = df["PW"].to_numpy(dtype=np.float32)
+
+    # 4. Angle of Arrival
+    aoa_vals = df["AOA"].to_numpy(dtype=np.float32)
+
+    # 5. Amplitude
+    amp_vals = df["Amplitude"].to_numpy(dtype=np.float32)
+
+    ctx_channels = np.stack([ctx_pri, rf_vals, pw_vals, aoa_vals, amp_vals], axis=0)
+    tgt_channels = np.stack([tgt_pri, rf_vals, pw_vals, aoa_vals, amp_vals], axis=0)
+
+    return ctx_channels, tgt_channels, emitter_mask
+
+
+def load_multivariate_dataset_sequences(
+    dataset_dir: Path,
+    split: str = "test",
+    max_seqs: Optional[int] = None,
+) -> List[Tuple[str, np.ndarray, np.ndarray, np.ndarray]]:
+    """Loads all 5-channel sequences for a dataset directory and split.
+
+    Returns:
+        List of (sequence_id, ctx_channels (5, N), tgt_channels (5, N), mask (N,))
+    """
+    split_dir = dataset_dir / split
+    if not split_dir.exists():
+        raise FileNotFoundError(f"Split directory not found: {split_dir}")
+
+    sequences = []
+    seq_files = sorted(list(split_dir.glob("seq_*.csv")))
+    if seq_files:
+        if max_seqs is not None and max_seqs > 0:
+            seq_files = seq_files[:max_seqs]
+        for f in seq_files:
+            ctx, tgt, mask = load_multivariate_sequence_arrays(f)
+            sequences.append((f.stem, ctx, tgt, mask))
+        return sequences
+
+    # Fallback to sequences.csv
+    comb_file = split_dir / "sequences.csv"
+    if comb_file.exists():
+        df_all = pd.read_csv(comb_file)
+        unique_ids = df_all["sequence_id"].unique()
+        if max_seqs is not None and max_seqs > 0:
+            unique_ids = unique_ids[:max_seqs]
+        for sid in unique_ids:
+            df_seq = df_all[df_all["sequence_id"] == sid].sort_values("pulse_index")
+            if len(df_seq) == 129 and df_seq["Measured_Delta_TOA"].iloc[0] == 0.0:
+                df_seq = df_seq.iloc[1:].reset_index(drop=True)
+
+            mask = (df_seq["Radar_ID"] == "R_SINGLE").to_numpy(dtype=bool) if "Radar_ID" in df_seq.columns else np.ones(len(df_seq), dtype=bool)
+            ctx_pri = df_seq["Measured_Delta_TOA"].to_numpy(dtype=np.float32)
+            tgt_pri = df_seq["PRI"].to_numpy(dtype=np.float32) if "PRI" in df_seq.columns else ctx_pri.copy()
+            rf_vals = df_seq["Frequency"].to_numpy(dtype=np.float32)
+            pw_vals = df_seq["PW"].to_numpy(dtype=np.float32)
+            aoa_vals = df_seq["AOA"].to_numpy(dtype=np.float32)
+            amp_vals = df_seq["Amplitude"].to_numpy(dtype=np.float32)
+
+            ctx = np.stack([ctx_pri, rf_vals, pw_vals, aoa_vals, amp_vals], axis=0)
+            tgt = np.stack([tgt_pri, rf_vals, pw_vals, aoa_vals, amp_vals], axis=0)
+            sequences.append((sid, ctx, tgt, mask))
+        return sequences
+
+    raise FileNotFoundError(f"No sequences found in {split_dir}")
+
+
+class MultivariatePDWDataset(Dataset):
+    """PyTorch Dataset for 5-channel Joint Multivariate Forecasting."""
+
+    def __init__(
+        self,
+        sequences: List[Tuple[str, np.ndarray, np.ndarray, np.ndarray]],
+        context_len: int = 96,
+        horizon_len: int = 32,
+    ):
+        self.items = []
+        self.context_len = context_len
+        self.horizon_len = horizon_len
+
+        required_len = context_len + horizon_len
+        for seq_id, ctx, tgt, mask in sequences:
+            if ctx.shape[1] >= required_len:
+                c = ctx[:, :context_len]
+                t = tgt[:, context_len : context_len + horizon_len]
+                m = mask[context_len : context_len + horizon_len]
+                self.items.append((seq_id, c, t, m))
+
+    def __len__(self) -> int:
+        return len(self.items)
+
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        _, ctx, tgt, mask = self.items[idx]
+        ctx_tensor = torch.from_numpy(ctx.copy()).float()      # (5, context_len)
+        tgt_tensor = torch.from_numpy(tgt.copy()).float()      # (5, horizon_len)
+        mask_tensor = torch.from_numpy(mask.copy()).bool()     # (horizon_len,)
+        return ctx_tensor, tgt_tensor, mask_tensor
+
+
+def create_unified_multivariate_dataloader(
+    datasets_root: Path,
+    profile_mode: str = "fixed",
+    split: str = "train",
+    radar_types: Optional[List[str]] = None,
+    error_levels: Optional[List[str]] = None,
+    context_len: int = 96,
+    horizon_len: int = 32,
+    batch_size: int = 64,
+    shuffle: bool = True,
+    max_seqs_per_dataset: Optional[int] = None,
+) -> DataLoader:
+    """Builds a unified DataLoader combining 5-channel sequences across all datasets."""
+    if radar_types is None:
+        radar_types = ["stable", "jitter", "stagger", "dwell_and_switch", "sliding"]
+    if error_levels is None:
+        error_levels = ["clean", "error_lv1", "error_lv2", "error_lv3"]
+
+    all_sequences = []
+    for rtype in radar_types:
+        for elevel in error_levels:
+            folder_name = f"1000x128_{elevel}"
+            dataset_dir = datasets_root / rtype / folder_name
+            if dataset_dir.exists():
+                seqs = load_multivariate_dataset_sequences(
+                    dataset_dir,
+                    split=split,
+                    max_seqs=max_seqs_per_dataset,
+                )
+                all_sequences.extend(seqs)
+
+    dataset = MultivariatePDWDataset(all_sequences, context_len=context_len, horizon_len=horizon_len)
+    return DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        drop_last=False,
+    )
+
