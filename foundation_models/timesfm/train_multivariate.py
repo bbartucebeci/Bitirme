@@ -339,7 +339,9 @@ def main():
         # 6. Generate Comparative Report
         zs_csv = DEFAULT_RESULTS_ROOT / "zero_shot" / f"multivariate_{args.profile_mode}" / "metrics.csv"
         lora_csv = results_dir / "metrics.csv"
-        comp_md = DEFAULT_RESULTS_ROOT / f"comparison_zero_shot_vs_lora_multivariate_{args.profile_mode}.md"
+        comparisons_dir = DEFAULT_RESULTS_ROOT / "comparisons"
+        comparisons_dir.mkdir(parents=True, exist_ok=True)
+        comp_md = comparisons_dir / f"comparison_zero_shot_vs_lora_multivariate_{args.profile_mode}.md"
         build_multivariate_comparison_report(zs_csv, lora_csv, comp_md)
 
 

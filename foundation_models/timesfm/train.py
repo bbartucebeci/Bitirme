@@ -331,7 +331,9 @@ def main():
         zero_shot_dir = PROJECT_ROOT / "results" / "timesfm_3.0" / "zero_shot" / f"univariate_{args.profile_mode}" / param_slug
         zero_shot_csv = zero_shot_dir / "metrics.csv"
         lora_csv = target_results_dir / "metrics.csv"
-        comparison_md = PROJECT_ROOT / "results" / "timesfm_3.0" / f"comparison_zero_shot_vs_lora_{args.profile_mode}_{param_slug}.md"
+        comparisons_dir = PROJECT_ROOT / "results" / "timesfm_3.0" / "comparisons"
+        comparisons_dir.mkdir(parents=True, exist_ok=True)
+        comparison_md = comparisons_dir / f"comparison_zero_shot_vs_lora_{args.profile_mode}_{param_slug}.md"
 
         build_comparison_report(zero_shot_csv, lora_csv, comparison_md, unit=param_unit, param_name=param_name)
 

@@ -1,13 +1,18 @@
-# PULSAR: Comprehensive TimesFM 3.0 Benchmark Summary [Univariate Varying Profile]
+# PULSAR: Unified Benchmark Summary [Varying Profile]
 
-**Compiled on**: 2026-10-26 23:05:00
+**Compiled on**: 2026-10-27 00:19:35
 
-Evaluates off-the-shelf Zero-Shot vs. LoRA Fine-Tuned TimesFM 3.0 across all 5 PDW parameters on varying profile datasets.
-Non-emitter pulses and false alarms are masked out; errors reflect true emitter pulse tracking accuracy.
+Comprehensive performance report evaluating Google TimesFM 3.0 across all single-radar varying profile datasets.
+Outliers and non-emitter pulses are masked out ($\text{Radar\_ID} == \text{'R\_SINGLE'}$); all metrics evaluate true emitter pulse tracking.
 
 ---
 
-## Pulse Repetition Interval (PRI) (Gate Tolerance: ±10 μs)
+## 1. Univariate PDW Parameter Benchmarks (Varying)
+
+Evaluates Zero-Shot vs. Dedicated LoRA Fine-Tuning across all 5 parameters on 4,000 test sequences:
+
+
+### Pulse Repetition Interval (PRI) (Gate Tolerance: ±10 μs)
 
 | Radar Type | Error Level | Zero-Shot MAE (us) | LoRA SFT MAE (us) | MAE Δ (%) | Zero-Shot Hit Rate | LoRA Hit Rate | Hit Rate Δ |
 |---|---|---:|---:|---:|---:|---:|---:|
@@ -32,7 +37,7 @@ Non-emitter pulses and false alarms are masked out; errors reflect true emitter 
 | `sliding` | `error_lv2` | 46.92 | **26.19** | -44.2% | 25.2% | **43.8%** | +18.5% |
 | `sliding` | `error_lv3` | 62.71 | **38.39** | -38.8% | 15.7% | **27.9%** | +12.2% |
 
-## Carrier Frequency (RF) (Gate Tolerance: ±2 MHz)
+### Carrier Frequency (RF) (Gate Tolerance: ±2 MHz)
 
 | Radar Type | Error Level | Zero-Shot MAE (MHz) | LoRA SFT MAE (MHz) | MAE Δ (%) | Zero-Shot Hit Rate | LoRA Hit Rate | Hit Rate Δ |
 |---|---|---:|---:|---:|---:|---:|---:|
@@ -57,7 +62,7 @@ Non-emitter pulses and false alarms are masked out; errors reflect true emitter 
 | `sliding` | `error_lv2` | 0.70 | **0.65** | -7.8% | 93.5% | **95.3%** | +1.8% |
 | `sliding` | `error_lv3` | 8.62 | **1.67** | -80.6% | 79.7% | **82.7%** | +3.0% |
 
-## Pulse Width (PW) (Gate Tolerance: ±0.1 μs)
+### Pulse Width (PW) (Gate Tolerance: ±0.1 μs)
 
 | Radar Type | Error Level | Zero-Shot MAE (us) | LoRA SFT MAE (us) | MAE Δ (%) | Zero-Shot Hit Rate | LoRA Hit Rate | Hit Rate Δ |
 |---|---|---:|---:|---:|---:|---:|---:|
@@ -82,7 +87,7 @@ Non-emitter pulses and false alarms are masked out; errors reflect true emitter 
 | `sliding` | `error_lv2` | 0.02 | 0.02 | +0.0% | 99.9% | **100.0%** | +0.0% |
 | `sliding` | `error_lv3` | 0.04 | **0.04** | -2.4% | 94.6% | **94.9%** | +0.3% |
 
-## Angle of Arrival (AOA) (Gate Tolerance: ±2°)
+### Angle of Arrival (AOA) (Gate Tolerance: ±2°)
 
 | Radar Type | Error Level | Zero-Shot MAE (deg) | LoRA SFT MAE (deg) | MAE Δ (%) | Zero-Shot Hit Rate | LoRA Hit Rate | Hit Rate Δ |
 |---|---|---:|---:|---:|---:|---:|---:|
@@ -107,7 +112,7 @@ Non-emitter pulses and false alarms are masked out; errors reflect true emitter 
 | `sliding` | `error_lv2` | 0.16 | **0.16** | -0.6% | 100.0% | 100.0% | +0.0% |
 | `sliding` | `error_lv3` | 0.86 | **0.43** | -49.5% | 99.5% | **99.8%** | +0.3% |
 
-## Received Peak Power (Amplitude) (Gate Tolerance: ±2 dBm)
+### Received Peak Power (Amplitude) (Gate Tolerance: ±2 dBm)
 
 | Radar Type | Error Level | Zero-Shot MAE (dBm) | LoRA SFT MAE (dBm) | MAE Δ (%) | Zero-Shot Hit Rate | LoRA Hit Rate | Hit Rate Δ |
 |---|---|---:|---:|---:|---:|---:|---:|
@@ -131,3 +136,61 @@ Non-emitter pulses and false alarms are masked out; errors reflect true emitter 
 | `sliding` | `error_lv1` | 0.16 | **0.16** | -0.6% | 100.0% | 100.0% | +0.0% |
 | `sliding` | `error_lv2` | 0.41 | **0.40** | -0.7% | 100.0% | 100.0% | +0.0% |
 | `sliding` | `error_lv3` | 0.82 | **0.81** | -0.5% | 95.0% | **95.2%** | +0.1% |
+
+---
+
+## 2. Joint 5-Channel Multivariate Benchmarks (Varying)
+
+Predicts all 5 PDW channels simultaneously across the 32-pulse horizon using tactical priority weighted Huber loss.
+
+| Radar Type | Error Level | PRI ZS (μs) | PRI LoRA (μs) | PRI Δ | RF ZS (MHz) | RF LoRA (MHz) | PW LoRA (μs) | AOA LoRA (°) | Amp LoRA (dBm) |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `stable` | `clean` | 0.00 | 0.00 | +0.0% | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| `stable` | `error_lv1` | 0.12 | 0.13 | +6.1% | 0.21 | 0.29 | 0.01 | 0.04 | 0.16 |
+| `stable` | `error_lv2` | 0.84 | **0.62** | -26.4% | 0.79 | 0.92 | 0.02 | 0.17 | 0.40 |
+| `stable` | `error_lv3` | 1.05 | 1.12 | +6.2% | 1.37 | 1.47 | 0.04 | 0.41 | 0.81 |
+| `jitter` | `clean` | 48.58 | **48.56** | -0.0% | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| `jitter` | `error_lv1` | 49.06 | **47.62** | -2.9% | 1.67 | 0.40 | 0.01 | 0.05 | 0.16 |
+| `jitter` | `error_lv2` | 48.79 | **48.72** | -0.1% | 0.77 | 0.88 | 0.02 | 0.17 | 0.40 |
+| `jitter` | `error_lv3` | 48.16 | **48.16** | -0.0% | 1.80 | 2.20 | 0.04 | 0.41 | 0.81 |
+| `stagger` | `clean` | 3.30 | **2.08** | -37.0% | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| `stagger` | `error_lv1` | 36.29 | **25.08** | -30.9% | 0.20 | 0.22 | 0.01 | 0.44 | 0.16 |
+| `stagger` | `error_lv2` | 77.08 | **59.92** | -22.3% | 0.73 | 0.87 | 0.02 | 0.87 | 0.41 |
+| `stagger` | `error_lv3` | 101.33 | **93.84** | -7.4% | 1.66 | 1.67 | 0.04 | 1.75 | 0.81 |
+| `dwell_and_switch` | `clean` | 12.01 | **10.17** | -15.3% | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| `dwell_and_switch` | `error_lv1` | 18.49 | **10.56** | -42.9% | 0.20 | 0.21 | 0.01 | 0.04 | 0.16 |
+| `dwell_and_switch` | `error_lv2` | 36.34 | **24.51** | -32.5% | 0.83 | 0.96 | 0.02 | 0.17 | 0.40 |
+| `dwell_and_switch` | `error_lv3` | 57.97 | **42.33** | -27.0% | 1.77 | 1.54 | 0.04 | 0.41 | 0.80 |
+| `sliding` | `clean` | 36.47 | **9.30** | -74.5% | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| `sliding` | `error_lv1` | 19.32 | **10.29** | -46.7% | 0.15 | 0.20 | 0.01 | 0.04 | 0.16 |
+| `sliding` | `error_lv2` | 38.31 | **25.68** | -33.0% | 0.71 | 0.81 | 0.02 | 0.16 | 0.40 |
+| `sliding` | `error_lv3` | 54.62 | **36.43** | -33.3% | 9.08 | 2.03 | 0.04 | 0.41 | 0.82 |
+
+---
+
+## 3. Univariate vs. Joint 5-Channel Multivariate Performance (Varying)
+
+Direct side-by-side comparison between dedicated univariate adapters and the unified joint multivariate adapter:
+
+| Radar Type | Error Level | UV PRI MAE (μs) | MV PRI MAE (μs) | PRI Δ (%) | UV PRI Hit | MV PRI Hit | UV RF MAE (MHz) | MV RF MAE (MHz) |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `stable` | `clean` | 0.00 | 0.00 | +0.0% | 100.0% | 100.0% | 0.00 | 0.00 |
+| `stable` | `error_lv1` | 0.14 | **0.13** | -8.1% | 100.0% | 100.0% | 0.18 | 0.29 |
+| `stable` | `error_lv2` | 1.29 | **0.62** | -52.0% | 99.7% | 99.9% | 0.88 | 0.92 |
+| `stable` | `error_lv3` | 1.24 | **1.12** | -9.9% | 99.8% | 99.8% | 1.23 | 1.47 |
+| `jitter` | `clean` | 48.67 | **48.56** | -0.2% | 13.0% | 13.0% | 0.00 | 0.00 |
+| `jitter` | `error_lv1` | 47.78 | **47.62** | -0.3% | 13.3% | 13.3% | 0.35 | 0.40 |
+| `jitter` | `error_lv2` | 48.88 | **48.72** | -0.3% | 13.1% | 13.6% | 0.70 | 0.88 |
+| `jitter` | `error_lv3` | 48.42 | **48.16** | -0.5% | 14.3% | 14.1% | 1.79 | 2.20 |
+| `stagger` | `clean` | **0.35** | 2.08 | +491.4% | 100.0% | 100.0% | 0.00 | 0.00 |
+| `stagger` | `error_lv1` | 25.12 | **25.08** | -0.2% | 74.9% | 75.4% | 0.19 | 0.22 |
+| `stagger` | `error_lv2` | 61.20 | **59.92** | -2.1% | 37.7% | 37.7% | 0.68 | 0.87 |
+| `stagger` | `error_lv3` | 95.00 | **93.84** | -1.2% | 16.0% | 17.0% | 2.23 | 1.67 |
+| `dwell_and_switch` | `clean` | **0.46** | 10.17 | +2119.8% | 100.0% | 75.4% | 0.00 | 0.00 |
+| `dwell_and_switch` | `error_lv1` | 10.70 | **10.56** | -1.3% | 84.1% | 84.5% | 0.17 | 0.21 |
+| `dwell_and_switch` | `error_lv2` | 24.77 | **24.51** | -1.0% | 60.5% | 61.7% | 1.23 | 0.96 |
+| `dwell_and_switch` | `error_lv3` | 42.70 | **42.33** | -0.9% | 38.7% | 39.1% | 1.77 | 1.54 |
+| `sliding` | `clean` | **0.57** | 9.30 | +1534.0% | 100.0% | 72.6% | 0.00 | 0.00 |
+| `sliding` | `error_lv1` | **9.81** | 10.29 | +5.0% | 77.0% | 76.9% | 0.14 | 0.20 |
+| `sliding` | `error_lv2` | 26.19 | **25.68** | -2.0% | 43.8% | 44.6% | 0.65 | 0.81 |
+| `sliding` | `error_lv3` | 38.39 | **36.43** | -5.1% | 27.9% | 29.4% | 1.67 | 2.03 |
