@@ -19,6 +19,14 @@ CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent.parent
 DEFAULT_DATASETS_ROOT = PROJECT_ROOT / "datasets" / "single_radar"
 
+PARAM_SPECS = {
+    "PRI": {"name": "PRI", "slug": "pri", "unit": "us", "default_tol": 10.0, "scale": 1000.0},
+    "Frequency": {"name": "Carrier Frequency", "slug": "frequency", "unit": "MHz", "default_tol": 2.0, "scale": 1000.0},
+    "PW": {"name": "Pulse Width", "slug": "pw", "unit": "us", "default_tol": 0.1, "scale": 1.0},
+    "AOA": {"name": "Angle of Arrival", "slug": "aoa", "unit": "deg", "default_tol": 2.0, "scale": 100.0},
+    "Amplitude": {"name": "Amplitude", "slug": "amplitude", "unit": "dBm", "default_tol": 2.0, "scale": 50.0},
+}
+
 
 def evaluate_single_dataset(
     tfm: Any,
@@ -29,17 +37,13 @@ def evaluate_single_dataset(
     context_len: int,
     horizon_len: int,
     max_test_seqs: Optional[int],
+    target_param: str = "PRI",
     tolerance: float = 10.0,
-    target_col: str = "Measured_Delta_TOA",
     unit: str = "us",
     param_display_name: str = "PRI",
     plots_dir: Optional[Path] = None,
-    tolerance_us: Optional[float] = None,
 ) -> Optional[Dict[str, Any]]:
-    """Evaluates TimesFM on one dataset using batched GPU prediction."""
-    if tolerance_us is not None:
-        tolerance = tolerance_us
-
+    """Evaluates TimesFM on one dataset using batched GPU prediction and emitter pulse masking."""
     if not dataset_dir.exists():
         print(f"[SKIP] Directory not found: {dataset_dir}")
         return None
@@ -49,7 +53,7 @@ def evaluate_single_dataset(
             dataset_dir,
             split="test",
             max_seqs=max_test_seqs,
-            col_name=target_col,
+            target_param=target_param,
         )
     except Exception as e:
         print(f"[ERROR] Failed to load {dataset_display}: {e}")
@@ -61,11 +65,12 @@ def evaluate_single_dataset(
 
     valid_items = []
     required_len = context_len + horizon_len
-    for seq_id, vals in test_seqs:
-        if len(vals) >= required_len:
-            ctx = vals[:context_len]
-            gt = vals[context_len : context_len + horizon_len]
-            valid_items.append((seq_id, ctx, gt))
+    for seq_id, ctx_vals, tgt_vals, mask_vals in test_seqs:
+        if len(ctx_vals) >= required_len:
+            ctx = ctx_vals[:context_len]
+            gt = tgt_vals[context_len : context_len + horizon_len]
+            mask = mask_vals[context_len : context_len + horizon_len]
+            valid_items.append((seq_id, ctx, gt, mask))
 
     if not valid_items:
         print(f"[SKIP] No sequences meet required length ({required_len}) in {dataset_display}")
@@ -80,12 +85,12 @@ def evaluate_single_dataset(
 
     mae_list, rmse_list, hit_rate_list = [], [], []
 
-    for idx, (seq_id, ctx, gt) in enumerate(valid_items):
+    for idx, (seq_id, ctx, gt, mask) in enumerate(valid_items):
         preds = np.asarray(outputs[idx].forecast, dtype=np.float32).squeeze()[:horizon_len]
-        metrics = compute_forecast_metrics(preds, gt, tolerance_us=tolerance)
+        metrics = compute_forecast_metrics(preds, gt, tolerance=tolerance, mask=mask, unit=unit)
 
-        mae_list.append(metrics["mae_us"])
-        rmse_list.append(metrics["rmse_us"])
+        mae_list.append(metrics["mae"])
+        rmse_list.append(metrics["rmse"])
         hit_rate_list.append(metrics["hit_rate_pct"])
 
         # Diagnostic plot for the first sequence
@@ -119,7 +124,7 @@ def evaluate_single_dataset(
     return {
         "radar_type": radar_type,
         "error_level": error_level,
-        "parameter": target_col,
+        "parameter": target_param,
         "evaluated_sequences": len(mae_list),
         "context_length": context_len,
         "horizon_length": horizon_len,
@@ -170,7 +175,7 @@ def main():
     parser = argparse.ArgumentParser(description="PULSAR: TimesFM 3.0 Evaluation Suite")
     parser.add_argument("--profile-mode", choices=["fixed", "varying"], default="fixed")
     parser.add_argument("--modality", choices=["univariate", "multivariate"], default="univariate")
-    parser.add_argument("--target-col", choices=["Measured_Delta_TOA", "Frequency", "PW"], default="Measured_Delta_TOA", help="Target parameter column")
+    parser.add_argument("--target-param", "--target-col", dest="target_param", choices=list(PARAM_SPECS.keys()) + ["Measured_Delta_TOA"], default="PRI", help="Target PDW parameter")
     parser.add_argument("--radar-type", choices=["stable", "jitter", "stagger", "dwell_and_switch", "sliding", "all"], default="all")
     parser.add_argument("--error-level", choices=["clean", "error_lv1", "error_lv2", "error_lv3", "all"], default="all")
     parser.add_argument("--weights-dir", type=Path, default=None, help="Path to fine-tuned LoRA checkpoint directory")
@@ -184,34 +189,18 @@ def main():
 
     args = parser.parse_args()
 
-    # Determine parameter meta
-    if args.target_col == "Measured_Delta_TOA":
-        param_name = "PRI"
-        param_unit = "us"
-        default_tol = 10.0
-        param_slug = ""
-    elif args.target_col == "Frequency":
-        param_name = "Carrier Frequency"
-        param_unit = "MHz"
-        default_tol = 2.0
-        param_slug = "frequency"
-    elif args.target_col == "PW":
-        param_name = "Pulse Width"
-        param_unit = "us"
-        default_tol = 0.1
-        param_slug = "pw"
-    else:
-        param_name = args.target_col
-        param_unit = "units"
-        default_tol = 1.0
-        param_slug = args.target_col.lower()
+    # Map parameter specifications
+    param_key = "PRI" if args.target_param == "Measured_Delta_TOA" else args.target_param
+    spec = PARAM_SPECS.get(param_key, {"name": param_key, "slug": param_key.lower(), "unit": "units", "default_tol": 1.0, "scale": 1.0})
 
-    tolerance = args.tolerance or args.tolerance_us or default_tol
+    param_name = spec["name"]
+    param_unit = spec["unit"]
+    param_slug = spec["slug"]
+    tolerance = args.tolerance or args.tolerance_us or spec["default_tol"]
 
     regime = "lora_sft" if args.weights_dir is not None else "zero_shot"
     if args.results_dir is None:
-        base_dir = PROJECT_ROOT / "results" / "timesfm_3.0" / regime / f"{args.modality}_{args.profile_mode}"
-        target_dir = base_dir / param_slug if param_slug else base_dir
+        target_dir = PROJECT_ROOT / "results" / "timesfm_3.0" / regime / f"{args.modality}_{args.profile_mode}" / param_slug
     else:
         target_dir = args.results_dir
 
@@ -224,7 +213,7 @@ def main():
     tfm = TimesFMLoRAEngine.load_for_inference(weights_dir=args.weights_dir)
 
     print("\n" + "=" * 70)
-    print(f"Beginning Evaluation [{regime.upper()}] for {param_name} ({args.target_col}) across {len(radar_types) * len(error_levels)} Datasets...")
+    print(f"Beginning Evaluation [{regime.upper()}] for {param_name} ({param_key}) across {len(radar_types) * len(error_levels)} Datasets...")
     print(f"Target Directory: {target_dir}")
     print(f"Context: {args.context_len} pulses | Horizon: {args.horizon} pulses | Tolerance: ±{tolerance:g} {param_unit}")
     print("=" * 70 + "\n")
@@ -247,8 +236,8 @@ def main():
                 context_len=args.context_len,
                 horizon_len=args.horizon,
                 max_test_seqs=args.max_test_seqs,
+                target_param=param_key,
                 tolerance=tolerance,
-                target_col=args.target_col,
                 unit=param_unit,
                 param_display_name=param_name,
                 plots_dir=plots_dir,
@@ -268,4 +257,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

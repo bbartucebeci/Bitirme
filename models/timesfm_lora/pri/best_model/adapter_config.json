@@ -36,9 +36,9 @@
   "revision": null,
   "target_modules": [
     "seq_attn.value_proj",
-    "ff0",
+    "ff1",
     "seq_attn.query_proj",
-    "ff1"
+    "ff0"
   ],
   "target_parameters": null,
   "task_type": null,
