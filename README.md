@@ -23,7 +23,8 @@ PULSAR is an Electronic Support Measures (ESM) / Electronic Intelligence (ELINT)
 7. [Getting Started & Installation](#7-getting-started--installation)
 8. [CLI Generator Usage Guide](#8-cli-generator-usage-guide)
 9. [Visualization & Interactive Exploration](#9-visualization--interactive-exploration)
-10. [Roadmap: Foundation Models & FPGA Deployment](#10-roadmap-foundation-models--fpga-deployment)
+10. [Foundation Models Suite (Google TimesFM 3.0)](#10-foundation-models-suite-google-timesfm-30)
+11. [Roadmap: Hardware Acceleration & FPGA Deployment](#11-roadmap-hardware-acceleration--fpga-deployment)
 
 ---
 
@@ -385,27 +386,190 @@ Automatically detects any generated dataset under `datasets/` and renders a 4-pa
 
 ---
 
-## 10. Roadmap: Foundation Models & FPGA Deployment
+## 10. Foundation Models Suite (Google TimesFM 3.0)
 
-As specified in [`PULSAR.md`](file:///c:/Users/Bu%20Bilgisayar/Desktop/Lessons/Bitirme%20Projesi/Bitirme/PULSAR.md), the project proceeds through three sequential phases:
+PULSAR incorporates time-series foundation models to predict future radar pulse characteristics and track complex, agile electronic warfare emitters. We benchmark **Google TimesFM 3.0** (`google/timesfm-2.0-500m-pytorch` / 330M parameters) in two regimes:
+1. **Zero-Shot Generalization**: Evaluating off-the-shelf pre-trained transformer capabilities on electronic warfare pulse streams.
+2. **Supervised Fine-Tuning (LoRA SFT)**: Adapting the foundation model to discrete, deterministic radar timing transitions using Low-Rank Adaptation (LoRA) on temporal attention and MLP projections.
+
+---
+
+### 10.1. Modular Codebase Architecture
+
+The foundation models pipeline is decoupled from dataset generation formats. Data ingestion, evaluation metrics, and plotting utilities are isolated under `foundation_models/common/`, allowing models and training regimes to be executed and modified independently:
+
+```text
+foundation_models/
+├── common/
+│   ├── dataset.py        # Centralized sequence loader & PyTorch DataLoader (supports PRI, RF, PW)
+│   ├── metrics.py        # EW Metrics: MAE, RMSE, Tactical Range-Gate Hit Rate (±10 μs)
+│   └── plotting.py       # Diagnostic forecast visualizer with shaded tactical corridors
+└── timesfm/
+    ├── adapter.py        # TimesFMLoRAEngine: PEFT LoRA, scale-normalization & zero-variance dither
+    ├── evaluate.py       # Standalone CLI for Zero-Shot or LoRA checkpoint evaluation
+    └── train.py          # Supervised Fine-Tuning CLI (Huber loss, validation, auto-report)
+```
+
+---
+
+### 10.2. Developer & Reproduction Guide
+
+#### 1. Prerequisites & Installation
+Ensure PyTorch with CUDA support and the official Google TimesFM package are installed:
+```bash
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+pip install peft "timesfm[torch]"
+```
+
+#### 2. Running Zero-Shot PRI Evaluation
+To evaluate the pre-trained base model across all 20 single-radar fixed datasets (4,000 sequences total):
+```bash
+python -m foundation_models.timesfm.evaluate \
+    --profile-mode fixed \
+    --target-col Measured_Delta_TOA \
+    --tolerance 10.0 \
+    --radar-type all \
+    --error-level all
+```
+* Results are exported to: `results/timesfm_3.0/zero_shot/univariate_fixed/` (`metrics.csv`, `report.md`, and 20 diagnostic plots).
+
+#### 3. Running Supervised Fine-Tuning (LoRA SFT)
+Train the model with LoRA adapting both **Temporal Self-Attention** (`query_proj`, `value_proj`) and **Feed-Forward MLP** (`ff0`, `ff1`) projections across all 20 transformer layers:
+```bash
+python -m foundation_models.timesfm.train \
+    --profile-mode fixed \
+    --target-col Measured_Delta_TOA \
+    --epochs 3 \
+    --batch-size 64 \
+    --lr 1e-4 \
+    --huber-beta 5.0 \
+    --lora-r 16 \
+    --lora-alpha 32
+```
+* **Trainable Parameters**: 3,276,800 out of 333,987,776 (0.98% of model; 99.02% frozen).
+* **Training Time**: ~3.5 minutes for 3 epochs on an NVIDIA RTX 4060 GPU (~2.2 GB VRAM).
+* **Output**: Best checkpoint saved to `models/timesfm_lora/pri/best_model`. Automated post-training evaluation runs across all 20 test datasets, and a comparative report is generated at `results/timesfm_3.0/comparison_zero_shot_vs_lora_fixed.md`.
+
+#### 4. Evaluating a Fine-Tuned LoRA Checkpoint Individually
+To evaluate an existing LoRA checkpoint (weights are fused via `merge_and_unload()` at load time):
+```bash
+python -m foundation_models.timesfm.evaluate \
+    --profile-mode fixed \
+    --weights-dir models/timesfm_lora/pri/best_model \
+    --target-col Measured_Delta_TOA \
+    --tolerance 10.0
+```
+
+#### 5. Benchmarking Other PDW Parameters (Carrier Frequency & Pulse Width)
+Evaluate TimesFM Zero-Shot on Carrier Frequency (RF) with $\pm 2.0\text{ MHz}$ receiver filter tolerance:
+```bash
+python -m foundation_models.timesfm.evaluate \
+    --profile-mode fixed \
+    --target-col Frequency \
+    --tolerance 2.0
+```
+Evaluate TimesFM Zero-Shot on Pulse Width (PW) with $\pm 0.1\ \mu\text{s}$ pulse duration tolerance:
+```bash
+python -m foundation_models.timesfm.evaluate \
+    --profile-mode fixed \
+    --target-col PW \
+    --tolerance 0.1
+```
+
+---
+
+### 10.3. CLI Arguments Reference
+
+#### `foundation_models.timesfm.evaluate`
+| Argument | Type | Default | Description |
+|---|---|---|---|
+| `--profile-mode` | Choice | `fixed` | Target dataset regime (`fixed` or `varying`). |
+| `--target-col` | Choice | `Measured_Delta_TOA` | Target PDW parameter: `Measured_Delta_TOA`, `Frequency`, `PW`. |
+| `--radar-type` | Choice | `all` | Radar type (`stable`, `jitter`, `stagger`, `dwell_and_switch`, `sliding`, or `all`). |
+| `--error-level` | Choice | `all` | Channel error level (`clean`, `error_lv1`, `error_lv2`, `error_lv3`, or `all`). |
+| `--weights-dir` | Path | `None` | Path to fine-tuned LoRA checkpoint. If omitted, evaluates Zero-Shot. |
+| `--context-len` | Int | `96` | Context history length in pulses. |
+| `--horizon` | Int | `32` | Forecast horizon length in pulses. |
+| `--max-test-seqs` | Int | `200` | Maximum test sequences evaluated per dataset (total 4,000 for 20 splits). |
+| `--tolerance` | Float | `Auto` | Tactical acceptance tolerance (10.0 μs for PRI, 2.0 MHz for RF, 0.1 μs for PW). |
+| `--no-plots` | Flag | `False` | Disables rendering and saving diagnostic PNG plots. |
+
+#### `foundation_models.timesfm.train`
+| Argument | Type | Default | Description |
+|---|---|---|---|
+| `--profile-mode` | Choice | `fixed` | Target dataset profile (`fixed` or `varying`). |
+| `--target-col` | Choice | `Measured_Delta_TOA` | Training target column (`Measured_Delta_TOA`, `Frequency`, `PW`). |
+| `--epochs` | Int | `3` | Number of training epochs. |
+| `--batch-size` | Int | `64` | Batch size across unified dataset (219 batches/epoch). |
+| `--lr` | Float | `1e-4` | Peak learning rate (AdamW with 10% linear warmup + cosine decay). |
+| `--huber-beta` | Float | `5.0` | Huber loss linear transition threshold (in target parameter units). |
+| `--lora-r` | Int | `16` | LoRA rank decomposition dimension. |
+| `--lora-alpha` | Int | `32` | LoRA scaling factor ($\alpha / r = 2.0$). |
+| `--save-dir` | Path | `models/timesfm_lora` | Output directory for checkpoints. |
+
+---
+
+### 10.4. PRI Benchmark Results: Zero-Shot vs. LoRA SFT
+
+Evaluated across all 20 test datasets (4,000 sequences total, 200 per split). Context: 96 pulses, Forecast Horizon: 32 pulses, Tactical Gate: $\pm 10\ \mu\text{s}$:
+
+| Radar Type | Error Level | Zero-Shot MAE ($\mu\text{s}$) | LoRA MAE ($\mu\text{s}$) | Error Delta (%) | Zero-Shot Hit Rate | LoRA Hit Rate | Tactical Gain |
+|---|---|---:|---:|---:|---:|---:|---:|
+| `stable` | `clean` | 0.00 | **0.00** | +0.0% | 100.0% | **100.0%** | +0.0% |
+| `stable` | `error_lv1` | 5.74 | **5.64** | -1.7% | 99.1% | **99.2%** | +0.1% |
+| `stable` | `error_lv2` | 19.20 | **18.27** | -4.8% | 96.3% | **97.3%** | +1.0% |
+| `stable` | `error_lv3` | 41.17 | **41.00** | -0.4% | 94.9% | **95.1%** | +0.2% |
+| `jitter` | `clean` | 39.94 | **39.90** | -0.1% | 15.5% | **15.6%** | +0.1% |
+| `jitter` | `error_lv1` | 45.95 | **45.72** | -0.5% | 15.4% | **15.5%** | +0.1% |
+| `jitter` | `error_lv2` | 59.60 | **58.64** | -1.6% | 13.9% | **14.2%** | +0.3% |
+| `jitter` | `error_lv3` | 78.33 | **77.96** | -0.5% | 14.5% | 14.2% | -0.3% |
+| `stagger` | `clean` | 2.69 | **0.30** | **-88.8%** | 100.0% | **100.0%** | +0.0% |
+| `stagger` | `error_lv1` | 46.06 | **33.20** | **-27.9%** | 61.7% | **74.6%** | **+12.9%** |
+| `stagger` | `error_lv2` | 98.50 | **88.69** | **-10.0%** | 26.9% | **39.5%** | **+12.6%** |
+| `stagger` | `error_lv3` | 132.91 | **129.92** | -2.2% | 14.8% | **16.7%** | **+1.9%** |
+| `dwell_and_switch` | `clean` | 25.34 | **0.28** | **-98.9%** | 37.5% | **100.0%** | **+62.5%** |
+| `dwell_and_switch` | `error_lv1` | 41.22 | **16.27** | **-60.5%** | 35.8% | **90.7%** | **+54.9%** |
+| `dwell_and_switch` | `error_lv2` | 68.86 | **39.25** | **-43.0%** | 25.1% | **69.9%** | **+44.8%** |
+| `dwell_and_switch` | `error_lv3` | 110.81 | **76.71** | **-30.8%** | 17.1% | **46.9%** | **+29.8%** |
+| `sliding` | `clean` | 71.04 | **0.34** | **-99.5%** | 15.6% | **100.0%** | **+84.4%** |
+| `sliding` | `error_lv1` | 61.11 | **10.86** | **-82.2%** | 22.1% | **83.7%** | **+61.6%** |
+| `sliding` | `error_lv2` | 69.33 | **33.26** | **-52.0%** | 19.4% | **56.1%** | **+36.7%** |
+| `sliding` | `error_lv3` | 101.50 | **74.93** | **-26.2%** | 12.9% | **33.1%** | **+20.2%** |
+
+#### Key Insights:
+1. **Sliding & Dwell-and-Switch Adaptation**: In zero-shot mode, TimesFM applied statistical wave-smoothing to step and ramp modulations, yielding poor tactical gate capture (15.6% and 37.5% hit rates). LoRA SFT adapted the self-attention and MLP weights to sharp discrete transitions, achieving **100% tactical hit rate and sub-microsecond MAE (0.28–0.34 μs)** on clean data.
+2. **Robustness Under Channel Noise**: Under Level 1 and Level 2 channel noise (multipath + missing pulses), LoRA delivered massive tactical gains: **+61.6%** for sliding error_lv1 and **+54.9%** for dwell-and-switch error_lv1.
+3. **Random Jitter Physical Floor**: Gaussian jitter is stochastically memoryless with zero deterministic sequence autocorrelation; both zero-shot and fine-tuned models converge to the empirical noise floor (~40 μs MAE / ~15% hit rate).
+
+---
+
+### 10.5. Carrier Frequency (RF) & Pulse Width (PW) Baselines
+
+Zero-shot performance of TimesFM 3.0 on secondary PDW parameters across fixed datasets:
+
+#### Carrier Frequency (`Frequency`, nominal 9000 MHz, Tolerance $\pm 2.0\text{ MHz}$):
+* **Clean**: **0.00 MHz MAE**, **100.0% Hit Rate** across all 5 radar types.
+* **Error Level 1**: 2.21–4.57 MHz MAE, **97.0%–99.3% Hit Rate**.
+* **Error Level 2**: 13.18–44.47 MHz MAE, **89.1%–92.2% Hit Rate**.
+* **Error Level 3**: 38.30–50.08 MHz MAE, **75.0%–78.4% Hit Rate**.
+
+#### Pulse Width (`PW`, nominal 1.50 $\mu\text{s}$, Tolerance $\pm 0.1\ \mu\text{s}$):
+* **Clean**: **0.00 μs MAE**, **100.0% Hit Rate** across all 5 radar types.
+* **Error Level 1**: 0.01 μs MAE, **99.9%–100.0% Hit Rate**.
+* **Error Level 2**: 0.04–0.06 μs MAE, **98.3%–99.6% Hit Rate**.
+* **Error Level 3**: 0.07–0.08 μs MAE, **93.0%–94.3% Hit Rate**.
+
+---
+
+## 11. Roadmap: Hardware Acceleration & FPGA Deployment
+
+As specified in [`PULSAR.md`](file:///c:/Users/Bu%20Bilgisayar/Desktop/Lessons/Bitirme%20Projesi/Bitirme/PULSAR.md), the final phase of PULSAR targets real-time hardware execution:
 
 ```mermaid
 flowchart LR
-    P1["Phase 1: Synthetic PDW Generation<br/>(Physics, Clock Noise, Benchmarks)"] --> P2["Phase 2: Time-Series Foundation Models<br/>(TimesFM 3.0, Zero-Shot, LoRA Fine-Tuning)"]
-    P2 --> P3["Phase 3: Real-Time FPGA Deployment<br/>(Quantization, Vivado HLS, High-Rate ESM)"]
+    P1["Phase 1: Synthetic PDW Generation<br/>(Physics, Clock Noise, Benchmarks)"] --> P2["Phase 2: Foundation Models & SFT<br/>(TimesFM 3.0, Zero-Shot, LoRA SFT)"]
+    P2 --> P3["Phase 3: Real-Time FPGA Deployment<br/>(Quantization, Vivado HLS, Nanosecond EW)"]
 ```
 
-### Phase 1: Synthetic Benchmarking & Signal Generation *(Completed)*
-* High-fidelity pulse stream generator with realistic hardware clock and environmental modeling.
-* Clean, scalable, modular CLI benchmark pipeline with disjoint train/val/test splits.
-* Externalized YAML configuration architecture in `configs/` and unified `requirements.txt`.
-
-### Phase 2: Time-Series Foundation Models *(Next Milestone)*
-* **Zero-Shot Univariate Baseline**: Establishing baseline forecasting performance using Google's **TimesFM 3.0** (`timesfm[torch]` with PyTorch CUDA backend).
-* **Failure Mode Analysis**: Demonstrated that zero-shot foundation models treat deterministic EW pulse trains with statistical smoothing (decaying/damped wave artifact).
-* **LoRA Fine-Tuning**: Applying Low-Rank Adaptation (LoRA) to adapt pretrained foundation model weights to sharp, discrete radar pulse timing laws.
-* **Multivariate & Covariate Modeling**: Incorporating Frequency, Pulse Width, and Amplitude as past covariates to enhance PRI prediction accuracy.
-
-### Phase 3: Hardware Acceleration & FPGA Deployment *(Future Work)*
-* Model distillation and INT8/FP8 quantization.
-* Deployment on Xilinx / AMD Zynq UltraScale+ FPGA for real-time nanosecond-level pulse deinterleaving and prediction.
+* **Model Quantization**: INT8/FP8 post-training quantization and knowledge distillation from TimesFM 3.0 to lightweight 1D-CNN/Transformer architectures.
+* **FPGA Implementation**: High-Level Synthesis (Vivado HLS) targeting AMD/Xilinx Zynq UltraScale+ MPSoC for sub-microsecond pulse deinterleaving and jamming gate placement.

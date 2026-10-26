@@ -10,24 +10,33 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 
 
-def load_sequence_pri(csv_path: Path) -> np.ndarray:
-    """Reads a single PDW CSV file and returns the clean PRI interval array."""
+def load_sequence_column(csv_path: Path, col_name: str = "Measured_Delta_TOA") -> np.ndarray:
+    """Reads a single PDW CSV file and returns the specified parameter array."""
     df = pd.read_csv(csv_path)
-    if "Measured_Delta_TOA" in df.columns:
-        pri = df["Measured_Delta_TOA"].to_numpy(dtype=np.float32)
-        # Drop anchor index 0 if it is 0.0
-        if len(pri) > 1 and pri[0] == 0.0:
-            pri = pri[1:]
-        return pri
-    raise ValueError(f"No Measured_Delta_TOA column found in {csv_path}")
+    if col_name not in df.columns:
+        raise ValueError(f"No '{col_name}' column found in {csv_path}. Available: {df.columns.tolist()}")
+    vals = df[col_name].to_numpy(dtype=np.float32)
+    # If Measured_Delta_TOA, drop anchor index 0 (value 0.0) so length matches 128 intervals
+    if col_name == "Measured_Delta_TOA" and len(vals) > 1 and vals[0] == 0.0:
+        vals = vals[1:]
+    elif len(vals) == 129:
+        # Align with the 128 pulse interval length of the sequence
+        vals = vals[1:]
+    return vals
+
+
+def load_sequence_pri(csv_path: Path) -> np.ndarray:
+    """Backwards-compatible helper for loading PRI."""
+    return load_sequence_column(csv_path, col_name="Measured_Delta_TOA")
 
 
 def load_dataset_sequences(
     dataset_dir: Path,
     split: str = "test",
     max_seqs: Optional[int] = None,
+    col_name: str = "Measured_Delta_TOA",
 ) -> List[Tuple[str, np.ndarray]]:
-    """Loads all sequences for a specific dataset and split."""
+    """Loads all sequences for a specific dataset, split, and target column."""
     split_dir = dataset_dir / split
     if not split_dir.exists():
         raise FileNotFoundError(f"Split directory not found: {split_dir}")
@@ -40,8 +49,8 @@ def load_dataset_sequences(
         if max_seqs is not None and max_seqs > 0:
             seq_files = seq_files[:max_seqs]
         for f in seq_files:
-            pri = load_sequence_pri(f)
-            sequences.append((f.stem, pri))
+            vals = load_sequence_column(f, col_name=col_name)
+            sequences.append((f.stem, vals))
         return sequences
 
     # 2. Fallback to combined sequences.csv
@@ -53,10 +62,12 @@ def load_dataset_sequences(
             unique_ids = unique_ids[:max_seqs]
         for sid in unique_ids:
             df_seq = df_all[df_all["sequence_id"] == sid].sort_values("pulse_index")
-            pri = df_seq["Measured_Delta_TOA"].to_numpy(dtype=np.float32)
-            if len(pri) > 1 and pri[0] == 0.0:
-                pri = pri[1:]
-            sequences.append((sid, pri))
+            vals = df_seq[col_name].to_numpy(dtype=np.float32)
+            if col_name == "Measured_Delta_TOA" and len(vals) > 1 and vals[0] == 0.0:
+                vals = vals[1:]
+            elif len(vals) == 129:
+                vals = vals[1:]
+            sequences.append((sid, vals))
         return sequences
 
     raise FileNotFoundError(f"No sequences found in {split_dir}")
@@ -99,6 +110,7 @@ def create_unified_pdw_dataloader(
     split: str = "train",
     radar_types: Optional[List[str]] = None,
     error_levels: Optional[List[str]] = None,
+    col_name: str = "Measured_Delta_TOA",
     context_len: int = 96,
     horizon_len: int = 32,
     batch_size: int = 64,
@@ -117,7 +129,12 @@ def create_unified_pdw_dataloader(
             folder_name = f"1000x128_{elevel}"
             dataset_dir = datasets_root / rtype / folder_name
             if dataset_dir.exists():
-                seqs = load_dataset_sequences(dataset_dir, split=split, max_seqs=max_seqs_per_dataset)
+                seqs = load_dataset_sequences(
+                    dataset_dir,
+                    split=split,
+                    max_seqs=max_seqs_per_dataset,
+                    col_name=col_name,
+                )
                 all_sequences.extend(seqs)
 
     dataset = PDWSequenceDataset(all_sequences, context_len=context_len, horizon_len=horizon_len)

@@ -28,7 +28,12 @@ class TimesFMLoRAEngine:
         self.lora_r = lora_r
         self.lora_alpha = lora_alpha
         self.lora_dropout = lora_dropout
-        self.target_modules = target_modules or ["ff0", "ff1"]
+        self.target_modules = target_modules or [
+            "seq_attn.query_proj",
+            "seq_attn.value_proj",
+            "ff0",
+            "ff1",
+        ]
 
         # 1. Load base forecaster
         self.tfm = TimesFM3Forecaster.from_pretrained(

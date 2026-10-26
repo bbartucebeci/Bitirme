@@ -12,19 +12,25 @@ def save_forecast_plot(
     context: np.ndarray,
     ground_truth: np.ndarray,
     predictions: np.ndarray,
-    tolerance_us: float = 10.0,
+    tolerance: float = 10.0,
+    param_label: str = "PRI",
+    unit: str = "μs",
     show_ctx_pts: int = 40,
+    tolerance_us: float | None = None,
 ):
-    """Renders and saves a diagnostic PRI forecast plot.
+    """Renders and saves a diagnostic parameter forecast plot.
 
     Includes:
-    - Observed context PRI pulses
-    - Ground truth future PRI pulses
+    - Observed context pulses
+    - Ground truth future pulses
     - Model forecast curve
-    - Tactical Range-Gate corridor (+/- tolerance_us around ground truth)
+    - Tactical Tolerance corridor (+/- tolerance around ground truth)
     - Shaded prediction error gap
     - Protected y-axis span to prevent deceptive auto-zoom on flat signals
     """
+    if tolerance_us is not None:
+        tolerance = tolerance_us
+
     context_len = len(context)
     horizon_len = len(ground_truth)
 
@@ -41,7 +47,7 @@ def save_forecast_plot(
         "o-",
         color="tab:blue",
         markersize=4,
-        label="Observed Context (PRI)",
+        label=f"Observed Context ({param_label})",
     )
 
     # 2. Ground truth
@@ -73,14 +79,14 @@ def save_forecast_plot(
         label="Forecast Horizon Boundary",
     )
 
-    # 5. Tactical EW Range-Gate Corridor (shaded green)
+    # 5. Tactical Tolerance Corridor (shaded green)
     plt.fill_between(
         x_horiz,
-        ground_truth - tolerance_us,
-        ground_truth + tolerance_us,
+        ground_truth - tolerance,
+        ground_truth + tolerance,
         color="tab:green",
         alpha=0.18,
-        label=f"Tactical Gate (±{tolerance_us:.0f} μs)",
+        label=f"Tactical Gate (±{tolerance:g} {unit})",
     )
 
     # 6. Prediction Error Gap (shaded red)
@@ -96,13 +102,14 @@ def save_forecast_plot(
     # Prevent micro-scale auto-zoom illusion on flat signals (e.g. stable radar)
     all_visible = np.concatenate([context[-actual_ctx_pts:], ground_truth, predictions])
     y_min, y_max = float(all_visible.min()), float(all_visible.max())
-    if (y_max - y_min) < 30.0:
+    min_span = max(tolerance * 3.0, 1.0)
+    if (y_max - y_min) < min_span:
         y_center = (y_max + y_min) / 2.0
-        plt.ylim(y_center - 18.0, y_center + 18.0)
+        plt.ylim(y_center - min_span * 0.6, y_center + min_span * 0.6)
 
     plt.title(title, fontsize=13, fontweight="bold")
     plt.xlabel("Pulse Index (n)")
-    plt.ylabel(r"PRI / Measured $\Delta$TOA ($\mu$s)")
+    plt.ylabel(f"{param_label} ({unit})")
     plt.legend(loc="upper right", frameon=True)
     plt.grid(True, linestyle=":", alpha=0.6)
     plt.tight_layout()
