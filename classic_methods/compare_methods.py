@@ -224,5 +224,15 @@ def generate_comparison_report(profile_mode: str = "fixed", param_slug: str = "p
 
 
 if __name__ == "__main__":
-    generate_all_diagnostic_plots()
-    generate_comparison_report()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Generate Classic Methods Comparison Reports & Plots")
+    parser.add_argument("--profile-mode", choices=["fixed", "varying", "both"], default="both")
+    parser.add_argument("--target-param", choices=list(PARAM_SPECS.keys()), default="PRI")
+    args = parser.parse_args()
+
+    modes = ["fixed", "varying"] if args.profile_mode == "both" else [args.profile_mode]
+    spec = PARAM_SPECS[args.target_param]
+    for mode in modes:
+        generate_all_diagnostic_plots(profile_mode=mode, target_param=args.target_param)
+        generate_comparison_report(profile_mode=mode, param_slug=spec["slug"], unit=spec["unit"])

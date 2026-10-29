@@ -1,0 +1,21 @@
+method,radar_type,error_level,evaluated_sequences,rmse_us,mae_us,medae_us,mape_pct,gate_hit_rate_pct,latency_us_per_seq
+Rolling Median (W=32),stable,clean,50,0.0,0.0,0.0,0.0,100.0,123.27
+Rolling Median (W=32),stable,error_lv1,50,0.015,0.015,0.013,0.002,100.0,101.7
+Rolling Median (W=32),stable,error_lv2,50,0.07,0.07,0.062,0.007,100.0,105.33
+Rolling Median (W=32),stable,error_lv3,50,0.169,0.169,0.136,0.017,100.0,103.15
+Rolling Median (W=32),jitter,clean,50,60.373,48.56,39.658,5.024,13.25,99.82
+Rolling Median (W=32),jitter,error_lv1,50,60.926,49.187,41.138,5.05,13.15,101.81
+Rolling Median (W=32),jitter,error_lv2,50,61.467,49.058,39.428,5.111,13.38,102.01
+Rolling Median (W=32),jitter,error_lv3,50,58.9,47.734,39.398,4.917,11.72,98.66
+Rolling Median (W=32),stagger,clean,50,130.443,99.798,93.955,10.531,33.38,95.99
+Rolling Median (W=32),stagger,error_lv1,50,130.703,100.06,93.996,10.573,33.33,98.96
+Rolling Median (W=32),stagger,error_lv2,50,130.65,100.031,93.726,10.559,33.4,99.58
+Rolling Median (W=32),stagger,error_lv3,50,131.253,100.798,93.878,10.651,33.22,101.81
+Rolling Median (W=32),dwell_and_switch,clean,50,212.593,177.44,272.81,19.835,25.88,97.99
+Rolling Median (W=32),dwell_and_switch,error_lv1,50,210.75,175.101,250.038,19.278,26.61,98.36
+Rolling Median (W=32),dwell_and_switch,error_lv2,50,211.033,174.258,231.424,19.363,27.75,102.02
+Rolling Median (W=32),dwell_and_switch,error_lv3,50,206.673,171.752,214.902,18.896,26.87,102.17
+Rolling Median (W=32),sliding,clean,50,96.849,84.12,85.923,8.505,6.12,100.25
+Rolling Median (W=32),sliding,error_lv1,50,97.022,84.277,85.923,8.515,6.44,96.99
+Rolling Median (W=32),sliding,error_lv2,50,97.957,85.191,86.18,8.606,6.26,99.74
+Rolling Median (W=32),sliding,error_lv3,50,97.9,85.117,85.639,8.563,6.5,101.16
