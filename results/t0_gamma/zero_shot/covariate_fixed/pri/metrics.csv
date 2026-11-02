@@ -1,0 +1,2 @@
+radar_type,error_level,parameter,evaluated_sequences,context_length,horizon_length,mae_us,rmse_us,gate_hit_rate_pct,tolerance,unit
+stable,clean,PRI,2,96,32,0.0,0.0,100.0,10.0,us
