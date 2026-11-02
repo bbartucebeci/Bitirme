@@ -1,6 +1,6 @@
 # t0-gamma Zero-Shot Univariate Benchmark [Amplitude Varying]
 
-**Evaluated on**: 2026-11-02 22:59:43
+**Evaluated on**: 2026-11-02 23:33:24
 
 **Context History**: 96 pulses | **Forecast Horizon**: 32 pulses
 

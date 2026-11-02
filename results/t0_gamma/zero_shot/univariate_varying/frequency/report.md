@@ -1,6 +1,6 @@
 # t0-gamma Zero-Shot Univariate Benchmark [Carrier Frequency Varying]
 
-**Evaluated on**: 2026-11-02 22:58:17
+**Evaluated on**: 2026-11-02 23:29:23
 
 **Context History**: 96 pulses | **Forecast Horizon**: 32 pulses
 

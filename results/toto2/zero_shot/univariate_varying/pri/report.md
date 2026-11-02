@@ -1,6 +1,6 @@
 # Toto 2.0 Zero-Shot Univariate Benchmark [PRI Varying]
 
-**Evaluated on**: 2026-11-02 22:54:51
+**Evaluated on**: 2026-11-02 23:26:54
 
 **Context History**: 96 pulses | **Forecast Horizon**: 32 pulses
 

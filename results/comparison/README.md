@@ -74,3 +74,6 @@ pip install toto-models>=1.0.0
 
 ---
 *Report generated automatically from zero-shot univariate benchmark results across 5 radar types × 4 error levels × 6 parameters.*
+
+## LoRA Fine-Tuning
+- LoRA fine-tuning implemented for t0-gamma
