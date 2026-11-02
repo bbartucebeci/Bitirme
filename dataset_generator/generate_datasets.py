@@ -275,8 +275,9 @@ def generate_single_radar_sequence(
     error_level: str,
     pulses_per_sequence: int = 128,
 ) -> pd.DataFrame:
+    # Save one anchor plus exactly N observed intervals, even when pulses are lost.
+    target_rows = pulses_per_sequence + 1
     mean_pri = profile["mean_pri_us"]
-    duration = pulses_per_sequence * mean_pri
 
     radar_cls = RADAR_CLASSES[radar_type]
     radar = radar_cls(
@@ -296,27 +297,34 @@ def generate_single_radar_sequence(
     env = Environment()
     env.add_radar(radar)
 
-    df = env.generate(
-        duration=duration,
-        start_time=0.0,
-        toa_noise_std=error_config["toa_noise_std"],
-        freq_noise_std=error_config["freq_noise_std"],
-        pw_noise_std=error_config["pw_noise_std"],
-        amp_noise_std=error_config["amp_noise_std"],
-        aoa_noise_std=error_config["aoa_noise_std"],
-        global_drop_rate=error_config["global_drop_rate"],
-        noise_rate=error_config["noise_rate"],
-        quantize=error_config["quantize"],
-    )
+    # The TimesFM benchmark first simulates with a margin, then extends the
+    # capture if necessary. A final check prevents saving a short sequence.
+    sim_pulses = int(np.ceil(target_rows * 1.5)) + 10
+    for _ in range(4):
+        df = env.generate(
+            duration=sim_pulses * mean_pri,
+            start_time=0.0,
+            toa_noise_std=error_config["toa_noise_std"],
+            freq_noise_std=error_config["freq_noise_std"],
+            pw_noise_std=error_config["pw_noise_std"],
+            amp_noise_std=error_config["amp_noise_std"],
+            aoa_noise_std=error_config["aoa_noise_std"],
+            global_drop_rate=error_config["global_drop_rate"],
+            noise_rate=error_config["noise_rate"],
+            quantize=error_config["quantize"],
+        )
+        if len(df) >= target_rows:
+            break
+        sim_pulses = max(sim_pulses * 2, target_rows * 3)
+    else:
+        raise ValueError(f"Generated only {len(df)} of {target_rows} observed pulses for {sequence_id}")
 
-    if df.empty:
-        raise ValueError(f"Generated empty sequence for {sequence_id}")
-
-    df = df.sort_values("TOA").reset_index(drop=True)
+    df = df.sort_values("TOA").iloc[:target_rows].copy().reset_index(drop=True)
     df["sequence_id"] = sequence_id
     df["pulse_index"] = np.arange(len(df), dtype=int)
     df["radar_type"] = radar_type
     df["error_level"] = error_level
+    df["Measured_Delta_TOA"] = df["TOA"].diff().fillna(0.0)
 
     cols = [c for c in OUTPUT_COLUMNS if c in df.columns]
     return df[cols]
@@ -474,6 +482,8 @@ def build_single_dataset(
         "freq_mode": freq_mode,
         "sequence_count": sequence_count,
         "expected_pulses_per_sequence": pulses_per_sequence,
+        "observed_rows_per_sequence": pulses_per_sequence + 1,
+        "first_row_is_anchor": True,
         "error_level": error_level,
         "error_parameters": error_config,
         "split": {
@@ -614,14 +624,19 @@ def main():
         default=20261020,
         help="Random seed for reproducibility",
     )
-
+    parser.add_argument(
+    "--pulses-per-sequence",
+    type=int,
+    choices=[128, 256, 512, 1024],
+    default=128,
+    )
     args = parser.parse_args()
 
     # Load modular configs
     error_levels_cfg, profiles_cfg, clock_noise_cfg = load_all_configs(args.config_dir)
 
     sequence_count = 10 if args.smoke_test else 1000
-    pulses_per_sequence = 128
+    pulses_per_sequence = args.pulses_per_sequence
 
     error_levels = list(error_levels_cfg.keys()) if args.error_level == "all" else [args.error_level]
     profile_modes = ["fixed", "varying"] if args.profile_mode == "both" else [args.profile_mode]

@@ -3,4 +3,5 @@ __pycache__/
 *.csv
 *.docx
 datasets/
+/models/chronos2_lora/
 interleaved datasets/

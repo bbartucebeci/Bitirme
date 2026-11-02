@@ -283,6 +283,13 @@ Datasets are structured to guarantee zero data leakage:
 * **Validation Split**: $10\%$ (100 sequences)
 * **Test Split**: $20\%$ (200 sequences)
 
+For newly generated single-radar datasets, `1000x128` means 1000 independent
+sequences with 128 observed intervals each. Every sequence CSV has 129 rows:
+the first row is the arrival-time anchor, followed by 128 observed pulses.
+Missing pulses appear as larger gaps between observed TOAs. Older CSVs made
+with a fixed simulation duration may have different row counts; regenerate
+them to use the 129-row format. Interleaved datasets retain variable row counts.
+
 ```text
 datasets/single_radar/fixed/stable/1000x128_clean/
 ├── metadata.yaml             # Complete machine-readable configuration & row counts
@@ -332,6 +339,7 @@ The unified generator tool is located at [`dataset_generator/generate_datasets.p
 * `--config-dir`: Path to folder containing YAML configurations (default: `configs/`).
 * `--smoke-test`: Generates 10 test sequences per dataset instead of 1000 for rapid debugging.
 * `--seed`: Master random seed for reproducible sampling (default: `20261020`).
+* `--pulses-per-sequence`: Observed intervals per single-radar sequence (`128`, `256`, `512`, or `1024`; default: `128`).
 
 ### Common Commands:
 
@@ -405,6 +413,13 @@ flowchart LR
 * **Failure Mode Analysis**: Demonstrated that zero-shot foundation models treat deterministic EW pulse trains with statistical smoothing (decaying/damped wave artifact).
 * **LoRA Fine-Tuning**: Applying Low-Rank Adaptation (LoRA) to adapt pretrained foundation model weights to sharp, discrete radar pulse timing laws.
 * **Multivariate & Covariate Modeling**: Incorporating Frequency, Pulse Width, and Amplitude as past covariates to enhance PRI prediction accuracy.
+
+#### Chronos-2 benchmark
+
+The self-contained [`foundation_models/chronos2/`](foundation_models/chronos2/README.md)
+package evaluates zero-shot forecasts, LoRA fine-tuning, and fixed/varying
+cross-profile transfer on the generated `1000x128` single-radar datasets.
+See its README for installation, commands, and sequence coverage details.
 
 ### Phase 3: Hardware Acceleration & FPGA Deployment *(Future Work)*
 * Model distillation and INT8/FP8 quantization.
