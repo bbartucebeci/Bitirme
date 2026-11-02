@@ -1,0 +1,402 @@
+[
+  {
+    "profile": "fixed",
+    "radar_type": "stable",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "source_csv": "datasets/single_radar/fixed/stable/1000x128_clean/test/seq_0800.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "jitter",
+    "error_level": "clean",
+    "sequence_id": "seq_0801",
+    "source_csv": "datasets/single_radar/fixed/jitter/1000x128_clean/test/seq_0801.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stagger",
+    "error_level": "clean",
+    "sequence_id": "seq_0802",
+    "source_csv": "datasets/single_radar/fixed/stagger/1000x128_clean/test/seq_0802.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "dwell_and_switch",
+    "error_level": "clean",
+    "sequence_id": "seq_0803",
+    "source_csv": "datasets/single_radar/fixed/dwell_and_switch/1000x128_clean/test/seq_0803.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sliding",
+    "error_level": "clean",
+    "sequence_id": "seq_0804",
+    "source_csv": "datasets/single_radar/fixed/sliding/1000x128_clean/test/seq_0804.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stable",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0805",
+    "source_csv": "datasets/single_radar/fixed/stable/1000x128_error_lv1/test/seq_0805.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 127,
+    "non_emitter_pulses": 1
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "jitter",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0806",
+    "source_csv": "datasets/single_radar/fixed/jitter/1000x128_error_lv1/test/seq_0806.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stagger",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0807",
+    "source_csv": "datasets/single_radar/fixed/stagger/1000x128_error_lv1/test/seq_0807.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0808",
+    "source_csv": "datasets/single_radar/fixed/dwell_and_switch/1000x128_error_lv1/test/seq_0808.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sliding",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0809",
+    "source_csv": "datasets/single_radar/fixed/sliding/1000x128_error_lv1/test/seq_0809.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stable",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0810",
+    "source_csv": "datasets/single_radar/fixed/stable/1000x128_error_lv2/test/seq_0810.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "jitter",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0811",
+    "source_csv": "datasets/single_radar/fixed/jitter/1000x128_error_lv2/test/seq_0811.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stagger",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0812",
+    "source_csv": "datasets/single_radar/fixed/stagger/1000x128_error_lv2/test/seq_0812.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 126,
+    "non_emitter_pulses": 2
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0813",
+    "source_csv": "datasets/single_radar/fixed/dwell_and_switch/1000x128_error_lv2/test/seq_0813.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sliding",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0814",
+    "source_csv": "datasets/single_radar/fixed/sliding/1000x128_error_lv2/test/seq_0814.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 127,
+    "non_emitter_pulses": 1
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stable",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0815",
+    "source_csv": "datasets/single_radar/fixed/stable/1000x128_error_lv3/test/seq_0815.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 127,
+    "non_emitter_pulses": 1
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "jitter",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0816",
+    "source_csv": "datasets/single_radar/fixed/jitter/1000x128_error_lv3/test/seq_0816.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 126,
+    "non_emitter_pulses": 2
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stagger",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0817",
+    "source_csv": "datasets/single_radar/fixed/stagger/1000x128_error_lv3/test/seq_0817.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 127,
+    "non_emitter_pulses": 1
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0818",
+    "source_csv": "datasets/single_radar/fixed/dwell_and_switch/1000x128_error_lv3/test/seq_0818.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 127,
+    "non_emitter_pulses": 1
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sliding",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0819",
+    "source_csv": "datasets/single_radar/fixed/sliding/1000x128_error_lv3/test/seq_0819.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 127,
+    "non_emitter_pulses": 1
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stable",
+    "error_level": "clean",
+    "sequence_id": "seq_0820",
+    "source_csv": "datasets/single_radar/varying/stable/1000x128_clean/test/seq_0820.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "varying",
+    "radar_type": "jitter",
+    "error_level": "clean",
+    "sequence_id": "seq_0821",
+    "source_csv": "datasets/single_radar/varying/jitter/1000x128_clean/test/seq_0821.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stagger",
+    "error_level": "clean",
+    "sequence_id": "seq_0822",
+    "source_csv": "datasets/single_radar/varying/stagger/1000x128_clean/test/seq_0822.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "varying",
+    "radar_type": "dwell_and_switch",
+    "error_level": "clean",
+    "sequence_id": "seq_0823",
+    "source_csv": "datasets/single_radar/varying/dwell_and_switch/1000x128_clean/test/seq_0823.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sliding",
+    "error_level": "clean",
+    "sequence_id": "seq_0824",
+    "source_csv": "datasets/single_radar/varying/sliding/1000x128_clean/test/seq_0824.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stable",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0825",
+    "source_csv": "datasets/single_radar/varying/stable/1000x128_error_lv1/test/seq_0825.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "varying",
+    "radar_type": "jitter",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0826",
+    "source_csv": "datasets/single_radar/varying/jitter/1000x128_error_lv1/test/seq_0826.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stagger",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0827",
+    "source_csv": "datasets/single_radar/varying/stagger/1000x128_error_lv1/test/seq_0827.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "varying",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0828",
+    "source_csv": "datasets/single_radar/varying/dwell_and_switch/1000x128_error_lv1/test/seq_0828.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sliding",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0829",
+    "source_csv": "datasets/single_radar/varying/sliding/1000x128_error_lv1/test/seq_0829.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stable",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0830",
+    "source_csv": "datasets/single_radar/varying/stable/1000x128_error_lv2/test/seq_0830.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "varying",
+    "radar_type": "jitter",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0831",
+    "source_csv": "datasets/single_radar/varying/jitter/1000x128_error_lv2/test/seq_0831.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 127,
+    "non_emitter_pulses": 1
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stagger",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0832",
+    "source_csv": "datasets/single_radar/varying/stagger/1000x128_error_lv2/test/seq_0832.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "varying",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0833",
+    "source_csv": "datasets/single_radar/varying/dwell_and_switch/1000x128_error_lv2/test/seq_0833.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 127,
+    "non_emitter_pulses": 1
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sliding",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0834",
+    "source_csv": "datasets/single_radar/varying/sliding/1000x128_error_lv2/test/seq_0834.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 126,
+    "non_emitter_pulses": 2
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stable",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0835",
+    "source_csv": "datasets/single_radar/varying/stable/1000x128_error_lv3/test/seq_0835.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "varying",
+    "radar_type": "jitter",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0836",
+    "source_csv": "datasets/single_radar/varying/jitter/1000x128_error_lv3/test/seq_0836.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 126,
+    "non_emitter_pulses": 2
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stagger",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0837",
+    "source_csv": "datasets/single_radar/varying/stagger/1000x128_error_lv3/test/seq_0837.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 126,
+    "non_emitter_pulses": 2
+  },
+  {
+    "profile": "varying",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0838",
+    "source_csv": "datasets/single_radar/varying/dwell_and_switch/1000x128_error_lv3/test/seq_0838.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sliding",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0839",
+    "source_csv": "datasets/single_radar/varying/sliding/1000x128_error_lv3/test/seq_0839.csv",
+    "plotted_pulses": 128,
+    "genuine_pulses": 128,
+    "non_emitter_pulses": 0
+  }
+]
