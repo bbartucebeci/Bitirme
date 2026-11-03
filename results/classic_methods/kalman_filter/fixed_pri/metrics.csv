@@ -1,0 +1,21 @@
+method,radar_type,error_level,evaluated_sequences,rmse_us,mae_us,medae_us,mape_pct,gate_hit_rate_pct,latency_us_per_seq
+Kalman Filter Bank,stable,clean,200,0.0,0.0,0.0,0.0,100.0,56138.11
+Kalman Filter Bank,stable,error_lv1,200,0.159,0.085,0.032,0.008,99.73,62087.05
+Kalman Filter Bank,stable,error_lv2,200,1.635,0.613,0.134,0.061,99.29,60124.89
+Kalman Filter Bank,stable,error_lv3,200,1.708,0.741,0.138,0.074,99.4,57762.54
+Kalman Filter Bank,jitter,clean,200,52.253,42.008,35.394,4.212,15.19,57148.54
+Kalman Filter Bank,jitter,error_lv1,200,52.136,41.911,35.044,4.206,15.22,56556.76
+Kalman Filter Bank,jitter,error_lv2,200,50.953,41.17,35.541,4.144,15.6,61989.94
+Kalman Filter Bank,jitter,error_lv3,200,52.221,42.09,35.477,4.229,14.82,60014.21
+Kalman Filter Bank,stagger,clean,200,0.0,0.0,0.0,0.0,100.0,61102.03
+Kalman Filter Bank,stagger,error_lv1,200,29.97,21.076,0.048,2.19,88.18,68021.39
+Kalman Filter Bank,stagger,error_lv2,200,70.733,51.333,0.711,5.307,71.26,73721.07
+Kalman Filter Bank,stagger,error_lv3,200,112.481,84.143,11.892,8.643,50.48,69166.38
+Kalman Filter Bank,dwell_and_switch,clean,200,0.0,0.0,0.0,0.0,100.0,62828.0
+Kalman Filter Bank,dwell_and_switch,error_lv1,200,23.465,9.236,0.051,0.964,93.08,68061.7
+Kalman Filter Bank,dwell_and_switch,error_lv2,200,62.266,24.948,0.371,2.589,82.82,58184.26
+Kalman Filter Bank,dwell_and_switch,error_lv3,200,91.335,46.837,1.086,4.917,70.46,68650.96
+Kalman Filter Bank,sliding,clean,200,0.0,0.0,0.0,0.0,100.0,72602.34
+Kalman Filter Bank,sliding,error_lv1,200,13.141,4.886,0.048,0.512,90.16,70871.77
+Kalman Filter Bank,sliding,error_lv2,200,36.167,14.977,0.418,1.582,68.26,61585.47
+Kalman Filter Bank,sliding,error_lv3,200,47.873,22.384,1.53,2.338,59.19,78085.09

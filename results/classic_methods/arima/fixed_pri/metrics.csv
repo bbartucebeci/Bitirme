@@ -1,0 +1,21 @@
+method,radar_type,error_level,evaluated_sequences,rmse_us,mae_us,medae_us,mape_pct,gate_hit_rate_pct,latency_us_per_seq
+"ARIMA (Box-Jenkins, AIC-selected)",stable,clean,200,0.0,0.0,0.0,0.0,100.0,179854.54
+"ARIMA (Box-Jenkins, AIC-selected)",stable,error_lv1,200,0.056,0.015,0.0,0.001,99.97,333301.94
+"ARIMA (Box-Jenkins, AIC-selected)",stable,error_lv2,200,0.244,0.114,0.002,0.011,99.94,323773.5
+"ARIMA (Box-Jenkins, AIC-selected)",stable,error_lv3,200,0.798,0.354,0.006,0.035,99.62,318528.77
+"ARIMA (Box-Jenkins, AIC-selected)",jitter,clean,200,49.978,40.131,33.788,4.025,16.03,174360.62
+"ARIMA (Box-Jenkins, AIC-selected)",jitter,error_lv1,200,50.306,40.361,33.818,4.053,16.25,168167.79
+"ARIMA (Box-Jenkins, AIC-selected)",jitter,error_lv2,200,49.582,40.021,34.381,4.026,16.23,162481.35
+"ARIMA (Box-Jenkins, AIC-selected)",jitter,error_lv3,200,50.231,40.375,34.552,4.056,16.04,174081.56
+"ARIMA (Box-Jenkins, AIC-selected)",stagger,clean,200,0.0,0.0,0.0,0.0,100.0,317787.93
+"ARIMA (Box-Jenkins, AIC-selected)",stagger,error_lv1,200,29.952,21.526,0.127,2.24,88.35,313822.24
+"ARIMA (Box-Jenkins, AIC-selected)",stagger,error_lv2,200,71.03,52.316,0.889,5.413,72.34,298728.03
+"ARIMA (Box-Jenkins, AIC-selected)",stagger,error_lv3,200,115.402,86.245,5.06,8.858,54.31,268661.53
+"ARIMA (Box-Jenkins, AIC-selected)",dwell_and_switch,clean,200,0.0,0.0,0.0,0.0,100.0,536130.64
+"ARIMA (Box-Jenkins, AIC-selected)",dwell_and_switch,error_lv1,200,20.201,9.167,0.096,0.954,94.98,440208.73
+"ARIMA (Box-Jenkins, AIC-selected)",dwell_and_switch,error_lv2,200,72.911,35.268,0.535,3.636,82.87,374001.32
+"ARIMA (Box-Jenkins, AIC-selected)",dwell_and_switch,error_lv3,200,113.173,72.198,1.311,7.516,60.33,279447.17
+"ARIMA (Box-Jenkins, AIC-selected)",sliding,clean,200,0.0,0.0,0.0,0.0,100.0,627794.57
+"ARIMA (Box-Jenkins, AIC-selected)",sliding,error_lv1,200,14.496,5.384,0.108,0.562,90.04,710585.14
+"ARIMA (Box-Jenkins, AIC-selected)",sliding,error_lv2,200,38.401,16.783,0.702,1.762,66.26,764363.37
+"ARIMA (Box-Jenkins, AIC-selected)",sliding,error_lv3,200,51.926,24.781,2.234,2.568,57.27,704525.11
