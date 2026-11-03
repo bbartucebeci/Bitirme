@@ -25,8 +25,21 @@ from classic_methods.common import (
 from classic_methods.rolling_median import rolling_median_forecast
 from classic_methods.period_estimation import period_estimation_forecast
 from classic_methods.hidden_markov_model import hmm_forecast
+from classic_methods.kalman_filter import kalman_forecast
+from classic_methods.exponential_smoothing import exponential_smoothing_forecast
+from classic_methods.arima import arima_forecast
 
 RESULTS_ROOT = PROJECT_ROOT / "results" / "classic_methods"
+
+# (slug, plot label, short table label, forecast fn, colour, marker style)
+METHODS = [
+    ("rolling_median", "Rolling Median (W=32)", "Rolling Median", rolling_median_forecast, "tab:orange", "v:"),
+    ("period_estimation", "Period Estimation (P_max=24)", "Period Est.", period_estimation_forecast, "tab:red", "^--"),
+    ("hidden_markov_model", "Hidden Markov Model (Baum-Welch + Viterbi)", "HMM", hmm_forecast, "tab:purple", "d-."),
+    ("kalman_filter", "Kalman Filter Bank", "Kalman", kalman_forecast, "tab:blue", "o--"),
+    ("exponential_smoothing", "Exponential Smoothing (AICc-selected ETS)", "Exp. Smoothing", exponential_smoothing_forecast, "tab:brown", "x-."),
+    ("arima", "ARIMA (Box-Jenkins, AIC-selected)", "ARIMA", arima_forecast, "tab:cyan", "*:"),
+]
 
 
 def generate_all_diagnostic_plots(
@@ -35,17 +48,13 @@ def generate_all_diagnostic_plots(
     context_len: int = 96,
     horizon_len: int = 32,
 ) -> None:
-    """Generates the 20 standard teammate-style PNG plots per method + 20 3-way overlay plots."""
+    """Generates the 20 standard teammate-style PNG plots per method + 20 all-method overlay plots."""
     spec = PARAM_SPECS[target_param]
     param_slug = spec["slug"]
     unit = "μs" if spec["unit"] == "us" else spec["unit"]
     tolerance = spec["default_tol"]
 
-    methods = [
-        ("rolling_median", "Rolling Median (W=32)", rolling_median_forecast),
-        ("period_estimation", "Period Estimation (P_max=24)", period_estimation_forecast),
-        ("hidden_markov_model", "Hidden Markov Model (Baum-Welch + Viterbi)", hmm_forecast),
-    ]
+    methods = [(slug, label, fn) for slug, label, _, fn, _, _ in METHODS]
 
     overlay_dir = RESULTS_ROOT / "plots_comparison" / f"{profile_mode}_{param_slug}"
     overlay_dir.mkdir(parents=True, exist_ok=True)
@@ -89,7 +98,7 @@ def generate_all_diagnostic_plots(
                     unit=unit,
                 )
 
-            # 2. Combined 3-Method Overlay Plot for easy thesis comparison
+            # 2. Combined all-method overlay plot for easy thesis comparison
             show_ctx_pts = min(40, len(ctx))
             x_ctx = np.arange(len(ctx) - show_ctx_pts, len(ctx))
             x_horiz = np.arange(len(ctx), len(ctx) + len(gt))
@@ -97,14 +106,13 @@ def generate_all_diagnostic_plots(
             plt.figure(figsize=(13, 5.2))
             plt.plot(x_ctx, ctx[-show_ctx_pts:], "o-", color="tab:blue", markersize=4, label=f"Observed Context ({spec['name']})")
             plt.plot(x_horiz, gt, "s-", color="tab:green", markersize=4.5, linewidth=2.0, label="Ground Truth (Actual Future)")
-            plt.plot(x_horiz, preds_dict["rolling_median"][1], "v:", color="tab:orange", markersize=4.5, label="Rolling Median")
-            plt.plot(x_horiz, preds_dict["period_estimation"][1], "^--", color="tab:red", markersize=5, label="Period Estimation")
-            plt.plot(x_horiz, preds_dict["hidden_markov_model"][1], "d-.", color="tab:purple", markersize=4.5, label="Hidden Markov Model")
+            for slug, _, short, _, color, style in METHODS:
+                plt.plot(x_horiz, preds_dict[slug][1], style, color=color, markersize=4.5, label=short)
 
             plt.axvline(x=len(ctx) - 0.5, color="black", linestyle="--", alpha=0.6, label="Forecast Horizon Boundary")
             plt.fill_between(x_horiz, gt - tolerance, gt + tolerance, color="tab:green", alpha=0.15, label=f"Tactical Gate (±{tolerance:g} {unit})")
 
-            all_vis = np.concatenate([ctx[-show_ctx_pts:], gt, preds_dict["rolling_median"][1], preds_dict["period_estimation"][1], preds_dict["hidden_markov_model"][1]])
+            all_vis = np.concatenate([ctx[-show_ctx_pts:], gt] + [preds_dict[slug][1] for slug, *_ in METHODS])
             y_min, y_max = float(all_vis.min()), float(all_vis.max())
             min_span = max(tolerance * 3.0, 1.0)
             if (y_max - y_min) < min_span:
@@ -120,66 +128,55 @@ def generate_all_diagnostic_plots(
             plt.savefig(overlay_dir / f"{rtype}_{elevel}.png", dpi=180)
             plt.close()
 
-    print(f"[SAVED] 60 Teammate-format individual forecast PNGs in results/classic_methods/<method>/{profile_mode}_{param_slug}/plots/")
-    print(f"[SAVED] 20 3-Method Overlay comparison PNGs in {overlay_dir}")
+    print(f"[SAVED] {20 * len(METHODS)} Teammate-format individual forecast PNGs in results/classic_methods/<method>/{profile_mode}_{param_slug}/plots/")
+    print(f"[SAVED] 20 {len(METHODS)}-Method Overlay comparison PNGs in {overlay_dir}")
 
 
 def generate_comparison_report(profile_mode: str = "fixed", param_slug: str = "pri", unit: str = "us") -> None:
-    methods = [
-        ("rolling_median", "Rolling Median"),
-        ("period_estimation", "Period Estimation"),
-        ("hidden_markov_model", "Hidden Markov Model"),
-    ]
-
     dfs = {}
-    for slug, label in methods:
+    for slug, *_ in METHODS:
         csv_path = RESULTS_ROOT / slug / f"{profile_mode}_{param_slug}" / "metrics.csv"
         if csv_path.exists():
             dfs[slug] = pd.read_csv(csv_path)
 
-    if len(dfs) < 3:
-        print(f"[WARN] Not all 3 method CSVs found yet ({list(dfs.keys())}).")
+    if len(dfs) < len(METHODS):
+        print(f"[WARN] Not all {len(METHODS)} method CSVs found yet ({list(dfs.keys())}).")
         return
 
-    rm_df = dfs["rolling_median"]
-    merged = rm_df[["radar_type", "error_level", "evaluated_sequences"]].copy()
-    for slug, prefix in [("rolling_median", "rm"), ("period_estimation", "pe"), ("hidden_markov_model", "hmm")]:
-        df = dfs[slug]
-        merged[f"{prefix}_rmse"] = df[f"rmse_{unit}"]
-        merged[f"{prefix}_mae"] = df[f"mae_{unit}"]
-        merged[f"{prefix}_mape"] = df["mape_pct"]
-        merged[f"{prefix}_hit"] = df["gate_hit_rate_pct"]
-        merged[f"{prefix}_lat"] = df["latency_us_per_seq"]
+    keys = ["radar_type", "error_level"]
+    merged = dfs[METHODS[0][0]][keys + ["evaluated_sequences"]].copy()
+    for slug, *_ in METHODS:
+        df = dfs[slug].set_index(keys)
+        idx = merged.set_index(keys).index
+        merged[f"{slug}_rmse"] = df.loc[idx, f"rmse_{unit}"].to_numpy()
+        merged[f"{slug}_mae"] = df.loc[idx, f"mae_{unit}"].to_numpy()
+        merged[f"{slug}_mape"] = df.loc[idx, "mape_pct"].to_numpy()
+        merged[f"{slug}_hit"] = df.loc[idx, "gate_hit_rate_pct"].to_numpy()
+        merged[f"{slug}_lat"] = df.loc[idx, "latency_us_per_seq"].to_numpy()
 
     out_csv = RESULTS_ROOT / f"comparison_{profile_mode}_{param_slug}.csv"
     merged.to_csv(out_csv, index=False)
 
     # Render summary bar chart (RMSE & Gate Hit Rate by Radar Type & Error Level)
-    fig, axes = plt.subplots(1, 2, figsize=(15, 5.5))
+    fig, axes = plt.subplots(2, 1, figsize=(17, 10))
     labels = [f"{r['radar_type']}\n({r['error_level']})" for _, r in merged.iterrows()]
     x = np.arange(len(labels))
-    w = 0.27
+    w = 0.8 / len(METHODS)
+    for i, (slug, _, short, _, color, _) in enumerate(METHODS):
+        off = (i - (len(METHODS) - 1) / 2) * w
+        axes[0].bar(x + off, merged[f"{slug}_rmse"], width=w, label=short, color=color)
+        axes[1].bar(x + off, merged[f"{slug}_hit"], width=w, label=short, color=color)
 
-    axes[0].bar(x - w, merged["rm_rmse"], width=w, label="Rolling Median", color="tab:orange")
-    axes[0].bar(x, merged["pe_rmse"], width=w, label="Period Estimation", color="tab:red")
-    axes[0].bar(x + w, merged["hmm_rmse"], width=w, label="Hidden Markov Model", color="tab:purple")
     axes[0].set_title("RMSE by Radar Type & Error Level (Lower is Better)", fontweight="bold")
     axes[0].set_ylabel(f"RMSE ({unit})")
-    axes[0].set_xticks(x)
-    axes[0].set_xticklabels(labels, rotation=75, fontsize=7.5)
-    axes[0].legend()
-    axes[0].grid(axis="y", linestyle=":", alpha=0.6)
-
-    axes[1].bar(x - w, merged["rm_hit"], width=w, label="Rolling Median", color="tab:orange")
-    axes[1].bar(x, merged["pe_hit"], width=w, label="Period Estimation", color="tab:red")
-    axes[1].bar(x + w, merged["hmm_hit"], width=w, label="Hidden Markov Model", color="tab:purple")
     axes[1].set_title("Tactical Gate Hit Rate (±10 μs) (Higher is Better)", fontweight="bold")
     axes[1].set_ylabel("Hit Rate (%)")
     axes[1].set_ylim(0, 108)
-    axes[1].set_xticks(x)
-    axes[1].set_xticklabels(labels, rotation=75, fontsize=7.5)
-    axes[1].legend()
-    axes[1].grid(axis="y", linestyle=":", alpha=0.6)
+    for ax in axes:
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels, rotation=75, fontsize=7.5)
+        ax.legend(ncol=len(METHODS), fontsize=8)
+        ax.grid(axis="y", linestyle=":", alpha=0.6)
 
     plt.tight_layout()
     summary_plot_path = RESULTS_ROOT / "plots_comparison" / f"{profile_mode}_{param_slug}" / "summary_metrics_bar_chart.png"
@@ -187,34 +184,51 @@ def generate_comparison_report(profile_mode: str = "fixed", param_slug: str = "p
     plt.savefig(summary_plot_path, dpi=180)
     plt.close()
 
+    shorts = [short for _, _, short, *_ in METHODS]
+    slugs = [slug for slug, *_ in METHODS]
+    sep = "|---|---|" + "---:|" * len(METHODS)
+
+    def table(metric: str, fmt: str, best: str) -> list:
+        rows = []
+        for _, r in merged.iterrows():
+            vals = [r[f"{s}_{metric}"] for s in slugs]
+            target = min(vals) if best == "min" else max(vals)
+            cells = [f"**{format(v, fmt)}**" if np.isclose(v, target) else format(v, fmt) for v in vals]
+            rows.append(f"| `{r['radar_type']}` | `{r['error_level']}` | " + " | ".join(cells) + " |")
+        return rows
+
+    head = "| Radar Type | Error Level | " + " | ".join(shorts) + " |"
+    n_seq = int(merged["evaluated_sequences"].max())
     md_lines = [
         f"# Classic Methods Side-by-Side Comparison [{param_slug.upper()} - {profile_mode.capitalize()}]",
         "",
-        "## 1. Root Mean Squared Error (RMSE) & Mean Absolute Error (MAE)",
+        f"All methods evaluated on the same {n_seq} test sequences per dataset "
+        "(context = 96 pulses, horizon = 32 pulses). Best value per row in **bold**.",
         "",
-        f"| Radar Type | Error Level | Rolling Median RMSE ({unit}) | Period Est. RMSE ({unit}) | HMM RMSE ({unit}) | Rolling Median MAE ({unit}) | Period Est. MAE ({unit}) | HMM MAE ({unit}) |",
-        "|---|---|---:|---:|---:|---:|---:|---:|",
+        f"## 1. Root Mean Squared Error (RMSE, {unit})",
+        "",
+        head,
+        sep,
+        *table("rmse", ".2f", "min"),
+        "",
+        f"## 2. Mean Absolute Error (MAE, {unit})",
+        "",
+        head,
+        sep,
+        *table("mae", ".2f", "min"),
+        "",
+        "## 3. Tactical Gate Hit Rate (+/-10 us, %)",
+        "",
+        head,
+        sep,
+        *table("hit", ".1f", "max"),
+        "",
+        "## 4. Inference Latency (us per sequence, Python, single core)",
+        "",
+        head,
+        sep,
+        *table("lat", ".0f", "min"),
     ]
-    for _, r in merged.iterrows():
-        md_lines.append(
-            f"| `{r['radar_type']}` | `{r['error_level']}` | "
-            f"{r['rm_rmse']:.2f} | {r['pe_rmse']:.2f} | {r['hmm_rmse']:.2f} | "
-            f"{r['rm_mae']:.2f} | {r['pe_mae']:.2f} | {r['hmm_mae']:.2f} |"
-        )
-
-    md_lines.extend([
-        "",
-        "## 2. Tactical Gate Hit Rate (+/-10 us) & Inference Latency",
-        "",
-        "| Radar Type | Error Level | Rolling Median Hit Rate | Period Est. Hit Rate | HMM Hit Rate | Rolling Median Latency (us) | Period Est. Latency (us) | HMM Latency (us) |",
-        "|---|---|---:|---:|---:|---:|---:|---:|",
-    ])
-    for _, r in merged.iterrows():
-        md_lines.append(
-            f"| `{r['radar_type']}` | `{r['error_level']}` | "
-            f"{r['rm_hit']:.1f}% | {r['pe_hit']:.1f}% | {r['hmm_hit']:.1f}% | "
-            f"{r['rm_lat']:.1f} | {r['pe_lat']:.1f} | {r['hmm_lat']:.1f} |"
-        )
 
     out_md = RESULTS_ROOT / f"comparison_{profile_mode}_{param_slug}.md"
     out_md.write_text("\n".join(md_lines) + "\n", encoding="utf-8")
