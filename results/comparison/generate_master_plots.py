@@ -1,15 +1,16 @@
 """PULSAR: Master Benchmark Visualization Suite (Primary Operational Benchmark: Varying Profile).
 
-Generates publication-grade figures inspired by executive leaderboard aesthetics:
+Generates publication-grade figures:
 1. `macro_pri_benchmark_leaderboard.png`:
    - Left: Overall PRI Gate Hit Rate (%) & MAE Leaderboard (Horizontal Bars, ranked).
-     Features distinct textures/hatches distinguishing Classical (///), LoRA SFT (solid), and Zero-Shot (..).
-   - Right: PRI Modulation Matrix with Diagonal Split Triangles:
-     - Upper-Left Triangle: Gate Hit Rate (%) [YlGnBu cmap]
-     - Lower-Right Triangle: Mean Absolute Error (μs) [YlOrRd cmap]
+     Unified colors per model family (Classical=Grey, Chronos-2=Blue, TimesFM=Red,
+     t0-gamma=Purple, Toto 2.0=Teal, TiRex-2=Amber), with prominent borders for multi-fine-tuned models.
+   - Right: PRI Modulation Matrix with Side-by-Side Sub-Rectangles:
+     - Left Sub-Rectangle: Gate Hit Rate (%) [YlGnBu colormap]
+     - Right Sub-Rectangle: Mean Absolute Error (μs) [YlOrRd colormap]
 2. `noise_level_pri_benchmark_leaderboard.png`:
    - Left: Overall PRI Gate Hit Rate (%) & MAE Leaderboard (Horizontal Bars, ranked).
-   - Right: PRI Noise Degradation Matrix with Diagonal Split Triangles (Clean -> Lv3).
+   - Right: PRI Noise Degradation Matrix with Side-by-Side Sub-Rectangles (Clean -> Lv3).
 3. `auxiliary_rf_aoa_comparison.png`: Carrier Frequency (RF) and Angle of Arrival (AOA)
    tracking comparison across models.
 4. `univariate_vs_multivariate_comparison.png`: Univariate vs. 5-Channel Multivariate
@@ -64,177 +65,170 @@ RADAR_LABELS = ["Stable", "Dwell & Switch", "Sliding", "Stagger", "Jitter"]
 ERROR_ORDER = ["clean", "error_lv1", "error_lv2", "error_lv3"]
 ERROR_LABELS = ["Clean", "Error Lv1", "Error Lv2", "Error Lv3"]
 
+# Unified Palette: Same color per model family, no patterns, prominent border for multi fine-tuned
+COLOR_CLASSIC = "#546e7a"   # Slate Grey (All Classical Algorithms)
+COLOR_CHRONOS = "#1976d2"   # Royal Cobalt Blue (All Chronos-2 Variants)
+COLOR_TIMESFM = "#d32f2f"   # Deep Crimson Red (All TimesFM Variants)
+COLOR_T0      = "#7b1fa2"   # Rich Amethyst Purple
+COLOR_TOTO    = "#00838f"   # Dark Cyan / Teal
+COLOR_TIREX   = "#f57f17"   # Deep Amber / Gold
+
 MODELS = [
     {
         "name": "[Classic] Period Estimation (P_max=24)",
-        "color": "#2c3e50",  # Classical: Dark Slate Steel
+        "color": COLOR_CLASSIC,
         "df": classic_df,
         "hit_col": "period_estimation_hit",
         "mae_col": "period_estimation_mae",
         "category": "classic",
-        "hatch": "///",
-        "edgecolor": "#1a252f",
-        "linewidth": 1.2,
+        "edgecolor": "#263238",
+        "linewidth": 1.0,
     },
     {
         "name": "[Classic] Kalman Filter (Bank)",
-        "color": "#34495e",  # Classical: Medium Slate Steel
+        "color": COLOR_CLASSIC,
         "df": classic_df,
         "hit_col": "kalman_filter_hit",
         "mae_col": "kalman_filter_mae",
         "category": "classic",
-        "hatch": "///",
-        "edgecolor": "#1a252f",
-        "linewidth": 1.2,
+        "edgecolor": "#263238",
+        "linewidth": 1.0,
     },
     {
         "name": "[LoRA] Chronos-2 (Uni)",
-        "color": "#1565c0",  # Chronos LoRA: Deep Royal Blue
+        "color": COLOR_CHRONOS,
         "df": chr_lora_df,
         "hit_col": "hit_rate_pct",
         "mae_col": "mae",
-        "category": "lora",
-        "hatch": "",
+        "category": "lora_uni",
         "edgecolor": "#0d47a1",
-        "linewidth": 1.1,
+        "linewidth": 1.4,
     },
     {
         "name": "[LoRA] TimesFM 3.0 (Uni)",
-        "color": "#c62828",  # TimesFM LoRA: Deep Crimson Terracotta
+        "color": COLOR_TIMESFM,
         "df": tfm_lora_df,
         "hit_col": "gate_hit_rate_pct",
         "mae_col": "mae_us",
-        "category": "lora",
-        "hatch": "",
+        "category": "lora_uni",
         "edgecolor": "#b71c1c",
-        "linewidth": 1.1,
+        "linewidth": 1.4,
     },
     {
-        "name": "[LoRA] Chronos-2 (Multi)",
-        "color": "#1976d2",  # Chronos LoRA: Vivid Cobalt Blue
+        "name": "[LoRA Multi] Chronos-2",
+        "color": COLOR_CHRONOS,
         "df": chr_mv_lora_df,
         "hit_col": "hit_rate_pri",
         "mae_col": "mae_pri",
-        "category": "lora",
-        "hatch": "",
-        "edgecolor": "#0d47a1",
-        "linewidth": 1.1,
+        "category": "lora_multi",
+        "edgecolor": "#111111",
+        "linewidth": 2.6,
     },
     {
         "name": "[Zero-Shot] t0-gamma (Uni)",
-        "color": "#7b1fa2",  # Zero-Shot: Rich Amethyst Violet
+        "color": COLOR_T0,
         "df": t0_df,
         "hit_col": "gate_hit_rate_pct",
         "mae_col": "mae_us",
         "category": "zero_shot",
-        "hatch": "..",
         "edgecolor": "#4a148c",
-        "linewidth": 0.9,
+        "linewidth": 0.8,
     },
     {
         "name": "[Zero-Shot] Chronos-2 (Uni)",
-        "color": "#64b5f6",  # Chronos ZS: Light Sky Blue
+        "color": COLOR_CHRONOS,
         "df": chr_zs_df,
         "hit_col": "hit_rate_pct",
         "mae_col": "mae",
         "category": "zero_shot",
-        "hatch": "..",
-        "edgecolor": "#1976d2",
-        "linewidth": 0.9,
+        "edgecolor": "#90caf9",
+        "linewidth": 0.8,
     },
     {
         "name": "[Zero-Shot] Toto 2.0 (Uni)",
-        "color": "#00acc1",  # Zero-Shot: Cyan / Teal
+        "color": COLOR_TOTO,
         "df": toto_df,
         "hit_col": "gate_hit_rate_pct",
         "mae_col": "mae_us",
         "category": "zero_shot",
-        "hatch": "..",
-        "edgecolor": "#00838f",
-        "linewidth": 0.9,
+        "edgecolor": "#004d40",
+        "linewidth": 0.8,
     },
     {
         "name": "[Zero-Shot] Chronos-2 (Multi)",
-        "color": "#90caf9",  # Chronos ZS: Soft Ice Blue
+        "color": COLOR_CHRONOS,
         "df": chr_mv_zs_df,
         "hit_col": "hit_rate_pri",
         "mae_col": "mae_pri",
         "category": "zero_shot",
-        "hatch": "..",
-        "edgecolor": "#1976d2",
-        "linewidth": 0.9,
+        "edgecolor": "#90caf9",
+        "linewidth": 0.8,
     },
     {
         "name": "[Classic] HMM (Baum-Welch + Viterbi)",
-        "color": "#455a64",  # Classical: Slate Grey
+        "color": COLOR_CLASSIC,
         "df": classic_df,
         "hit_col": "hidden_markov_model_hit",
         "mae_col": "hidden_markov_model_mae",
         "category": "classic",
-        "hatch": "///",
-        "edgecolor": "#1a252f",
-        "linewidth": 1.2,
+        "edgecolor": "#263238",
+        "linewidth": 1.0,
     },
     {
-        "name": "[LoRA] TimesFM 3.0 (Multi)",
-        "color": "#d84315",  # TimesFM LoRA: Rust / Burnt Orange
+        "name": "[LoRA Multi] TimesFM 3.0",
+        "color": COLOR_TIMESFM,
         "df": tfm_mv_lora_df,
         "hit_col": "hit_rate_pri",
         "mae_col": "mae_pri",
-        "category": "lora",
-        "hatch": "",
-        "edgecolor": "#bf360c",
-        "linewidth": 1.1,
+        "category": "lora_multi",
+        "edgecolor": "#111111",
+        "linewidth": 2.6,
     },
     {
         "name": "[Zero-Shot] TiRex-2 (Uni)",
-        "color": "#ff8f00",  # Zero-Shot: Vivid Amber
+        "color": COLOR_TIREX,
         "df": tirex_df,
         "hit_col": "hit_rate_pct",
         "mae_col": "mae",
         "category": "zero_shot",
-        "hatch": "..",
         "edgecolor": "#e65100",
-        "linewidth": 0.9,
+        "linewidth": 0.8,
     },
     {
         "name": "[Zero-Shot] TimesFM 3.0 (Multi)",
-        "color": "#f57c00",  # TimesFM ZS: Warm Orange-Gold
+        "color": COLOR_TIMESFM,
         "df": tfm_mv_zs_df,
         "hit_col": "hit_rate_pri",
         "mae_col": "mae_pri",
         "category": "zero_shot",
-        "hatch": "..",
-        "edgecolor": "#e65100",
-        "linewidth": 0.9,
+        "edgecolor": "#ef9a9a",
+        "linewidth": 0.8,
     },
     {
         "name": "[Zero-Shot] TimesFM 3.0 (Uni)",
-        "color": "#ffb74d",  # TimesFM ZS: Light Golden Sand
+        "color": COLOR_TIMESFM,
         "df": tfm_zs_df,
         "hit_col": "gate_hit_rate_pct",
         "mae_col": "mae_us",
         "category": "zero_shot",
-        "hatch": "..",
-        "edgecolor": "#ef6c00",
-        "linewidth": 0.9,
+        "edgecolor": "#ef9a9a",
+        "linewidth": 0.8,
     },
     {
         "name": "[Classic] Rolling Median (W=32)",
-        "color": "#607d8b",  # Classical: Light Slate
+        "color": COLOR_CLASSIC,
         "df": classic_df,
         "hit_col": "rolling_median_hit",
         "mae_col": "rolling_median_mae",
         "category": "classic",
-        "hatch": "///",
-        "edgecolor": "#1a252f",
-        "linewidth": 1.2,
+        "edgecolor": "#263238",
+        "linewidth": 1.0,
     },
 ]
 
 
 def render_benchmark_graphic(group_by="radar", out_filename="macro_pri_benchmark_leaderboard.png"):
-    """Renders 2-part graphic: Left Leaderboard + Right Aligned Diagonal Split Triangles."""
+    """Renders 2-part graphic: Left Leaderboard + Right Aligned Side-by-Side Sub-Rectangles."""
     is_radar = (group_by == "radar")
     cols = RADAR_ORDER if is_radar else ERROR_ORDER
     col_labels = RADAR_LABELS if is_radar else ERROR_LABELS
@@ -260,7 +254,6 @@ def render_benchmark_graphic(group_by="radar", out_filename="macro_pri_benchmark
             "name": m["name"],
             "color": m["color"],
             "category": m["category"],
-            "hatch": m["hatch"],
             "edgecolor": m["edgecolor"],
             "linewidth": m["linewidth"],
             "macro_hit": macro_hit,
@@ -273,8 +266,8 @@ def render_benchmark_graphic(group_by="radar", out_filename="macro_pri_benchmark
 
     N = len(parsed_models)
     M = len(cols)
-    fig = plt.figure(figsize=(23, 10.5), dpi=300)
-    gs = fig.add_gridspec(1, 2, width_ratios=[0.44, 0.56], wspace=0.18)
+    fig = plt.figure(figsize=(24, 10.5), dpi=300)
+    gs = fig.add_gridspec(1, 2, width_ratios=[0.43, 0.57], wspace=0.18)
     ax_bar = fig.add_subplot(gs[0, 0])
     ax_heat = fig.add_subplot(gs[0, 1])
 
@@ -283,7 +276,6 @@ def render_benchmark_graphic(group_by="radar", out_filename="macro_pri_benchmark
     hits = [m["macro_hit"] for m in parsed_models]
     maes = [m["macro_mae"] for m in parsed_models]
     colors = [m["color"] for m in parsed_models]
-    hatches = [m["hatch"] for m in parsed_models]
     edgecolors = [m["edgecolor"] for m in parsed_models]
     linewidths = [m["linewidth"] for m in parsed_models]
     names = [m["name"] for m in parsed_models]
@@ -298,16 +290,15 @@ def render_benchmark_graphic(group_by="radar", out_filename="macro_pri_benchmark
             color=colors[idx],
             height=0.74,
             edgecolor=edgecolors[idx],
-            hatch=hatches[idx],
             linewidth=linewidths[idx],
-            alpha=0.95,
+            alpha=0.92,
             zorder=2,
         )
 
     ax_bar.set_yticks(y_pos)
     ax_bar.set_yticklabels(names, fontsize=10.5, fontweight="semibold", color="#202124")
     ax_bar.set_xlim(0, 105)
-    ax_bar.set_xlabel("Mean PRI Gate Hit Rate (%) [±10 μs Gate Corridor]", fontsize=11, fontweight="bold", labelpad=8)
+    ax_bar.set_xlabel("Mean PRI Gate Hit Rate (%) [±10 μs Corridor]", fontsize=11, fontweight="bold", labelpad=8)
     ax_bar.set_title("A. Overall Tactical PRI Gate Hit Rate & MAE Leaderboard", fontsize=12.5, fontweight="bold", loc="left", pad=12)
 
     for idx, (hit, mae) in enumerate(zip(hits, maes)):
@@ -328,11 +319,15 @@ def render_benchmark_graphic(group_by="radar", out_filename="macro_pri_benchmark
     ax_bar.spines["left"].set_color("#cccccc")
     ax_bar.spines["bottom"].set_color("#cccccc")
 
-    # Legend for Paradigm Differentiation (Classic vs LoRA vs Zero-Shot)
+    # Legend for Model Families & Multivariate LoRA Prominence
     legend_handles = [
-        patches.Patch(facecolor="#34495e", edgecolor="#1a252f", hatch="///", label="Classical Signal Processing Baselines"),
-        patches.Patch(facecolor="#1565c0", edgecolor="#0d47a1", label="Fine-Tuned Foundation Models (LoRA SFT)"),
-        patches.Patch(facecolor="#90caf9", edgecolor="#37474f", hatch="..", label="Pre-Trained Foundation Models (Zero-Shot)"),
+        patches.Patch(facecolor=COLOR_CLASSIC, edgecolor="#263238", label="Classical Baselines (Grey)"),
+        patches.Patch(facecolor=COLOR_CHRONOS, edgecolor="#0d47a1", label="Chronos-2 Family (Blue)"),
+        patches.Patch(facecolor=COLOR_TIMESFM, edgecolor="#b71c1c", label="TimesFM 3.0 Family (Red)"),
+        patches.Patch(facecolor=COLOR_T0, edgecolor="#4a148c", label="t0-gamma (Purple)"),
+        patches.Patch(facecolor=COLOR_TOTO, edgecolor="#004d40", label="Toto 2.0 (Teal)"),
+        patches.Patch(facecolor=COLOR_TIREX, edgecolor="#e65100", label="TiRex-2 (Amber)"),
+        patches.Patch(facecolor="white", edgecolor="#111111", linewidth=2.4, label="LoRA Multivariate (Prominent Bold Border)"),
     ]
     ax_bar.legend(
         handles=legend_handles,
@@ -340,11 +335,12 @@ def render_benchmark_graphic(group_by="radar", out_filename="macro_pri_benchmark
         frameon=True,
         facecolor="#ffffff",
         edgecolor="#cccccc",
-        framealpha=0.95,
-        fontsize=9.2,
+        framealpha=0.96,
+        fontsize=8.8,
+        ncol=2,
     )
 
-    # Right: Aligned Diagonal Split Triangles
+    # Right: Aligned Side-by-Side Sub-Rectangles Matrix
     cmap_hit = plt.cm.YlGnBu
     norm_hit = mcolors.Normalize(vmin=0, vmax=100)
 
@@ -358,58 +354,54 @@ def render_benchmark_graphic(group_by="radar", out_filename="macro_pri_benchmark
             color_hit = cmap_hit(norm_hit(c_hit))
             color_mae = cmap_mae(norm_mae(np.clip(c_mae, 0, 60)))
 
-            # Upper-Left Triangle (Hit Rate %)
-            poly_top = patches.Polygon(
-                [
-                    (c_idx - 0.5, r_idx - 0.5),
-                    (c_idx + 0.5, r_idx - 0.5),
-                    (c_idx - 0.5, r_idx + 0.5),
-                ],
+            # Left Sub-Rectangle (Hit Rate %)
+            rect_left = patches.Rectangle(
+                (c_idx - 0.5, r_idx - 0.5),
+                0.5,
+                1.0,
                 facecolor=color_hit,
                 edgecolor="#ffffff",
                 linewidth=0.75,
                 zorder=2,
             )
-            # Lower-Right Triangle (MAE μs)
-            poly_bot = patches.Polygon(
-                [
-                    (c_idx + 0.5, r_idx - 0.5),
-                    (c_idx + 0.5, r_idx + 0.5),
-                    (c_idx - 0.5, r_idx + 0.5),
-                ],
+            # Right Sub-Rectangle (MAE μs)
+            rect_right = patches.Rectangle(
+                (c_idx, r_idx - 0.5),
+                0.5,
+                1.0,
                 facecolor=color_mae,
                 edgecolor="#ffffff",
                 linewidth=0.75,
                 zorder=2,
             )
 
-            ax_heat.add_patch(poly_top)
-            ax_heat.add_patch(poly_bot)
+            ax_heat.add_patch(rect_left)
+            ax_heat.add_patch(rect_right)
 
-            # High-contrast dynamic text
+            # High-contrast text colors
             hit_text_color = "white" if c_hit > 60 else "#141414"
             mae_text_color = "white" if c_mae > 35 else "#141414"
 
-            # Top-left label: Hit Rate %
+            # Text: Left = Hit Rate %
             ax_heat.text(
-                c_idx - 0.16,
-                r_idx - 0.14,
+                c_idx - 0.25,
+                r_idx,
                 f"{c_hit:.1f}%",
                 ha="center",
                 va="center",
-                fontsize=9.2,
+                fontsize=9.0,
                 fontweight="bold",
                 color=hit_text_color,
                 zorder=3,
             )
-            # Bottom-right label: MAE μs
+            # Text: Right = MAE μs
             ax_heat.text(
-                c_idx + 0.16,
-                r_idx + 0.18,
-                f"{c_mae:.1f} μs",
+                c_idx + 0.25,
+                r_idx,
+                f"{c_mae:.1f}",
                 ha="center",
                 va="center",
-                fontsize=8.4,
+                fontsize=8.5,
                 fontweight="semibold",
                 color=mae_text_color,
                 zorder=3,
@@ -422,12 +414,35 @@ def render_benchmark_graphic(group_by="radar", out_filename="macro_pri_benchmark
     ax_heat.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False, left=False, right=False)
     ax_heat.set_yticks([])
 
+    # Column Sub-headers: Hit % | MAE μs
+    for c_idx in range(M):
+        ax_heat.text(
+            c_idx - 0.25,
+            -0.82,
+            "Hit %",
+            ha="center",
+            va="bottom",
+            fontsize=9.0,
+            fontweight="bold",
+            color="#0d47a1",
+        )
+        ax_heat.text(
+            c_idx + 0.25,
+            -0.82,
+            "MAE (μs)",
+            ha="center",
+            va="bottom",
+            fontsize=8.5,
+            fontweight="bold",
+            color="#b71c1c",
+        )
+
     sub_title = (
-        "B. PRI Hit Rate (Upper-Left) & MAE (Lower-Right) by Radar Modulation Type"
+        "B. PRI Hit Rate (Left Sub-Cell) & MAE (Right Sub-Cell) by Radar Modulation Type"
         if is_radar
-        else "B. PRI Hit Rate (Upper-Left) & MAE (Lower-Right) by Noise Error Level"
+        else "B. PRI Hit Rate (Left Sub-Cell) & MAE (Right Sub-Cell) by Noise Error Level"
     )
-    ax_heat.set_title(sub_title, fontsize=12.0, fontweight="bold", loc="left", pad=28)
+    ax_heat.set_title(sub_title, fontsize=12.0, fontweight="bold", loc="left", pad=32)
     ax_heat.spines[:].set_color("#888888")
     ax_heat.spines[:].set_linewidth(1.0)
 
@@ -437,12 +452,12 @@ def render_benchmark_graphic(group_by="radar", out_filename="macro_pri_benchmark
 
     cax_hit = fig.add_axes([0.915, 0.55, 0.016, 0.33])
     cbar_hit = fig.colorbar(sm_hit, cax=cax_hit)
-    cbar_hit.set_label("Upper-Left: Gate Hit Rate (%)", fontsize=9.5, fontweight="bold")
+    cbar_hit.set_label("Left Sub-Cell: Gate Hit Rate (%)", fontsize=9.5, fontweight="bold")
     cbar_hit.ax.tick_params(labelsize=8.5)
 
     cax_mae = fig.add_axes([0.915, 0.14, 0.016, 0.33])
     cbar_mae = fig.colorbar(sm_mae, cax=cax_mae)
-    cbar_mae.set_label("Lower-Right: Mean Absolute Error (μs)", fontsize=9.5, fontweight="bold")
+    cbar_mae.set_label("Right Sub-Cell: Mean Absolute Error (μs)", fontsize=9.5, fontweight="bold")
     cbar_mae.ax.tick_params(labelsize=8.5)
 
     main_title = (
@@ -480,8 +495,8 @@ def plot_auxiliary_rf_aoa():
         rf_zs_means = [df_rf_zs[df_rf_zs["radar_type"] == r][rf_col_zs].mean() for r in RADAR_ORDER]
         rf_lora_means = [df_rf_lora[df_rf_lora["radar_type"] == r][rf_col_lora].mean() for r in RADAR_ORDER]
 
-        ax_rf.bar(x - width/2, rf_zs_means, width, label="TimesFM 3.0 (Zero-Shot)", color="#4285F4", alpha=0.9, edgecolor="white", hatch="..")
-        ax_rf.bar(x + width/2, rf_lora_means, width, label="TimesFM 3.0 (LoRA SFT)", color="#0F9D58", alpha=0.9, edgecolor="white")
+        ax_rf.bar(x - width/2, rf_zs_means, width, label="TimesFM 3.0 (Zero-Shot)", color="#ef5350", alpha=0.9, edgecolor="#b71c1c")
+        ax_rf.bar(x + width/2, rf_lora_means, width, label="TimesFM 3.0 (LoRA SFT)", color="#b71c1c", alpha=0.95, edgecolor="#111111", linewidth=1.5)
 
         for i in range(len(RADAR_ORDER)):
             diff = rf_zs_means[i] - rf_lora_means[i]
@@ -494,7 +509,7 @@ def plot_auxiliary_rf_aoa():
                     ha="center",
                     fontsize=8.5,
                     fontweight="bold",
-                    color="#0F9D58",
+                    color="#b71c1c",
                 )
 
         ax_rf.set_title("Carrier Frequency (RF) Tracking Error by Radar Type", fontweight="bold", fontsize=12)
@@ -513,8 +528,8 @@ def plot_auxiliary_rf_aoa():
         aoa_zs_means = [df_aoa_zs[df_aoa_zs["radar_type"] == r][aoa_col_zs].mean() for r in RADAR_ORDER]
         aoa_lora_means = [df_aoa_lora[df_aoa_lora["radar_type"] == r][aoa_col_lora].mean() for r in RADAR_ORDER]
 
-        ax_aoa.bar(x - width/2, aoa_zs_means, width, label="TimesFM 3.0 (Zero-Shot)", color="#4285F4", alpha=0.9, edgecolor="white", hatch="..")
-        ax_aoa.bar(x + width/2, aoa_lora_means, width, label="TimesFM 3.0 (LoRA SFT)", color="#0F9D58", alpha=0.9, edgecolor="white")
+        ax_aoa.bar(x - width/2, aoa_zs_means, width, label="TimesFM 3.0 (Zero-Shot)", color="#ef5350", alpha=0.9, edgecolor="#b71c1c")
+        ax_aoa.bar(x + width/2, aoa_lora_means, width, label="TimesFM 3.0 (LoRA SFT)", color="#b71c1c", alpha=0.95, edgecolor="#111111", linewidth=1.5)
 
         for i in range(len(RADAR_ORDER)):
             diff = aoa_zs_means[i] - aoa_lora_means[i]
@@ -527,7 +542,7 @@ def plot_auxiliary_rf_aoa():
                     ha="center",
                     fontsize=8.5,
                     fontweight="bold",
-                    color="#0F9D58",
+                    color="#b71c1c",
                 )
 
         ax_aoa.set_title("Circular Angle of Arrival (AOA) Error by Radar Type", fontweight="bold", fontsize=12)
@@ -568,8 +583,8 @@ def plot_univariate_vs_multivariate():
         uni_means = [df_uni[df_uni["error_level"] == e]["mae_us"].mean() for e in ERROR_ORDER]
         mv_means = [df_mv[df_mv["error_level"] == e]["mae_pri"].mean() for e in ERROR_ORDER]
 
-        ax_tfm.bar(x - width/2, uni_means, width, label="Univariate PRI (Delta-TOA only)", color="#0F9D58", alpha=0.85, edgecolor="white")
-        ax_tfm.bar(x + width/2, mv_means, width, label="Multivariate 5-Channel (Joint)", color="#202124", alpha=0.85, edgecolor="white")
+        ax_tfm.bar(x - width/2, uni_means, width, label="TimesFM LoRA (Univariate PRI)", color="#ef5350", alpha=0.85, edgecolor="#b71c1c")
+        ax_tfm.bar(x + width/2, mv_means, width, label="TimesFM LoRA (Multivariate 5-Ch)", color="#b71c1c", alpha=0.95, edgecolor="#111111", linewidth=2.0)
 
         for i in range(len(ERROR_ORDER)):
             diff = uni_means[i] - mv_means[i]
@@ -599,8 +614,8 @@ def plot_univariate_vs_multivariate():
         chr_uni_means = [df_chr_uni[df_chr_uni["error_level"] == e]["mae"].mean() for e in ERROR_ORDER]
         chr_mv_means = [df_chr_mv[df_chr_mv["error_level"] == e]["mae_pri"].mean() for e in ERROR_ORDER]
 
-        ax_chr.bar(x - width/2, chr_uni_means, width, label="Univariate PRI (Delta-TOA only)", color="#1565c0", alpha=0.85, edgecolor="white")
-        ax_chr.bar(x + width/2, chr_mv_means, width, label="Multivariate 5-Channel (Joint)", color="#455a64", alpha=0.85, edgecolor="white")
+        ax_chr.bar(x - width/2, chr_uni_means, width, label="Chronos-2 LoRA (Univariate PRI)", color="#64b5f6", alpha=0.85, edgecolor="#1976d2")
+        ax_chr.bar(x + width/2, chr_mv_means, width, label="Chronos-2 LoRA (Multivariate 5-Ch)", color="#1976d2", alpha=0.95, edgecolor="#111111", linewidth=2.0)
 
         for i in range(len(ERROR_ORDER)):
             diff = chr_uni_means[i] - chr_mv_means[i]
@@ -638,7 +653,7 @@ def plot_univariate_vs_multivariate():
 
 
 def main():
-    print("Generating master benchmark figures (Varying Profile - Primary Operational Benchmark)...")
+    print("Generating master benchmark figures (Varying Profile - Side-by-Side Rectangles & Unified Family Palette)...")
     render_benchmark_graphic(group_by="radar", out_filename="macro_pri_benchmark_leaderboard.png")
     render_benchmark_graphic(group_by="error", out_filename="noise_level_pri_benchmark_leaderboard.png")
     plot_auxiliary_rf_aoa()

@@ -15,11 +15,11 @@ This document provides the consolidated cross-model benchmark across all five ti
 
 ### 1. Macro Leaderboard & Radar Modulation Matrix
 ![Macro PRI Benchmark Leaderboard](macro_pri_benchmark_leaderboard.png)
-*Figure 1: Executive 2-part benchmark graphic for the Varying Profile. (A) Overall Tactical PRI Gate Hit Rate (%) and MAE leaderboard ranking all 15 foundation model variants and classical baselines, styled with distinct hatch textures separating Classical Baselines (`///`), Fine-Tuned LoRA (`solid`), and Pre-Trained Zero-Shot (`..`). (B) Modulation matrix featuring Diagonal Split Triangles: Upper-Left Triangle = PRI Gate Hit Rate (%) [YlGnBu colormap]; Lower-Right Triangle = PRI Mean Absolute Error (μs) [YlOrRd colormap].*
+*Figure 1: Executive 2-part benchmark graphic for the Varying Profile. (A) Overall Tactical PRI Gate Hit Rate (%) and MAE leaderboard ranking all 15 foundation model variants and classical baselines, styled with unified model family colors (Grey=Classical, Blue=Chronos-2, Red=TimesFM, Purple=t0-gamma, Teal=Toto 2.0, Amber=TiRex-2) and prominent bold borders for multivariate fine-tuned models. (B) Modulation matrix featuring Side-by-Side Sub-Rectangles: Left Sub-Cell = PRI Gate Hit Rate (%) [YlGnBu colormap]; Right Sub-Cell = PRI Mean Absolute Error (μs) [YlOrRd colormap].*
 
 ### 2. Macro Leaderboard & Noise Degradation Matrix
 ![Noise Level PRI Benchmark Leaderboard](noise_level_pri_benchmark_leaderboard.png)
-*Figure 2: Noise resilience breakdown on the Varying Profile. (A) Overall leaderboard. (B) Channel corruption matrix featuring Diagonal Split Triangles across progressive noise regimes (`Clean`, `Error Lv1`, `Error Lv2`, `Error Lv3`), illustrating how Hit Rate (Upper-Left) degrades as MAE (Lower-Right) climbs.*
+*Figure 2: Noise resilience breakdown on the Varying Profile. (A) Overall leaderboard. (B) Channel corruption matrix featuring Side-by-Side Sub-Rectangles across progressive noise regimes (`Clean`, `Error Lv1`, `Error Lv2`, `Error Lv3`), illustrating how Hit Rate (Left Sub-Cell) degrades as MAE (Right Sub-Cell) climbs.*
 
 ### 3. Auxiliary Modalities: Spectral (RF) & Spatial (AOA) Performance
 ![Auxiliary RF and AOA Tracking](auxiliary_rf_aoa_comparison.png)
