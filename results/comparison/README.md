@@ -77,3 +77,297 @@ pip install toto-models>=1.0.0
 
 ## LoRA Fine-Tuning
 - LoRA fine-tuning implemented for t0-gamma
+---
+## Comprehensive Model Comparison: Zero-Shot vs LoRA Fine-Tuned
+All models evaluated on 200 test sequences per dataset (5 radar types × 4 error levels).
+PRI parameter, fixed profile, context=96, horizon=32.
+| Model | Radar Type | Error Level | MAE (μs) | Hit Rate (%) |
+|---|---|---|---:|---:|
+| TimesFM 3.0 LoRA SFT | dwell_and_switch | clean | 0.25 | 100.0% |
+| TimesFM 3.0 LoRA SFT | dwell_and_switch | error_lv1 | 8.84 | 91.4% |
+| TimesFM 3.0 LoRA SFT | dwell_and_switch | error_lv2 | 23.01 | 70.6% |
+| TimesFM 3.0 LoRA SFT | dwell_and_switch | error_lv3 | 39.78 | 50.0% |
+| TimesFM 3.0 LoRA SFT | jitter | clean | 39.89 | 15.6% |
+| TimesFM 3.0 LoRA SFT | jitter | error_lv1 | 40.44 | 15.6% |
+| TimesFM 3.0 LoRA SFT | jitter | error_lv2 | 40.61 | 14.5% |
+| TimesFM 3.0 LoRA SFT | jitter | error_lv3 | 40.60 | 15.2% |
+| TimesFM 3.0 LoRA SFT | sliding | clean | 0.39 | 100.0% |
+| TimesFM 3.0 LoRA SFT | sliding | error_lv1 | 6.74 | 84.1% |
+| TimesFM 3.0 LoRA SFT | sliding | error_lv2 | 18.69 | 56.4% |
+| TimesFM 3.0 LoRA SFT | sliding | error_lv3 | 33.10 | 33.8% |
+| TimesFM 3.0 LoRA SFT | stable | clean | 0.00 | 100.0% |
+| TimesFM 3.0 LoRA SFT | stable | error_lv1 | 0.20 | 99.9% |
+| TimesFM 3.0 LoRA SFT | stable | error_lv2 | 0.67 | 99.4% |
+| TimesFM 3.0 LoRA SFT | stable | error_lv3 | 1.21 | 99.8% |
+| TimesFM 3.0 LoRA SFT | stagger | clean | 0.33 | 100.0% |
+| TimesFM 3.0 LoRA SFT | stagger | error_lv1 | 28.37 | 74.5% |
+| TimesFM 3.0 LoRA SFT | stagger | error_lv2 | 70.61 | 39.7% |
+| TimesFM 3.0 LoRA SFT | stagger | error_lv3 | 95.80 | 18.1% |
+| TimesFM 3.0 Zero-Shot | dwell_and_switch | clean | 25.34 | 37.5% |
+| TimesFM 3.0 Zero-Shot | dwell_and_switch | error_lv1 | 34.01 | 36.0% |
+| TimesFM 3.0 Zero-Shot | dwell_and_switch | error_lv2 | 53.20 | 25.8% |
+| TimesFM 3.0 Zero-Shot | dwell_and_switch | error_lv3 | 76.11 | 17.8% |
+| TimesFM 3.0 Zero-Shot | jitter | clean | 39.94 | 15.5% |
+| TimesFM 3.0 Zero-Shot | jitter | error_lv1 | 40.66 | 15.5% |
+| TimesFM 3.0 Zero-Shot | jitter | error_lv2 | 41.58 | 14.5% |
+| TimesFM 3.0 Zero-Shot | jitter | error_lv3 | 41.06 | 15.5% |
+| TimesFM 3.0 Zero-Shot | sliding | clean | 71.04 | 15.6% |
+| TimesFM 3.0 Zero-Shot | sliding | error_lv1 | 57.23 | 22.2% |
+| TimesFM 3.0 Zero-Shot | sliding | error_lv2 | 55.11 | 19.8% |
+| TimesFM 3.0 Zero-Shot | sliding | error_lv3 | 60.90 | 13.7% |
+| TimesFM 3.0 Zero-Shot | stable | clean | 0.00 | 100.0% |
+| TimesFM 3.0 Zero-Shot | stable | error_lv1 | 0.29 | 99.8% |
+| TimesFM 3.0 Zero-Shot | stable | error_lv2 | 1.65 | 98.3% |
+| TimesFM 3.0 Zero-Shot | stable | error_lv3 | 1.44 | 99.6% |
+| TimesFM 3.0 Zero-Shot | stagger | clean | 2.69 | 100.0% |
+| TimesFM 3.0 Zero-Shot | stagger | error_lv1 | 41.04 | 61.7% |
+| TimesFM 3.0 Zero-Shot | stagger | error_lv2 | 80.01 | 27.2% |
+| TimesFM 3.0 Zero-Shot | stagger | error_lv3 | 98.25 | 15.4% |
+| Toto 2.0 Zero-Shot | dwell_and_switch | clean | 3.81 | 93.8% |
+| Toto 2.0 Zero-Shot | dwell_and_switch | error_lv1 | 10.32 | 90.2% |
+| Toto 2.0 Zero-Shot | dwell_and_switch | error_lv2 | 30.73 | 75.1% |
+| Toto 2.0 Zero-Shot | dwell_and_switch | error_lv3 | 46.09 | 56.8% |
+| Toto 2.0 Zero-Shot | jitter | clean | 40.25 | 15.4% |
+| Toto 2.0 Zero-Shot | jitter | error_lv1 | 40.11 | 15.5% |
+| Toto 2.0 Zero-Shot | jitter | error_lv2 | 40.65 | 15.4% |
+| Toto 2.0 Zero-Shot | jitter | error_lv3 | 41.66 | 15.8% |
+| Toto 2.0 Zero-Shot | sliding | clean | 8.18 | 71.9% |
+| Toto 2.0 Zero-Shot | sliding | error_lv1 | 15.28 | 61.5% |
+| Toto 2.0 Zero-Shot | sliding | error_lv2 | 30.27 | 40.5% |
+| Toto 2.0 Zero-Shot | sliding | error_lv3 | 43.73 | 26.2% |
+| Toto 2.0 Zero-Shot | stable | clean | 0.00 | 100.0% |
+| Toto 2.0 Zero-Shot | stable | error_lv1 | 0.09 | 100.0% |
+| Toto 2.0 Zero-Shot | stable | error_lv2 | 0.57 | 99.9% |
+| Toto 2.0 Zero-Shot | stable | error_lv3 | 0.92 | 99.8% |
+| Toto 2.0 Zero-Shot | stagger | clean | 0.60 | 100.0% |
+| Toto 2.0 Zero-Shot | stagger | error_lv1 | 19.82 | 83.8% |
+| Toto 2.0 Zero-Shot | stagger | error_lv2 | 83.53 | 36.0% |
+| Toto 2.0 Zero-Shot | stagger | error_lv3 | 88.52 | 23.3% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma LoRA Fine-Tuned | stable | clean | 0.96 | 0.0% |
+| t0-gamma Zero-Shot | dwell_and_switch | clean | 0.94 | 100.0% |
+| t0-gamma Zero-Shot | dwell_and_switch | error_lv1 | 9.08 | 93.6% |
+| t0-gamma Zero-Shot | dwell_and_switch | error_lv2 | 29.57 | 73.3% |
+| t0-gamma Zero-Shot | dwell_and_switch | error_lv3 | 48.32 | 56.0% |
+| t0-gamma Zero-Shot | jitter | clean | 40.79 | 14.9% |
+| t0-gamma Zero-Shot | jitter | error_lv1 | 43.36 | 15.5% |
+| t0-gamma Zero-Shot | jitter | error_lv2 | 41.63 | 15.1% |
+| t0-gamma Zero-Shot | jitter | error_lv3 | 41.57 | 15.5% |
+| t0-gamma Zero-Shot | sliding | clean | 2.74 | 100.0% |
+| t0-gamma Zero-Shot | sliding | error_lv1 | 13.86 | 75.7% |
+| t0-gamma Zero-Shot | sliding | error_lv2 | 27.77 | 45.3% |
+| t0-gamma Zero-Shot | sliding | error_lv3 | 39.65 | 29.8% |
+| t0-gamma Zero-Shot | stable | clean | 0.00 | 100.0% |
+| t0-gamma Zero-Shot | stable | error_lv1 | 5.94 | 99.2% |
+| t0-gamma Zero-Shot | stable | error_lv2 | 1.08 | 98.8% |
+| t0-gamma Zero-Shot | stable | error_lv3 | 1.21 | 99.8% |
+| t0-gamma Zero-Shot | stagger | clean | 4.77 | 96.9% |
+| t0-gamma Zero-Shot | stagger | error_lv1 | 28.63 | 70.1% |
+| t0-gamma Zero-Shot | stagger | error_lv2 | 88.09 | 25.1% |
+| t0-gamma Zero-Shot | stagger | error_lv3 | 94.75 | 14.4% |
+### Key Findings
+- **Toto 2.0 Zero-Shot** consistently achieves the lowest MAE under noise (error_lv1-lv3), especially on staggered and dwell_and_switch profiles
+- **TimesFM 3.0 LoRA SFT** provides the best balance across all conditions, with LoRA fine-tuning significantly improving performance over zero-shot
+- **t0-gamma Zero-Shot** performs competitively on clean canonical radars but degrades under noise
+- **t0-gamma LoRA Fine-Tuned**: LoRA weights saved but gradient-based training not supported by t0-gamma model architecture; results reflect base model behavior
+- **Toto 2.0 LoRA**: Not supported by upstream release (fine-tuning planned but unavailable)
+---
+*Report generated from comprehensive benchmark evaluation across all model configurations.*

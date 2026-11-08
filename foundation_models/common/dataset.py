@@ -49,8 +49,9 @@ def load_sequence_arrays(
             tgt_vals = df["PRI"].to_numpy(dtype=np.float32)
         else:
             tgt_vals = ctx_vals.copy()
-    elif target_param in df.columns:
-        ctx_vals = df[target_param].to_numpy(dtype=np.float32)
+    elif any(col.lower() == target_param.lower() for col in df.columns):
+        actual_col = next(col for col in df.columns if col.lower() == target_param.lower())
+        ctx_vals = df[actual_col].to_numpy(dtype=np.float32)
         tgt_vals = ctx_vals.copy()
     else:
         raise ValueError(f"Target parameter '{target_param}' not found in {csv_path}. Columns: {df.columns.tolist()}")

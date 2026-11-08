@@ -1,0 +1,281 @@
+model,radar_type,error_level,mae,hit_rate
+TimesFM 3.0 Zero-Shot,stable,clean,0.0,100.0
+TimesFM 3.0 Zero-Shot,stable,error_lv1,0.289,99.75
+TimesFM 3.0 Zero-Shot,stable,error_lv2,1.647,98.31
+TimesFM 3.0 Zero-Shot,stable,error_lv3,1.437,99.59
+TimesFM 3.0 Zero-Shot,jitter,clean,39.937,15.48
+TimesFM 3.0 Zero-Shot,jitter,error_lv1,40.655,15.51
+TimesFM 3.0 Zero-Shot,jitter,error_lv2,41.579,14.48
+TimesFM 3.0 Zero-Shot,jitter,error_lv3,41.059,15.49
+TimesFM 3.0 Zero-Shot,stagger,clean,2.691,100.0
+TimesFM 3.0 Zero-Shot,stagger,error_lv1,41.042,61.71
+TimesFM 3.0 Zero-Shot,stagger,error_lv2,80.01,27.19
+TimesFM 3.0 Zero-Shot,stagger,error_lv3,98.246,15.39
+TimesFM 3.0 Zero-Shot,dwell_and_switch,clean,25.337,37.5
+TimesFM 3.0 Zero-Shot,dwell_and_switch,error_lv1,34.013,36.01
+TimesFM 3.0 Zero-Shot,dwell_and_switch,error_lv2,53.201,25.83
+TimesFM 3.0 Zero-Shot,dwell_and_switch,error_lv3,76.111,17.84
+TimesFM 3.0 Zero-Shot,sliding,clean,71.037,15.62
+TimesFM 3.0 Zero-Shot,sliding,error_lv1,57.234,22.18
+TimesFM 3.0 Zero-Shot,sliding,error_lv2,55.109,19.82
+TimesFM 3.0 Zero-Shot,sliding,error_lv3,60.897,13.67
+TimesFM 3.0 LoRA SFT,stable,clean,0.0,100.0
+TimesFM 3.0 LoRA SFT,stable,error_lv1,0.205,99.89
+TimesFM 3.0 LoRA SFT,stable,error_lv2,0.666,99.36
+TimesFM 3.0 LoRA SFT,stable,error_lv3,1.209,99.76
+TimesFM 3.0 LoRA SFT,jitter,clean,39.894,15.55
+TimesFM 3.0 LoRA SFT,jitter,error_lv1,40.437,15.57
+TimesFM 3.0 LoRA SFT,jitter,error_lv2,40.61,14.48
+TimesFM 3.0 LoRA SFT,jitter,error_lv3,40.602,15.24
+TimesFM 3.0 LoRA SFT,stagger,clean,0.329,100.0
+TimesFM 3.0 LoRA SFT,stagger,error_lv1,28.369,74.51
+TimesFM 3.0 LoRA SFT,stagger,error_lv2,70.611,39.7
+TimesFM 3.0 LoRA SFT,stagger,error_lv3,95.801,18.15
+TimesFM 3.0 LoRA SFT,dwell_and_switch,clean,0.252,100.0
+TimesFM 3.0 LoRA SFT,dwell_and_switch,error_lv1,8.844,91.36
+TimesFM 3.0 LoRA SFT,dwell_and_switch,error_lv2,23.006,70.64
+TimesFM 3.0 LoRA SFT,dwell_and_switch,error_lv3,39.781,50.01
+TimesFM 3.0 LoRA SFT,sliding,clean,0.39,100.0
+TimesFM 3.0 LoRA SFT,sliding,error_lv1,6.743,84.1
+TimesFM 3.0 LoRA SFT,sliding,error_lv2,18.689,56.35
+TimesFM 3.0 LoRA SFT,sliding,error_lv3,33.096,33.79
+t0-gamma Zero-Shot,stable,clean,0.0,100.0
+t0-gamma Zero-Shot,stable,error_lv1,5.941,99.16
+t0-gamma Zero-Shot,stable,error_lv2,1.077,98.84
+t0-gamma Zero-Shot,stable,error_lv3,1.206,99.78
+t0-gamma Zero-Shot,jitter,clean,40.787,14.95
+t0-gamma Zero-Shot,jitter,error_lv1,43.363,15.46
+t0-gamma Zero-Shot,jitter,error_lv2,41.628,15.11
+t0-gamma Zero-Shot,jitter,error_lv3,41.571,15.47
+t0-gamma Zero-Shot,stagger,clean,4.767,96.88
+t0-gamma Zero-Shot,stagger,error_lv1,28.634,70.13
+t0-gamma Zero-Shot,stagger,error_lv2,88.094,25.11
+t0-gamma Zero-Shot,stagger,error_lv3,94.746,14.37
+t0-gamma Zero-Shot,dwell_and_switch,clean,0.938,100.0
+t0-gamma Zero-Shot,dwell_and_switch,error_lv1,9.077,93.61
+t0-gamma Zero-Shot,dwell_and_switch,error_lv2,29.575,73.33
+t0-gamma Zero-Shot,dwell_and_switch,error_lv3,48.322,56.03
+t0-gamma Zero-Shot,sliding,clean,2.738,100.0
+t0-gamma Zero-Shot,sliding,error_lv1,13.862,75.72
+t0-gamma Zero-Shot,sliding,error_lv2,27.77,45.3
+t0-gamma Zero-Shot,sliding,error_lv3,39.65,29.81
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+t0-gamma LoRA Fine-Tuned,stable,clean,0.956,0.0
+Toto 2.0 Zero-Shot,stable,clean,0.0,100.0
+Toto 2.0 Zero-Shot,stable,error_lv1,0.088,99.98
+Toto 2.0 Zero-Shot,stable,error_lv2,0.572,99.86
+Toto 2.0 Zero-Shot,stable,error_lv3,0.916,99.83
+Toto 2.0 Zero-Shot,jitter,clean,40.252,15.38
+Toto 2.0 Zero-Shot,jitter,error_lv1,40.109,15.5
+Toto 2.0 Zero-Shot,jitter,error_lv2,40.654,15.45
+Toto 2.0 Zero-Shot,jitter,error_lv3,41.661,15.79
+Toto 2.0 Zero-Shot,stagger,clean,0.596,100.0
+Toto 2.0 Zero-Shot,stagger,error_lv1,19.822,83.81
+Toto 2.0 Zero-Shot,stagger,error_lv2,83.533,36.04
+Toto 2.0 Zero-Shot,stagger,error_lv3,88.521,23.34
+Toto 2.0 Zero-Shot,dwell_and_switch,clean,3.805,93.75
+Toto 2.0 Zero-Shot,dwell_and_switch,error_lv1,10.316,90.19
+Toto 2.0 Zero-Shot,dwell_and_switch,error_lv2,30.729,75.12
+Toto 2.0 Zero-Shot,dwell_and_switch,error_lv3,46.085,56.75
+Toto 2.0 Zero-Shot,sliding,clean,8.181,71.88
+Toto 2.0 Zero-Shot,sliding,error_lv1,15.278,61.48
+Toto 2.0 Zero-Shot,sliding,error_lv2,30.266,40.49
+Toto 2.0 Zero-Shot,sliding,error_lv3,43.732,26.25
