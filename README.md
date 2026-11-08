@@ -453,11 +453,11 @@ models/lora_sft/
 
 #### Master Benchmark Visualizations
 
-![Master Benchmark PRI Bars](results/comparison/master_benchmark_pri_bars.png)
-*Figure 1: Cross-model PRI MAE across all 5 radar types and 4 noise regimes comparing TimesFM (ZS & LoRA), Chronos-2 (ZS & LoRA), TiRex-2, Toto 2.0, t0-gamma, and top Classical baselines.*
+![Master Benchmark PRI Leaderboard](results/comparison/macro_pri_benchmark_leaderboard.png)
+*Figure 1: Executive 2-part master benchmark graphic: (A) Macro PRI Gate Hit Rate (%) and MAE leaderboard ranking all 15 foundation model variants and classical baselines. (B) Aligned radar modulation heatmap across Stable, Dwell & Switch, Sliding, Stagger, and Jitter.*
 
-![Noise Degradation Curves](results/comparison/noise_degradation_curves.png)
-*Figure 2: Noise degradation curves demonstrating error growth and tracking stability as channel corruption increases from Clean to Error Level 3.*
+![Noise Level PRI Leaderboard](results/comparison/noise_level_pri_benchmark_leaderboard.png)
+*Figure 2: Noise resilience breakdown: (A) Overall leaderboard. (B) Aligned channel corruption heatmap across Clean, Error Lv1, Error Lv2, and Error Lv3, illustrating why classical filtering algorithms maintain superior hit rates under severe corruptions.*
 
 ![Auxiliary Modalities](results/comparison/auxiliary_rf_aoa_comparison.png)
 *Figure 3: Carrier Frequency (MHz) and circular Angle of Arrival (degrees) tracking performance under noise.*
