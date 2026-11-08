@@ -1,0 +1,21 @@
+method,radar_type,error_level,evaluated_sequences,rmse_us,mae_us,medae_us,mape_pct,gate_hit_rate_pct,latency_us_per_seq
+Hidden Markov Model (Baum-Welch + Viterbi),stable,clean,200,0.0,0.0,0.0,0.0,100.0,241.43
+Hidden Markov Model (Baum-Welch + Viterbi),stable,error_lv1,200,0.009,0.008,0.007,0.001,100.0,85562.91
+Hidden Markov Model (Baum-Welch + Viterbi),stable,error_lv2,200,0.222,0.087,0.034,0.009,99.97,74327.98
+Hidden Markov Model (Baum-Welch + Viterbi),stable,error_lv3,200,0.672,0.246,0.08,0.025,99.95,72572.73
+Hidden Markov Model (Baum-Welch + Viterbi),jitter,clean,200,50.03,40.168,34.11,4.029,15.98,30434.28
+Hidden Markov Model (Baum-Welch + Viterbi),jitter,error_lv1,200,50.264,40.354,33.954,4.049,16.38,28552.63
+Hidden Markov Model (Baum-Welch + Viterbi),jitter,error_lv2,200,50.347,40.4,34.02,4.067,15.87,27833.44
+Hidden Markov Model (Baum-Welch + Viterbi),jitter,error_lv3,200,50.366,40.442,33.97,4.063,16.16,25738.59
+Hidden Markov Model (Baum-Welch + Viterbi),stagger,clean,200,0.0,0.0,0.0,0.0,100.0,27080.1
+Hidden Markov Model (Baum-Welch + Viterbi),stagger,error_lv1,200,29.502,20.972,0.025,2.181,89.39,38282.11
+Hidden Markov Model (Baum-Welch + Viterbi),stagger,error_lv2,200,71.234,51.954,0.142,5.373,73.7,34614.29
+Hidden Markov Model (Baum-Welch + Viterbi),stagger,error_lv3,200,112.99,83.54,0.484,8.594,58.12,35280.96
+Hidden Markov Model (Baum-Welch + Viterbi),dwell_and_switch,clean,200,0.0,0.0,0.0,0.0,100.0,26756.62
+Hidden Markov Model (Baum-Welch + Viterbi),dwell_and_switch,error_lv1,200,20.678,11.269,0.012,1.084,96.0,49850.82
+Hidden Markov Model (Baum-Welch + Viterbi),dwell_and_switch,error_lv2,200,80.647,43.882,0.093,4.273,85.39,53924.2
+Hidden Markov Model (Baum-Welch + Viterbi),dwell_and_switch,error_lv3,200,130.781,78.535,0.227,7.807,74.03,55767.03
+Hidden Markov Model (Baum-Welch + Viterbi),sliding,clean,200,45.826,40.0,40.0,4.039,25.0,74585.53
+Hidden Markov Model (Baum-Welch + Viterbi),sliding,error_lv1,200,51.381,42.892,40.0,4.349,12.28,71618.41
+Hidden Markov Model (Baum-Welch + Viterbi),sliding,error_lv2,200,62.273,49.468,40.0,5.051,11.7,78073.48
+Hidden Markov Model (Baum-Welch + Viterbi),sliding,error_lv3,200,68.141,53.684,40.465,5.485,11.12,79353.05

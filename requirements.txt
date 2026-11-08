@@ -24,10 +24,13 @@ transformers>=4.38.0
 accelerate>=0.27.0
 peft>=0.9.0
 
-
 # --- Phase 3: Additional Zero-Shot Foundation Models ---
 # t0-gamma (The Forecasting Company) - supports univariate + covariate forecasting
 tfc-t0[torch]>=0.6.0
 rotary-embedding-torch>=0.5.0
 # Toto 2.0 (Datadog) - zero-shot only; fine-tuning and covariates not yet available
 toto-models>=1.0.0
+
+# --- Classic Baselines (classic_methods/) ---
+hmmlearn>=0.3.0
+statsmodels>=0.14.0

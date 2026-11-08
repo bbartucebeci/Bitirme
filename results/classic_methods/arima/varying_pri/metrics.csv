@@ -1,0 +1,21 @@
+method,radar_type,error_level,evaluated_sequences,rmse_us,mae_us,medae_us,mape_pct,gate_hit_rate_pct,latency_us_per_seq
+"ARIMA (Box-Jenkins, AIC-selected)",stable,clean,200,0.0,0.0,0.0,0.0,100.0,176345.18
+"ARIMA (Box-Jenkins, AIC-selected)",stable,error_lv1,200,0.039,0.017,0.0,0.002,100.0,328142.56
+"ARIMA (Box-Jenkins, AIC-selected)",stable,error_lv2,200,1.0,0.756,0.002,0.082,99.42,336090.73
+"ARIMA (Box-Jenkins, AIC-selected)",stable,error_lv3,200,0.525,0.278,0.004,0.027,99.87,317904.37
+"ARIMA (Box-Jenkins, AIC-selected)",jitter,clean,200,60.537,48.784,39.583,4.942,13.25,163457.04
+"ARIMA (Box-Jenkins, AIC-selected)",jitter,error_lv1,200,59.832,48.372,40.406,4.926,13.46,167073.3
+"ARIMA (Box-Jenkins, AIC-selected)",jitter,error_lv2,200,59.302,47.851,39.558,4.863,14.12,157792.16
+"ARIMA (Box-Jenkins, AIC-selected)",jitter,error_lv3,200,60.479,48.664,40.941,4.962,13.74,169249.65
+"ARIMA (Box-Jenkins, AIC-selected)",stagger,clean,200,0.0,0.0,0.0,0.0,100.0,306792.97
+"ARIMA (Box-Jenkins, AIC-selected)",stagger,error_lv1,200,27.205,19.133,0.126,2.028,89.78,320644.73
+"ARIMA (Box-Jenkins, AIC-selected)",stagger,error_lv2,200,80.584,59.395,0.869,5.966,69.3,304244.08
+"ARIMA (Box-Jenkins, AIC-selected)",stagger,error_lv3,200,104.64,74.019,2.634,7.5,60.1,270071.94
+"ARIMA (Box-Jenkins, AIC-selected)",dwell_and_switch,clean,200,0.0,0.0,0.0,0.0,100.0,697365.77
+"ARIMA (Box-Jenkins, AIC-selected)",dwell_and_switch,error_lv1,200,31.369,13.141,0.098,1.412,93.2,529113.77
+"ARIMA (Box-Jenkins, AIC-selected)",dwell_and_switch,error_lv2,200,80.004,46.481,0.593,4.749,74.91,412529.36
+"ARIMA (Box-Jenkins, AIC-selected)",dwell_and_switch,error_lv3,200,128.329,89.548,2.195,9.39,46.96,298387.27
+"ARIMA (Box-Jenkins, AIC-selected)",sliding,clean,200,0.0,0.0,0.0,0.0,100.0,585044.5
+"ARIMA (Box-Jenkins, AIC-selected)",sliding,error_lv1,200,13.793,6.09,0.107,0.622,87.69,657296.87
+"ARIMA (Box-Jenkins, AIC-selected)",sliding,error_lv2,200,30.022,14.417,0.674,1.468,73.16,789330.76
+"ARIMA (Box-Jenkins, AIC-selected)",sliding,error_lv3,200,56.644,31.099,14.297,3.185,48.19,708430.83
