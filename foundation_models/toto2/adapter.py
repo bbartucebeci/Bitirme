@@ -8,9 +8,6 @@ from typing import Any, List, Optional
 import numpy as np
 import torch
 
-from toto2 import Toto2Model
-
-
 class Forecast:
     def __init__(self, forecast: np.ndarray):
         self.forecast = np.asarray(forecast, dtype=np.float32)
@@ -19,7 +16,7 @@ class Forecast:
 class Toto2Forecaster:
     """Thin wrapper exposing the predict_batch interface used by PULSAR evaluators."""
 
-    def __init__(self, model: Toto2Model, device: str = "cpu"):
+    def __init__(self, model: Any, device: str = "cpu"):
         self.model = model
         self.device = device
 
@@ -30,6 +27,14 @@ class Toto2Forecaster:
         device: str = "auto",
         weights_dir: Optional[Path | str] = None,
     ) -> "Toto2Forecaster":
+        try:
+            from toto2 import Toto2Model
+        except ImportError as exc:
+            raise ImportError(
+                "Toto 2.0 is not installed. Please install it with: "
+                "pip install 'toto-models>=1.0.0'"
+            ) from exc
+
         if device == "auto":
             device = "cuda" if torch.cuda.is_available() else "cpu"
         model = Toto2Model.from_pretrained(model_id)

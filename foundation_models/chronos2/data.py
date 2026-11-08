@@ -100,8 +100,8 @@ def load_split(
         frame = frame.sort_values("pulse_index").reset_index(drop=True)
         if "sequence_id" in frame and frame["sequence_id"].nunique() != 1:
             raise ValueError(f"{sequence_id}: contains multiple sequence IDs")
-        # Match the existing TimesFM loader: drop the anchor only for 129-row captures.
-        if len(frame) == expected_pulses + 1 and float(frame.loc[0, "Measured_Delta_TOA"]) == 0.0:
+        # Drop arrival-time anchor at pulse 0 (Measured_Delta_TOA == 0.0)
+        if len(frame) > 1 and "Measured_Delta_TOA" in frame and float(frame.loc[0, "Measured_Delta_TOA"]) == 0.0:
             frame = frame.iloc[1:].reset_index(drop=True)
         if len(frame) < context_len + horizon_len:
             continue

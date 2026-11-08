@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 
-from foundation_models.common.dataset import load_dataset_sequences
+from foundation_models.common.dataset import load_dataset_sequences, clean_pri_context
 from foundation_models.common.metrics import compute_forecast_metrics
 from foundation_models.common.plotting import save_forecast_plot
 from foundation_models.timesfm.adapter import TimesFMLoRAEngine
@@ -42,6 +42,7 @@ def evaluate_single_dataset(
     unit: str = "us",
     param_display_name: str = "PRI",
     plots_dir: Optional[Path] = None,
+    clean_context: bool = False,
 ) -> Optional[Dict[str, Any]]:
     """Evaluates TimesFM on one dataset using batched GPU prediction and emitter pulse masking."""
     if not dataset_dir.exists():
@@ -68,6 +69,8 @@ def evaluate_single_dataset(
     for seq_id, ctx_vals, tgt_vals, mask_vals in test_seqs:
         if len(ctx_vals) >= required_len:
             ctx = ctx_vals[:context_len]
+            if clean_context and target_param.upper() in ["PRI", "MEASURED_DELTA_TOA"]:
+                ctx = clean_pri_context(ctx, target_len=context_len)
             gt = tgt_vals[context_len : context_len + horizon_len]
             mask = mask_vals[context_len : context_len + horizon_len]
             valid_items.append((seq_id, ctx, gt, mask))
@@ -88,6 +91,9 @@ def evaluate_single_dataset(
     for idx, (seq_id, ctx, gt, mask) in enumerate(valid_items):
         preds = np.asarray(outputs[idx].forecast, dtype=np.float32).squeeze()[:horizon_len]
         metrics = compute_forecast_metrics(preds, gt, tolerance=tolerance, mask=mask, unit=unit)
+
+        if metrics.get("valid_pulses_evaluated", 0) == 0:
+            continue
 
         mae_list.append(metrics["mae"])
         rmse_list.append(metrics["rmse"])
@@ -185,6 +191,7 @@ def main():
     parser.add_argument("--tolerance", type=float, default=None, help="Tactical acceptance tolerance corridor")
     parser.add_argument("--tolerance-us", type=float, default=None, help="Deprecated alias for --tolerance")
     parser.add_argument("--results-dir", type=Path, default=None)
+    parser.add_argument("--clean-context", action="store_true", help="Apply classical clean_pri_context filter to input context before inference")
     parser.add_argument("--no-plots", action="store_true")
 
     args = parser.parse_args()
@@ -241,6 +248,7 @@ def main():
                 unit=param_unit,
                 param_display_name=param_name,
                 plots_dir=plots_dir,
+                clean_context=args.clean_context,
             )
             if res:
                 results.append(res)

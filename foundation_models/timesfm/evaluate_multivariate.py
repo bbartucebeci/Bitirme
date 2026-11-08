@@ -105,9 +105,10 @@ def evaluate_single_multivariate_dataset(
                 mask=mask,
                 unit=ch_unit,
             )
-            channel_maes[ch_name].append(met["mae"])
-            channel_rmses[ch_name].append(met["rmse"])
-            channel_hits[ch_name].append(met["hit_rate_pct"])
+            if met.get("valid_pulses_evaluated", 0) > 0:
+                channel_maes[ch_name].append(met["mae"])
+                channel_rmses[ch_name].append(met["rmse"])
+                channel_hits[ch_name].append(met["hit_rate_pct"])
 
         # Render 5-panel tactical dashboard plot for first sequence
         if plots_dir is not None and idx == 0:

@@ -746,14 +746,15 @@ To rigorously verify that the models do not overfit to fixed emitter settings an
 
 ---
 
-### 10.11. Additional Foundation Models (Chronos-2, TiRex-2, t0-gamma, Toto 2.0)
+### 10.11. Additional Foundation Models & Classical Baselines
 
-In addition to TimesFM 3.0, PULSAR benchmarks four additional state-of-the-art time-series foundation models across the `1000x128` single-radar datasets:
+In addition to TimesFM 3.0, PULSAR benchmarks four additional state-of-the-art time-series foundation models and six classical EW signal processing baselines across the `1000x128` single-radar datasets:
 * **Chronos-2** ([`foundation_models/chronos2/`](foundation_models/chronos2/README.md)): Zero-shot forecasts, LoRA fine-tuning, and fixed/varying cross-profile transfer (`results/chronos_2/`).
 * **TiRex-2** ([`foundation_models/tirex2/`](foundation_models/tirex2/README.md)): Zero-shot univariate benchmarking across fixed and varying radar profiles (`results/tirex_2/`).
 * **t0-gamma** (`foundation_models/t0_gamma/`): Univariate, covariate, and multivariate zero-shot evaluations (`results/t0_gamma/`).
 * **Toto 2.0** (`foundation_models/toto2/`): Univariate and multivariate zero-shot evaluations (`results/toto2/`).
-* **Cross-Model Comparison**: See [`results/comparison/README.md`](results/comparison/README.md) for side-by-side comparisons across foundation models.
+* **Classical Baselines** (`classic_methods/`): Period Estimation, Kalman Filter Bank, ARIMA, Hidden Markov Model, Exponential Smoothing, and Rolling Median (`results/classic_methods/`).
+* **Consolidated Master Benchmark**: See [`results/comparison/README.md`](results/comparison/README.md) for full side-by-side performance tables across foundation models and classical methods.
 
 ---
 

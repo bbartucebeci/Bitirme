@@ -8,9 +8,6 @@ from typing import Any, List, Optional
 import numpy as np
 import torch
 
-from t0 import T0Forecaster
-
-
 class Forecast:
     def __init__(self, forecast: np.ndarray):
         self.forecast = np.asarray(forecast, dtype=np.float32)
@@ -19,7 +16,7 @@ class Forecast:
 class T0GammaForecaster:
     """Thin wrapper exposing the predict_batch interface used by PULSAR evaluators."""
 
-    def __init__(self, model: T0Forecaster, device: str = "cpu"):
+    def __init__(self, model: Any, device: str = "cpu"):
         self.model = model
         self.device = device
 
@@ -30,6 +27,14 @@ class T0GammaForecaster:
         device: str = "auto",
         weights_dir: Optional[Path | str] = None,
     ) -> "T0GammaForecaster":
+        try:
+            from t0 import T0Forecaster
+        except ImportError as exc:
+            raise ImportError(
+                "t0-gamma is not installed. Please install it with: "
+                "pip install 'tfc-t0[torch]>=0.6.0' rotary-embedding-torch"
+            ) from exc
+
         if device == "auto":
             device = "cuda" if torch.cuda.is_available() else "cpu"
         model = T0Forecaster.from_pretrained(model_id).eval()

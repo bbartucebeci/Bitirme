@@ -77,7 +77,7 @@ def load_sequence_arrays(
     df = pd.read_csv(csv_path)
 
     # Drop anchor pulse at index 0 where Measured_Delta_TOA == 0.0
-    if len(df) > 1 and "Measured_Delta_TOA" in df.columns and df["Measured_Delta_TOA"].iloc[0] == 0.0:
+    if len(df) > 1 and "Measured_Delta_TOA" in df.columns and float(df["Measured_Delta_TOA"].iloc[0]) == 0.0:
         df = df.iloc[1:].reset_index(drop=True)
 
     if "Radar_ID" in df.columns:

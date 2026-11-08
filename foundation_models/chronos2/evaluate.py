@@ -87,6 +87,7 @@ def evaluate_condition(
     batch_size: int,
     max_test_seqs: int | None,
     plot_path: Path | None,
+    clean_context: bool = False,
 ) -> dict[str, float]:
     loaded = load_split(
         dataset_dir,
@@ -102,7 +103,16 @@ def evaluate_condition(
     scores = []
     for start in range(0, len(windows), batch_size):
         batch = windows[start : start + batch_size]
-        predictions = predict_median(pipeline, [window.context for window in batch], horizon_len, batch_size)
+        batch_contexts = []
+        for window in batch:
+            ctx = window.context
+            if clean_context and target_param in ("PRI", "multivariate"):
+                from foundation_models.common.dataset import clean_pri_context
+                cleaned_pri = clean_pri_context(ctx[0], target_len=context_len)
+                ctx = ctx.copy()
+                ctx[0] = cleaned_pri
+            batch_contexts.append(ctx)
+        predictions = predict_median(pipeline, batch_contexts, horizon_len, batch_size)
         for window, prediction in zip(batch, predictions, strict=True):
             if target_param == "multivariate":
                 score = score_window(prediction, window.target, window.emitter_mask)
@@ -133,6 +143,7 @@ def run_evaluation(
     radar_type: str | None = None,
     error_level: str | None = None,
     plots: bool = True,
+    clean_context: bool = False,
 ) -> pd.DataFrame:
     if target_param not in (*CHANNELS, "multivariate"):
         raise ValueError(f"Unknown target parameter: {target_param}")
@@ -160,7 +171,7 @@ def run_evaluation(
         plot_path = output_dir / "plots" / f"{rtype}_{level}.png" if output_dir and plots else None
         metrics = evaluate_condition(
             pipeline, dataset_dir, target_param, context_len, horizon_len,
-            batch_size, max_test_seqs, plot_path,
+            batch_size, max_test_seqs, plot_path, clean_context=clean_context,
         )
         row = {"radar_type": rtype, "error_level": level, **metrics}
         rows.append(row)
@@ -201,6 +212,7 @@ def main() -> None:
     parser.add_argument("--model-id", default=MODEL_ID)
     parser.add_argument("--weights-dir", type=Path)
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
+    parser.add_argument("--clean-context", action="store_true", help="Apply classical clean_pri_context filter to input context before inference")
     parser.add_argument("--no-plots", action="store_true")
     parser.add_argument("--coverage-only", action="store_true", help="Inspect selected CSVs without loading Chronos-2")
     args = parser.parse_args()
@@ -226,7 +238,7 @@ def main() -> None:
             pipeline, args.profile_mode, task, args.dataset_size,
             args.context_len, args.horizon, args.batch_size, args.max_test_seqs,
             RESULTS_ROOT / regime / mode, args.radar_type, args.error_level,
-            not args.no_plots,
+            not args.no_plots, clean_context=args.clean_context,
         )
 
 

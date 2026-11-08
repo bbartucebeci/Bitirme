@@ -10,6 +10,66 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 
 
+def clean_pri_context(context: np.ndarray, target_len: Optional[int] = None) -> np.ndarray:
+    """Applies ESM front-end gating to raw Measured_Delta_TOA context (reconstructs splits & missing pulses).
+
+    Args:
+        context: 1D array of observed pulse intervals.
+        target_len: Optional fixed length to pad or slice to.
+    """
+    x = np.asarray(context, dtype=np.float32).copy()
+    if len(x) < 4:
+        return x
+
+    med = float(np.median(x))
+    if med <= 0:
+        return x
+
+    reconstructed: List[float] = []
+    i = 0
+    n = len(x)
+    while i < n:
+        val = float(x[i])
+        if val < 0.55 * med and (i + 1) < n:
+            combined = val + float(x[i + 1])
+            if abs(combined - med) < abs(float(x[i + 1]) - med) or combined < 1.45 * med:
+                reconstructed.append(combined)
+                i += 2
+                continue
+            else:
+                i += 1
+                continue
+        reconstructed.append(val)
+        i += 1
+
+    if len(reconstructed) < 4:
+        reconstructed = list(x)
+
+    arr = np.asarray(reconstructed, dtype=np.float32)
+    med = float(np.median(arr))
+
+    expanded: List[float] = []
+    for val in arr:
+        ratio = float(val) / max(1e-5, med)
+        if 1.65 <= ratio <= 2.45:
+            expanded.extend([float(val) / 2.0, float(val) / 2.0])
+        elif 2.45 < ratio <= 3.45:
+            expanded.extend([float(val) / 3.0, float(val) / 3.0, float(val) / 3.0])
+        elif 0.55 <= ratio < 1.65:
+            expanded.append(float(val))
+        else:
+            expanded.append(med)
+
+    res = np.asarray(expanded, dtype=np.float32)
+    if target_len is not None:
+        if len(res) < target_len:
+            pad = np.full(target_len - len(res), med, dtype=np.float32)
+            res = np.concatenate([pad, res])
+        elif len(res) > target_len:
+            res = res[-target_len:]
+    return res
+
+
 def load_sequence_arrays(
     csv_path: Path,
     target_param: str = "PRI",
@@ -28,8 +88,8 @@ def load_sequence_arrays(
     """
     df = pd.read_csv(csv_path)
 
-    # If 129 pulses with anchor at pulse 0 (Measured_Delta_TOA == 0.0), drop anchor
-    if len(df) == 129 and "Measured_Delta_TOA" in df.columns and df["Measured_Delta_TOA"].iloc[0] == 0.0:
+    # Drop arrival-time anchor at pulse 0 (Measured_Delta_TOA == 0.0)
+    if len(df) > 1 and "Measured_Delta_TOA" in df.columns and float(df["Measured_Delta_TOA"].iloc[0]) == 0.0:
         df = df.iloc[1:].reset_index(drop=True)
 
     # 1. Emitter mask: True for true emitter pulses, False for NOISE or ECHO
@@ -94,7 +154,7 @@ def load_dataset_sequences(
             unique_ids = unique_ids[:max_seqs]
         for sid in unique_ids:
             df_seq = df_all[df_all["sequence_id"] == sid].sort_values("pulse_index")
-            if len(df_seq) == 129 and df_seq["Measured_Delta_TOA"].iloc[0] == 0.0:
+            if len(df_seq) > 1 and "Measured_Delta_TOA" in df_seq.columns and float(df_seq["Measured_Delta_TOA"].iloc[0]) == 0.0:
                 df_seq = df_seq.iloc[1:].reset_index(drop=True)
 
             if "Radar_ID" in df_seq.columns:
@@ -215,7 +275,7 @@ def load_multivariate_sequence_arrays(
     """
     df = pd.read_csv(csv_path)
 
-    if len(df) == 129 and "Measured_Delta_TOA" in df.columns and df["Measured_Delta_TOA"].iloc[0] == 0.0:
+    if len(df) > 1 and "Measured_Delta_TOA" in df.columns and float(df["Measured_Delta_TOA"].iloc[0]) == 0.0:
         df = df.iloc[1:].reset_index(drop=True)
 
     if "Radar_ID" in df.columns:
@@ -278,7 +338,7 @@ def load_multivariate_dataset_sequences(
             unique_ids = unique_ids[:max_seqs]
         for sid in unique_ids:
             df_seq = df_all[df_all["sequence_id"] == sid].sort_values("pulse_index")
-            if len(df_seq) == 129 and df_seq["Measured_Delta_TOA"].iloc[0] == 0.0:
+            if len(df_seq) > 1 and "Measured_Delta_TOA" in df_seq.columns and float(df_seq["Measured_Delta_TOA"].iloc[0]) == 0.0:
                 df_seq = df_seq.iloc[1:].reset_index(drop=True)
 
             mask = (df_seq["Radar_ID"] == "R_SINGLE").to_numpy(dtype=bool) if "Radar_ID" in df_seq.columns else np.ones(len(df_seq), dtype=bool)
