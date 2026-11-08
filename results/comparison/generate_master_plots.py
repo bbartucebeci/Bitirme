@@ -60,108 +60,123 @@ ERROR_LABELS = ["Clean", "Error Lv1", "Error Lv2", "Error Lv3"]
 MODELS = [
     {
         "name": "Classic: Period Estimation (P_max=24)",
-        "color": "#1b7875",  # Teal Pine Green
+        "color": "#107c78",  # Classical: Deep Forest Teal
         "df": classic_df,
         "hit_col": "period_estimation_hit",
         "mae_col": "period_estimation_mae",
+        "category": "classic",
     },
     {
         "name": "Classic: Kalman Filter (Bank)",
-        "color": "#304ffe",  # Deep Indigo
+        "color": "#288a85",  # Classical: Medium Slate Teal
         "df": classic_df,
         "hit_col": "kalman_filter_hit",
         "mae_col": "kalman_filter_mae",
+        "category": "classic",
     },
     {
         "name": "Chronos-2 (LoRA SFT, Uni)",
-        "color": "#235bb8",  # Royal Blue
+        "color": "#1565c0",  # Chronos LoRA: Deep Royal Blue
         "df": chr_lora_df,
         "hit_col": "hit_rate_pct",
         "mae_col": "mae",
+        "category": "chronos_lora",
     },
     {
         "name": "TimesFM 3.0 (LoRA SFT, Uni)",
-        "color": "#b8623b",  # Warm Terracotta
+        "color": "#c62828",  # TimesFM LoRA: Deep Crimson Terracotta
         "df": tfm_lora_df,
         "hit_col": "gate_hit_rate_pct",
         "mae_col": "mae_us",
+        "category": "timesfm_lora",
     },
     {
         "name": "Chronos-2 (LoRA SFT, Multi)",
-        "color": "#2e6fd9",  # Slate Cobalt
+        "color": "#1976d2",  # Chronos LoRA: Vivid Cobalt Blue
         "df": chr_mv_lora_df,
         "hit_col": "hit_rate_pri",
         "mae_col": "mae_pri",
+        "category": "chronos_lora",
     },
     {
         "name": "t0-gamma (Zero-Shot, Uni)",
-        "color": "#795548",  # Deep Copper
+        "color": "#7b1fa2",  # Zero-Shot: Rich Amethyst Violet
         "df": t0_df,
         "hit_col": "gate_hit_rate_pct",
         "mae_col": "mae_us",
+        "category": "zs_other",
     },
     {
         "name": "Chronos-2 (Zero-Shot, Uni)",
-        "color": "#4aa3df",  # Cerulean / Sky Blue
+        "color": "#64b5f6",  # Chronos ZS: Light Sky Blue (matching Chronos family)
         "df": chr_zs_df,
         "hit_col": "hit_rate_pct",
         "mae_col": "mae",
+        "category": "chronos_zs",
     },
     {
         "name": "Toto 2.0 (Zero-Shot, Uni)",
-        "color": "#00acc1",  # Dark Cyan
+        "color": "#00acc1",  # Zero-Shot: Cyan / Teal
         "df": toto_df,
         "hit_col": "gate_hit_rate_pct",
         "mae_col": "mae_us",
+        "category": "zs_other",
     },
     {
         "name": "Chronos-2 (Zero-Shot, Multi)",
-        "color": "#5cb8ef",  # Lighter Sky Blue
+        "color": "#90caf9",  # Chronos ZS: Soft Ice Blue (matching Chronos family)
         "df": chr_mv_zs_df,
         "hit_col": "hit_rate_pri",
         "mae_col": "mae_pri",
+        "category": "chronos_zs",
     },
     {
         "name": "Classic: HMM (Baum-Welch + Viterbi)",
-        "color": "#6f8298",  # Slate Blue-Grey
+        "color": "#546e7a",  # Classical: Slate Grey
         "df": classic_df,
         "hit_col": "hidden_markov_model_hit",
         "mae_col": "hidden_markov_model_mae",
+        "category": "classic",
     },
     {
         "name": "TimesFM 3.0 (LoRA SFT, Multi)",
-        "color": "#cf754d",  # Terracotta Accent
+        "color": "#d84315",  # TimesFM LoRA: Rust / Burnt Orange
         "df": tfm_mv_lora_df,
         "hit_col": "hit_rate_pri",
         "mae_col": "mae_pri",
+        "category": "timesfm_lora",
     },
     {
         "name": "TiRex-2 (Zero-Shot, Uni)",
-        "color": "#fb8c00",  # Vivid Amber Orange
+        "color": "#ff8f00",  # Zero-Shot: Vivid Amber
         "df": tirex_df,
         "hit_col": "hit_rate_pct",
         "mae_col": "mae",
+        "category": "zs_other",
     },
     {
         "name": "TimesFM 3.0 (Zero-Shot, Multi)",
-        "color": "#e5b032",  # Amber Yellow
+        "color": "#f57c00",  # TimesFM ZS: Warm Orange-Gold (matching TimesFM family)
         "df": tfm_mv_zs_df,
         "hit_col": "hit_rate_pri",
         "mae_col": "mae_pri",
+        "category": "timesfm_zs",
     },
     {
         "name": "TimesFM 3.0 (Zero-Shot, Uni)",
-        "color": "#f1c24c",  # Light Gold
+        "color": "#ffb74d",  # TimesFM ZS: Light Golden Sand (matching TimesFM family)
         "df": tfm_zs_df,
         "hit_col": "gate_hit_rate_pct",
         "mae_col": "mae_us",
+        "category": "timesfm_zs",
     },
     {
         "name": "Classic: Rolling Median (W=32)",
-        "color": "#8898a8",  # Cool Grey
+        "color": "#90a4ae",  # Classical: Light Slate
         "df": classic_df,
         "hit_col": "rolling_median_hit",
         "mae_col": "rolling_median_mae",
+        "category": "classic",
     },
 ]
 
@@ -212,15 +227,15 @@ def render_benchmark_graphic(group_by="radar", out_filename="macro_pri_benchmark
     colors = [m["color"] for m in parsed_models]
     names = [m["name"] for m in parsed_models]
 
-    ax_bar.barh(y_pos, hits, color=colors, height=0.72, edgecolor="none", alpha=0.95)
+    ax_bar.set_axisbelow(True)
+    ax_bar.grid(axis="x", linestyle=":", color="#e0e0e0", alpha=0.8, zorder=0)
+
+    ax_bar.barh(y_pos, hits, color=colors, height=0.72, edgecolor="none", alpha=0.95, zorder=2)
     ax_bar.set_yticks(y_pos)
     ax_bar.set_yticklabels(names, fontsize=10.5, fontweight="semibold", color="#202124")
     ax_bar.set_xlim(0, 105)
     ax_bar.set_xlabel("Mean PRI Gate Hit Rate (%) [±10 μs Gate]", fontsize=11, fontweight="bold", labelpad=8)
     ax_bar.set_title("A. Overall PRI Gate Hit Rate & MAE Leaderboard", fontsize=12.5, fontweight="bold", loc="left", pad=12)
-
-    for x_val in [20, 40, 60, 80, 100]:
-        ax_bar.axvline(x_val, color="white", linestyle="--", linewidth=0.8, alpha=0.6, zorder=3)
 
     for idx, (hit, mae) in enumerate(zip(hits, maes)):
         y = y_pos[idx]
@@ -239,7 +254,6 @@ def render_benchmark_graphic(group_by="radar", out_filename="macro_pri_benchmark
     ax_bar.spines["right"].set_visible(False)
     ax_bar.spines["left"].set_color("#cccccc")
     ax_bar.spines["bottom"].set_color("#cccccc")
-    ax_bar.grid(axis="x", linestyle=":", color="#e0e0e0", alpha=0.5)
 
     # Right: Aligned Heatmap
     heat_matrix = np.zeros((N, len(cols)))
@@ -252,7 +266,7 @@ def render_benchmark_graphic(group_by="radar", out_filename="macro_pri_benchmark
 
     ax_heat.set_xticks(np.arange(len(cols)))
     ax_heat.set_xticklabels(col_labels, fontsize=11, fontweight="bold", color="#202124")
-    ax_heat.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False)
+    ax_heat.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False, left=False, right=False)
     ax_heat.set_yticks([])
 
     sub_title = (
@@ -291,11 +305,11 @@ def render_benchmark_graphic(group_by="radar", out_filename="macro_pri_benchmark
     cbar.set_label("PRI Gate Hit Rate (%)", fontsize=10, fontweight="bold")
     cbar.ax.tick_params(labelsize=9)
 
-    ax_heat.spines[:].set_color("#ffffff")
+    ax_heat.spines[:].set_visible(False)
     ax_heat.set_xticks(np.arange(len(cols) + 1) - 0.5, minor=True)
     ax_heat.set_yticks(np.arange(N + 1) - 0.5, minor=True)
-    ax_heat.grid(which="minor", color="white", linestyle="-", linewidth=1.5)
-    ax_heat.tick_params(which="minor", bottom=False, left=False)
+    ax_heat.grid(which="minor", color="white", linestyle="-", linewidth=1.0)
+    ax_heat.tick_params(which="minor", bottom=False, left=False, top=False, right=False)
 
     main_title = (
         "Macro PRI Benchmark: Explicit Periodicity Search vs. Foundation Models Across Radar Modulations"

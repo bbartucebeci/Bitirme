@@ -31,55 +31,32 @@ This document provides the consolidated cross-model benchmark across all five ti
 
 ---
 
-## Executive 3-Tier Benchmark Tables
+## Executive Benchmark Tables
 
-### Tier 1: Master Macro PRI Leaderboard
-Ranked by overall Tactical Gate Hit Rate (±10.0 μs corridor) across all 4,000 test sequences:
+### Table 1: Master Macro & Noise Degradation Leaderboard
+Ranked by overall Tactical Gate Hit Rate (±10.0 μs corridor) across all 4,000 test sequences. Each cell displays `Hit Rate % [MAE μs]`, with the top-performing algorithm in each column bolded:
 
-| Rank | Model | Macro Hit (%) | Macro MAE (μs) | Clean MAE (μs) | Lv1 MAE (μs) | Lv2 MAE (μs) | Lv3 MAE (μs) |
-|---|---|---:|---:|---:|---:|---:|---:|
-| 1 | **Classic: Period Estimation (P_max=24)** | **74.3%** | **20.68** | 8.03 | 14.14 | 24.50 | 36.04 |
-| 2 | **Classic: Kalman Filter (Bank)** | **71.7%** | **22.42** | 8.40 | 15.44 | 26.61 | 39.24 |
-| 3 | **Chronos-2 (LoRA SFT, Uni)** | **65.3%** | **24.39** | 9.28 | 18.02 | 29.94 | 40.30 |
-| 4 | **TimesFM 3.0 (LoRA SFT, Uni)** | **63.9%** | **24.48** | 8.17 | 16.92 | 30.72 | 42.10 |
-| 5 | **Chronos-2 (LoRA SFT, Multi)** | **63.6%** | **25.76** | 9.32 | 19.75 | 31.73 | 42.24 |
-| 6 | **t0-gamma (Zero-Shot, Uni)** | **62.0%** | **28.19** | 9.85 | 20.18 | 37.63 | 45.10 |
-| 7 | **Chronos-2 (Zero-Shot, Uni)** | **61.6%** | **29.69** | 9.43 | 22.22 | 37.71 | 49.39 |
-| 8 | **Toto 2.0 (Zero-Shot, Uni)** | **61.0%** | **27.26** | 10.57 | 17.12 | 37.15 | 44.18 |
-| 9 | **Chronos-2 (Zero-Shot, Multi)** | **60.5%** | **30.80** | 9.60 | 22.22 | 38.61 | 52.79 |
-| 10 | **Classic: HMM (Baum-Welch + Viterbi)** | **60.1%** | **31.90** | 16.03 | 23.10 | 37.16 | 51.29 |
-| 11 | **TimesFM 3.0 (LoRA SFT, Multi)** | **59.6%** | **26.18** | 17.30 | 16.76 | 29.79 | 40.89 |
-| 12 | **TiRex-2 (Zero-Shot, Uni)** | **50.9%** | **29.71** | 13.13 | 22.27 | 35.71 | 47.72 |
-| 13 | **TimesFM 3.0 (Zero-Shot, Multi)** | **46.1%** | **37.26** | 35.37 | 23.23 | 39.38 | 51.07 |
-| 14 | **TimesFM 3.0 (Zero-Shot, Uni)** | **42.6%** | **41.08** | 27.80 | 34.65 | 46.31 | 55.55 |
-| 15 | **Classic: Rolling Median (W=32)** | **33.5%** | **74.09** | 73.85 | 73.96 | 74.15 | 74.38 |
-
----
-
-### Tier 2: Noise-Level Error Breakdown
-Performance across progressive ESM receiver noise corruptions (Hit Rate % [MAE μs]):
-
-| Model | Clean | Error Lv1 | Error Lv2 | Error Lv3 |
-|---|---:|---:|---:|---:|
-| **Classic: Period Estimation** | **83.2% [8.0 μs]** | **78.9% [14.1 μs]** | **70.6% [24.5 μs]** | **64.5% [36.0 μs]** |
-| **Classic: Kalman Filter** | 83.0% [8.4 μs] | 77.3% [15.4 μs] | 67.4% [26.6 μs] | 58.9% [39.2 μs] |
-| **Chronos-2 (LoRA SFT, Uni)** | 83.2% [9.3 μs] | 72.5% [18.0 μs] | 58.4% [29.9 μs] | 47.2% [40.3 μs] |
-| **TimesFM 3.0 (LoRA SFT, Uni)** | 83.1% [8.2 μs] | 73.1% [16.9 μs] | 56.1% [30.7 μs] | 43.4% [42.1 μs] |
-| **Chronos-2 (LoRA SFT, Multi)** | 83.2% [9.3 μs] | 70.2% [19.7 μs] | 55.4% [31.7 μs] | 45.4% [42.2 μs] |
-| **t0-gamma (Zero-Shot, Uni)** | 82.4% [9.8 μs] | 70.8% [20.2 μs] | 51.5% [37.6 μs] | 43.1% [45.1 μs] |
-| **Chronos-2 (Zero-Shot, Uni)** | 83.2% [9.4 μs] | 69.8% [22.2 μs] | 53.0% [37.7 μs] | 40.6% [49.4 μs] |
-| **Toto 2.0 (Zero-Shot, Uni)** | 76.2% [10.6 μs] | 70.2% [17.1 μs] | 53.4% [37.2 μs] | 44.4% [44.2 μs] |
-| **Chronos-2 (Zero-Shot, Multi)** | 83.2% [9.6 μs] | 70.4% [22.2 μs] | 51.0% [38.6 μs] | 37.4% [52.8 μs] |
-| **Classic: HMM** | 68.2% [16.0 μs] | 62.8% [23.1 μs] | 57.3% [37.2 μs] | 51.9% [51.3 μs] |
-| **TimesFM 3.0 (LoRA SFT, Multi)** | 62.5% [17.3 μs] | 73.9% [16.8 μs] | 57.5% [29.8 μs] | 44.6% [40.9 μs] |
-| **TiRex-2 (Zero-Shot, Uni)** | 61.9% [13.1 μs] | 56.9% [22.3 μs] | 46.8% [35.7 μs] | 37.9% [47.7 μs] |
-| **TimesFM 3.0 (Zero-Shot, Multi)** | 49.4% [35.4 μs] | 58.3% [23.2 μs] | 42.2% [39.4 μs] | 34.7% [51.1 μs] |
-| **TimesFM 3.0 (Zero-Shot, Uni)** | 53.7% [27.8 μs] | 47.0% [34.6 μs] | 37.1% [46.3 μs] | 32.4% [55.5 μs] |
-| **Classic: Rolling Median** | 32.5% [73.8 μs] | 32.3% [74.0 μs] | 34.0% [74.2 μs] | 35.2% [74.4 μs] |
+| Rank | Model | Macro (Overall) | Clean | Error Lv1 | Error Lv2 | Error Lv3 |
+|---|---|---:|---:|---:|---:|---:|
+| 1 | **Classic: Period Estimation (P_max=24)** | **74.3% [20.7 μs]** | **83.2% [8.0 μs]** | **78.9% [14.1 μs]** | **70.6% [24.5 μs]** | **64.5% [36.0 μs]** |
+| 2 | **Classic: Kalman Filter (Bank)** | 71.7% [22.4 μs] | 83.0% [8.4 μs] | 77.3% [15.4 μs] | 67.4% [26.6 μs] | 58.9% [39.2 μs] |
+| 3 | **Chronos-2 (LoRA SFT, Uni)** | 65.3% [24.4 μs] | 83.2% [9.3 μs] | 72.5% [18.0 μs] | 58.4% [29.9 μs] | 47.2% [40.3 μs] |
+| 4 | **TimesFM 3.0 (LoRA SFT, Uni)** | 63.9% [24.5 μs] | 83.1% [8.2 μs] | 73.1% [16.9 μs] | 56.1% [30.7 μs] | 43.4% [42.1 μs] |
+| 5 | **Chronos-2 (LoRA SFT, Multi)** | 63.6% [25.8 μs] | 83.2% [9.3 μs] | 70.2% [19.7 μs] | 55.4% [31.7 μs] | 45.4% [42.2 μs] |
+| 6 | **t0-gamma (Zero-Shot, Uni)** | 62.0% [28.2 μs] | 82.4% [9.8 μs] | 70.8% [20.2 μs] | 51.5% [37.6 μs] | 43.1% [45.1 μs] |
+| 7 | **Chronos-2 (Zero-Shot, Uni)** | 61.6% [29.7 μs] | 83.2% [9.4 μs] | 69.8% [22.2 μs] | 53.0% [37.7 μs] | 40.6% [49.4 μs] |
+| 8 | **Toto 2.0 (Zero-Shot, Uni)** | 61.0% [27.3 μs] | 76.2% [10.6 μs] | 70.2% [17.1 μs] | 53.4% [37.2 μs] | 44.4% [44.2 μs] |
+| 9 | **Chronos-2 (Zero-Shot, Multi)** | 60.5% [30.8 μs] | 83.2% [9.6 μs] | 70.4% [22.2 μs] | 51.0% [38.6 μs] | 37.4% [52.8 μs] |
+| 10 | **Classic: HMM (Baum-Welch + Viterbi)** | 60.1% [31.9 μs] | 68.2% [16.0 μs] | 62.8% [23.1 μs] | 57.3% [37.2 μs] | 51.9% [51.3 μs] |
+| 11 | **TimesFM 3.0 (LoRA SFT, Multi)** | 59.6% [26.2 μs] | 62.5% [17.3 μs] | 73.9% [16.8 μs] | 57.5% [29.8 μs] | 44.6% [40.9 μs] |
+| 12 | **TiRex-2 (Zero-Shot, Uni)** | 50.9% [29.7 μs] | 61.9% [13.1 μs] | 56.9% [22.3 μs] | 46.8% [35.7 μs] | 37.9% [47.7 μs] |
+| 13 | **TimesFM 3.0 (Zero-Shot, Multi)** | 46.1% [37.3 μs] | 49.4% [35.4 μs] | 58.3% [23.2 μs] | 42.2% [39.4 μs] | 34.7% [51.1 μs] |
+| 14 | **TimesFM 3.0 (Zero-Shot, Uni)** | 42.6% [41.1 μs] | 53.7% [27.8 μs] | 47.0% [34.6 μs] | 37.1% [46.3 μs] | 32.4% [55.5 μs] |
+| 15 | **Classic: Rolling Median (W=32)** | 33.5% [74.1 μs] | 32.5% [73.8 μs] | 32.3% [74.0 μs] | 34.0% [74.2 μs] | 35.2% [74.4 μs] |
 
 ---
 
-### Tier 3: Radar Modulation Breakdown
+### Table 2: Radar Modulation Breakdown
 Performance across distinct pulse repetition modulation types (Hit Rate % [MAE μs]):
 
 | Model | Stable | Dwell & Switch | Sliding | Stagger | Jitter |
@@ -131,6 +108,62 @@ Performance across distinct pulse repetition modulation types (Hit Rate % [MAE �
 | `sliding` | `error_lv3` | 60.90 μs | 33.10 μs | 49.72 μs | 35.05 μs | 48.57 μs | 43.73 μs | 39.65 μs | 19.06 μs | 22.38 μs |
 
 </details>
+
+---
+
+## Data Provenance & Averaging Methodology
+
+To ensure strict scientific reproducibility and clarity on how every metric is derived, this section details the end-to-end data pipeline from raw pulse arrival times down to the cells in Table 1 and Table 2.
+
+### 1. Underlying Test Dataset & Conditions
+* **Dataset**: Controlled Single-Radar Profile (`datasets/single_radar/fixed/` and `varying/`).
+* **Condition Grid**: 5 Radar Modulations $\times$ 4 Noise Corruptions = **20 distinct operational conditions**:
+  - **Radar Modulations**: `stable`, `dwell_and_switch`, `sliding`, `stagger`, `jitter`.
+  - **Noise Regimes**:
+    - `clean`: Baseline ideal EW reception (0% dropouts, 0% Poisson false alarms, 0.05 μs clock jitter).
+    - `error_lv1`: 5% missing pulses, 5% spurious false alarms, 0.2 μs timing jitter.
+    - `error_lv2`: 10% missing pulses, 10% spurious false alarms, 0.5 μs timing jitter.
+    - `error_lv3`: 20% missing pulses, 20% spurious false alarms, 1.0 μs timing jitter.
+* **Volume**: Each condition contains **200 independent test sequences** (split `test.csv`), representing **4,000 test sequences** in total.
+
+### 2. Pulse Windowing & Emitter Masking
+For each test sequence containing $N = 128$ recorded pulses:
+1. **Anchor Removal**: The first pulse ($t_0$) is dropped as an arrival time anchor, producing 127 pulse-to-pulse intervals ($PRI_k = TOA_k - TOA_{k-1}$).
+2. **Context vs. Forecast Horizon**:
+   - **Context Window**: The first **96 pulses** are provided to the model or baseline algorithm as historical observation.
+   - **Forecast Horizon**: The subsequent **32 pulses** represent the prediction horizon.
+3. **Emitter Masking**: To evaluate true tactical tracking rather than spurious noise prediction, metrics are scored **strictly on valid emitter pulses** (`Radar_ID == "R_SINGLE"`). Spurious Poisson false alarm arrivals and receiver multipath ghosts are excluded from the target evaluation mask.
+
+### 3. Per-Sequence Evaluation Metrics
+For each sequence $s$ and valid horizon step $i \in \{1, \dots, H\}$ (where $H \le 32$ is the number of valid emitter pulses in the horizon):
+* **Absolute Error**:
+  $$e_i = |\hat{PRI}_i - PRI_i|$$
+* **Tactical Gate Hit**: A prediction is scored as an operational success if it falls within the tactical acceptance corridor of $\pm 10.0\ \mu\text{s}$:
+  $$\text{Hit}_i = \begin{cases} 1, & \text{if } | \hat{PRI}_i - PRI_i | \le 10.0\ \mu\text{s} \\ 0, & \text{otherwise} \end{cases}$$
+* **Sequence MAE**: Mean absolute error across valid horizon pulses:
+  $$\text{MAE}_s = \frac{1}{H} \sum_{i=1}^{H} e_i$$
+* **Sequence Hit Rate (%)**:
+  $$\text{HitRate}_s = \left( \frac{1}{H} \sum_{i=1}^{H} \text{Hit}_i \right) \times 100\%$$
+
+### 4. Aggregation Hierarchy
+
+#### A. Condition-Level Split Metric (Stored in `metrics.csv`)
+For each of the 20 conditions $c = (r, e)$ where $r \in \{\text{radar types}\}$ and $e \in \{\text{error levels}\}$:
+$$\text{MAE}_c = \frac{1}{200} \sum_{s=1}^{200} \text{MAE}_s, \quad \text{HitRate}_c = \frac{1}{200} \sum_{s=1}^{200} \text{HitRate}_s$$
+These 20 values populate the per-condition metric files (e.g. `results/{model}/.../metrics.csv`) and the expandable 20-Condition Matrix above.
+
+#### B. Macro (Overall) Benchmark (Table 1, Column 3)
+The macro metric represents the **unweighted arithmetic mean** across all 20 conditions, giving equal strategic weight to every modulation and noise regime ($20 \times 200 = 4,000$ test sequences):
+$$\text{Macro Hit Rate} = \frac{1}{20} \sum_{c=1}^{20} \text{HitRate}_c = \frac{1}{20} \sum_{r=1}^{5} \sum_{e=1}^{4} \text{HitRate}_{(r,e)}$$
+$$\text{Macro MAE} = \frac{1}{20} \sum_{c=1}^{20} \text{MAE}_c = \frac{1}{20} \sum_{r=1}^{5} \sum_{e=1}^{4} \text{MAE}_{(r,e)}$$
+
+#### C. Noise-Level Columns (Table 1, Columns 4–7: Clean, Lv1, Lv2, Lv3)
+For each error level $e$, the metric is the unweighted mean across the **5 radar modulation types** under that specific noise level ($5 \text{ conditions} \times 200 = 1,000$ sequences per column):
+$$\text{HitRate}_{e} = \frac{1}{5} \sum_{r=1}^{5} \text{HitRate}_{(r, e)}, \quad \text{MAE}_{e} = \frac{1}{5} \sum_{r=1}^{5} \text{MAE}_{(r, e)}$$
+
+#### D. Radar-Type Columns (Table 2: Stable, Dwell, Sliding, Stagger, Jitter)
+For each radar modulation $r$, the metric is the unweighted mean across the **4 noise levels** for that specific modulation ($4 \text{ conditions} \times 200 = 800$ sequences per column):
+$$\text{HitRate}_{r} = \frac{1}{4} \sum_{e=1}^{4} \text{HitRate}_{(r, e)}, \quad \text{MAE}_{r} = \frac{1}{4} \sum_{e=1}^{4} \text{MAE}_{(r, e)}$$
 
 ---
 
