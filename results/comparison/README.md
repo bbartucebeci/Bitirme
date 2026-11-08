@@ -13,99 +13,99 @@ This document provides the consolidated cross-model benchmark across all five ti
 
 ## Executive Benchmark Visualizations
 
-### 1. Macro Leaderboard & Radar Modulation Heatmap
+### 1. Macro Leaderboard & Radar Modulation Matrix
 ![Macro PRI Benchmark Leaderboard](macro_pri_benchmark_leaderboard.png)
-*Figure 1: Executive 2-part benchmark graphic. (A) Overall PRI Gate Hit Rate (%) and MAE leaderboard ranking all 15 foundation model variants and classical baselines. (B) Modulation-by-modulation performance heatmap (`Stable`, `Dwell & Switch`, `Sliding`, `Stagger`, `Jitter`) showing tactical hit rates and mean errors.*
+*Figure 1: Executive 2-part benchmark graphic for the Varying Profile. (A) Overall Tactical PRI Gate Hit Rate (%) and MAE leaderboard ranking all 15 foundation model variants and classical baselines, styled with distinct hatch textures separating Classical Baselines (`///`), Fine-Tuned LoRA (`solid`), and Pre-Trained Zero-Shot (`..`). (B) Modulation matrix featuring Diagonal Split Triangles: Upper-Left Triangle = PRI Gate Hit Rate (%) [YlGnBu colormap]; Lower-Right Triangle = PRI Mean Absolute Error (μs) [YlOrRd colormap].*
 
-### 2. Macro Leaderboard & Noise Degradation Heatmap
+### 2. Macro Leaderboard & Noise Degradation Matrix
 ![Noise Level PRI Benchmark Leaderboard](noise_level_pri_benchmark_leaderboard.png)
-*Figure 2: Noise resilience breakdown. (A) Overall leaderboard. (B) Channel corruption heatmap across increasing noise regimes (`Clean`, `Error Lv1`, `Error Lv2`, `Error Lv3`), highlighting why classical filtering algorithms maintain high hit rates under severe corruptions.*
+*Figure 2: Noise resilience breakdown on the Varying Profile. (A) Overall leaderboard. (B) Channel corruption matrix featuring Diagonal Split Triangles across progressive noise regimes (`Clean`, `Error Lv1`, `Error Lv2`, `Error Lv3`), illustrating how Hit Rate (Upper-Left) degrades as MAE (Lower-Right) climbs.*
 
 ### 3. Auxiliary Modalities: Spectral (RF) & Spatial (AOA) Performance
 ![Auxiliary RF and AOA Tracking](auxiliary_rf_aoa_comparison.png)
-*Figure 3: Carrier Frequency (MHz) and circular Angle of Arrival (degrees) tracking performance across radar types, demonstrating that LoRA fine-tuning improves multi-parameter EW state estimation.*
+*Figure 3: Carrier Frequency (MHz) and circular Angle of Arrival (degrees) tracking performance across radar types on the Varying Profile, demonstrating that LoRA fine-tuning improves multi-parameter EW state estimation.*
 
 ### 4. Auxiliary Channel Temporal Anchoring (Univariate vs. 5-Channel Multivariate)
 ![Univariate vs Multivariate Comparison](univariate_vs_multivariate_comparison.png)
-*Figure 4: Direct comparison of Univariate PRI forecasting vs. 5-Channel Joint Multivariate forecasting under noise, visualizing the temporal anchoring effect where auxiliary channels (RF, PW, AOA, Amplitude) preserve sequence synchronization during pulse dropouts.*
+*Figure 4: Direct comparison of Univariate PRI forecasting vs. 5-Channel Joint Multivariate forecasting under noise on the Varying Profile, visualizing the temporal anchoring effect where auxiliary channels (RF, PW, AOA, Amplitude) preserve sequence synchronization during pulse dropouts.*
 
 ---
 
-## Executive Benchmark Tables
+## Executive Benchmark Tables (Varying Profile — Primary Operational Benchmark)
 
 ### Table 1: Master Macro & Noise Degradation Leaderboard
-Ranked by overall Tactical Gate Hit Rate (±10.0 μs corridor) across all 4,000 test sequences. Each cell displays `Hit Rate % [MAE μs]`, with the top-performing algorithm in each column bolded:
+Ranked by overall Tactical Gate Hit Rate (±10.0 μs corridor) across all 4,000 test sequences in the Varying Profile benchmark (`datasets/single_radar/varying/`). Each cell displays `Hit Rate % [MAE μs]`, with the top-performing algorithm in each column bolded:
 
 | Rank | Model | Macro (Overall) | Clean | Error Lv1 | Error Lv2 | Error Lv3 |
 |---|---|---:|---:|---:|---:|---:|
-| 1 | **Classic: Period Estimation (P_max=24)** | **74.3% [20.7 μs]** | **83.2% [8.0 μs]** | **78.9% [14.1 μs]** | **70.6% [24.5 μs]** | **64.5% [36.0 μs]** |
-| 2 | **Classic: Kalman Filter (Bank)** | 71.7% [22.4 μs] | 83.0% [8.4 μs] | 77.3% [15.4 μs] | 67.4% [26.6 μs] | 58.9% [39.2 μs] |
-| 3 | **Chronos-2 (LoRA SFT, Uni)** | 65.3% [24.4 μs] | 83.2% [9.3 μs] | 72.5% [18.0 μs] | 58.4% [29.9 μs] | 47.2% [40.3 μs] |
-| 4 | **TimesFM 3.0 (LoRA SFT, Uni)** | 63.9% [24.5 μs] | 83.1% [8.2 μs] | 73.1% [16.9 μs] | 56.1% [30.7 μs] | 43.4% [42.1 μs] |
-| 5 | **Chronos-2 (LoRA SFT, Multi)** | 63.6% [25.8 μs] | 83.2% [9.3 μs] | 70.2% [19.7 μs] | 55.4% [31.7 μs] | 45.4% [42.2 μs] |
-| 6 | **t0-gamma (Zero-Shot, Uni)** | 62.0% [28.2 μs] | 82.4% [9.8 μs] | 70.8% [20.2 μs] | 51.5% [37.6 μs] | 43.1% [45.1 μs] |
-| 7 | **Chronos-2 (Zero-Shot, Uni)** | 61.6% [29.7 μs] | 83.2% [9.4 μs] | 69.8% [22.2 μs] | 53.0% [37.7 μs] | 40.6% [49.4 μs] |
-| 8 | **Toto 2.0 (Zero-Shot, Uni)** | 61.0% [27.3 μs] | 76.2% [10.6 μs] | 70.2% [17.1 μs] | 53.4% [37.2 μs] | 44.4% [44.2 μs] |
-| 9 | **Chronos-2 (Zero-Shot, Multi)** | 60.5% [30.8 μs] | 83.2% [9.6 μs] | 70.4% [22.2 μs] | 51.0% [38.6 μs] | 37.4% [52.8 μs] |
-| 10 | **Classic: HMM (Baum-Welch + Viterbi)** | 60.1% [31.9 μs] | 68.2% [16.0 μs] | 62.8% [23.1 μs] | 57.3% [37.2 μs] | 51.9% [51.3 μs] |
-| 11 | **TimesFM 3.0 (LoRA SFT, Multi)** | 59.6% [26.2 μs] | 62.5% [17.3 μs] | 73.9% [16.8 μs] | 57.5% [29.8 μs] | 44.6% [40.9 μs] |
-| 12 | **TiRex-2 (Zero-Shot, Uni)** | 50.9% [29.7 μs] | 61.9% [13.1 μs] | 56.9% [22.3 μs] | 46.8% [35.7 μs] | 37.9% [47.7 μs] |
-| 13 | **TimesFM 3.0 (Zero-Shot, Multi)** | 46.1% [37.3 μs] | 49.4% [35.4 μs] | 58.3% [23.2 μs] | 42.2% [39.4 μs] | 34.7% [51.1 μs] |
-| 14 | **TimesFM 3.0 (Zero-Shot, Uni)** | 42.6% [41.1 μs] | 53.7% [27.8 μs] | 47.0% [34.6 μs] | 37.1% [46.3 μs] | 32.4% [55.5 μs] |
-| 15 | **Classic: Rolling Median (W=32)** | 33.5% [74.1 μs] | 32.5% [73.8 μs] | 32.3% [74.0 μs] | 34.0% [74.2 μs] | 35.2% [74.4 μs] |
+| 1 | **Classic: Period Estimation (P_max=24)** | **73.7% [22.6 μs]** | 82.7% [9.7 μs] | **78.2% [15.6 μs]** | **70.8% [27.6 μs]** | **63.2% [37.3 μs]** |
+| 2 | **Classic: Kalman Filter (Bank)** | 71.1% [24.5 μs] | 82.6% [10.1 μs] | 76.6% [16.9 μs] | 67.7% [29.8 μs] | 57.4% [41.3 μs] |
+| 3 | **Chronos-2 (LoRA SFT, Uni)** | 63.1% [26.8 μs] | **82.7% [10.9 μs]** | 69.9% [20.0 μs] | 54.7% [33.0 μs] | 45.1% [43.4 μs] |
+| 4 | **Chronos-2 (LoRA SFT, Multi)** | 62.0% [28.1 μs] | 82.4% [11.2 μs] | 68.9% [21.4 μs] | 53.5% [34.8 μs] | 43.3% [45.2 μs] |
+| 5 | **t0-gamma (Zero-Shot, Uni)** | 61.6% [29.4 μs] | 81.2% [11.5 μs] | 68.9% [22.2 μs] | 53.4% [36.3 μs] | 42.7% [47.4 μs] |
+| 6 | **Toto 2.0 (Zero-Shot, Uni)** | 61.5% [28.7 μs] | 79.8% [11.4 μs] | 69.9% [20.8 μs] | 54.9% [35.3 μs] | 41.4% [47.2 μs] |
+| 7 | **TimesFM 3.0 (LoRA SFT, Uni)** | 60.7% [26.6 μs] | 82.6% [10.0 μs] | 69.9% [18.7 μs] | 51.0% [32.5 μs] | 39.3% [45.2 μs] |
+| 8 | **Chronos-2 (Zero-Shot, Uni)** | 60.6% [31.4 μs] | 81.8% [11.3 μs] | 68.1% [25.6 μs] | 51.9% [39.2 μs] | 40.8% [49.4 μs] |
+| 9 | **Chronos-2 (Zero-Shot, Multi)** | 59.5% [32.2 μs] | 81.0% [11.6 μs] | 67.5% [25.4 μs] | 50.4% [40.0 μs] | 38.9% [51.9 μs] |
+| 10 | **Classic: HMM (Baum-Welch + Viterbi)** | 58.8% [33.7 μs] | 65.3% [16.9 μs] | 62.4% [24.1 μs] | 56.2% [39.3 μs] | 51.3% [54.5 μs] |
+| 11 | **TimesFM 3.0 (LoRA SFT, Multi)** | 58.4% [27.3 μs] | 72.2% [14.0 μs] | 70.0% [18.7 μs] | 51.5% [31.9 μs] | 39.9% [44.4 μs] |
+| 12 | **TiRex-2 (Zero-Shot, Uni)** | 51.9% [31.6 μs] | 65.2% [14.6 μs] | 58.0% [24.2 μs] | 46.8% [37.8 μs] | 37.7% [50.0 μs] |
+| 13 | **TimesFM 3.0 (Zero-Shot, Multi)** | 50.4% [34.4 μs] | 67.2% [20.1 μs] | 59.1% [24.7 μs] | 42.0% [40.3 μs] | 33.2% [52.6 μs] |
+| 14 | **TimesFM 3.0 (Zero-Shot, Uni)** | 47.8% [37.0 μs] | 65.5% [19.1 μs] | 54.3% [29.5 μs] | 39.5% [43.6 μs] | 31.8% [55.6 μs] |
+| 15 | **Classic: Rolling Median (W=32)** | 36.1% [80.5 μs] | 35.7% [81.1 μs] | 35.6% [80.6 μs] | 36.0% [79.9 μs] | 37.1% [80.3 μs] |
 
 ---
 
 ### Table 2: Radar Modulation Breakdown
-Performance across distinct pulse repetition modulation types (Hit Rate % [MAE μs]):
+Performance across distinct pulse repetition modulation types on the Varying Profile (Hit Rate % [MAE μs]):
 
 | Model | Stable | Dwell & Switch | Sliding | Stagger | Jitter |
 |---|---:|---:|---:|---:|---:|
-| **Classic: Period Estimation** | **100.0% [0.0 μs]** | **94.5% [15.0 μs]** | **80.3% [9.4 μs]** | **80.5% [38.7 μs]** | 16.1% [40.2 μs] |
-| **Classic: Kalman Filter** | 99.6% [0.4 μs] | 86.6% [20.3 μs] | 79.4% [10.6 μs] | 77.5% [39.1 μs] | 15.2% [41.8 μs] |
-| **Chronos-2 (LoRA SFT, Uni)** | 99.6% [0.9 μs] | 87.0% [16.7 μs] | 67.7% [17.1 μs] | 56.5% [47.1 μs] | 15.8% [40.2 μs] |
-| **TimesFM 3.0 (LoRA SFT, Uni)** | 99.8% [0.5 μs] | 78.0% [18.0 μs] | 68.6% [14.7 μs] | 58.1% [48.8 μs] | 15.2% [40.4 μs] |
-| **Chronos-2 (LoRA SFT, Multi)** | 99.7% [1.4 μs] | 82.0% [18.7 μs] | 63.2% [19.6 μs] | 57.1% [48.9 μs] | 15.8% [40.1 μs] |
-| **t0-gamma (Zero-Shot, Uni)** | 99.4% [2.1 μs] | 80.7% [22.0 μs] | 62.7% [21.0 μs] | 51.6% [54.1 μs] | 15.2% [41.8 μs] |
-| **Chronos-2 (Zero-Shot, Uni)** | 99.3% [1.9 μs] | 77.9% [24.6 μs] | 59.8% [27.0 μs] | 55.6% [54.4 μs] | 15.7% [40.6 μs] |
-| **Toto 2.0 (Zero-Shot, Uni)** | 99.9% [0.4 μs] | 79.0% [22.7 μs] | 50.0% [24.4 μs] | 60.8% [48.1 μs] | 15.5% [40.7 μs] |
-| **Chronos-2 (Zero-Shot, Multi)** | 99.1% [2.1 μs] | 71.4% [29.0 μs] | 58.8% [28.4 μs] | 57.6% [53.9 μs] | 15.8% [40.5 μs] |
-| **Classic: HMM** | 100.0% [0.1 μs] | 88.9% [33.4 μs] | 15.0% [46.5 μs] | 80.3% [39.1 μs] | 16.1% [40.3 μs] |
-| **TimesFM 3.0 (LoRA SFT, Multi)** | 99.9% [0.5 μs] | 69.7% [22.9 μs] | 54.6% [19.0 μs] | 58.4% [48.3 μs] | 15.5% [40.2 μs] |
-| **TiRex-2 (Zero-Shot, Uni)** | 99.5% [0.9 μs] | 62.1% [26.9 μs] | 35.1% [28.7 μs] | 42.3% [51.5 μs] | 15.5% [40.6 μs] |
-| **TimesFM 3.0 (Zero-Shot, Multi)** | 99.9% [0.5 μs] | 39.4% [37.8 μs] | 25.5% [53.0 μs] | 50.4% [54.8 μs] | 15.5% [40.3 μs] |
-| **TimesFM 3.0 (Zero-Shot, Uni)** | 99.4% [0.8 μs] | 29.3% [47.2 μs] | 17.8% [61.1 μs] | 51.1% [55.5 μs] | 15.2% [40.8 μs] |
-| **Classic: Rolling Median** | 100.0% [0.1 μs] | 10.0% [150.1 μs] | 7.8% [80.6 μs] | 34.2% [98.8 μs] | 15.6% [40.9 μs] |
+| **Classic: Period Estimation (P_max=24)** | **100.0% [0.0 μs]** | **93.9% [17.1 μs]** | **79.3% [10.4 μs]** | **81.7% [36.9 μs]** | 13.7% [48.4 μs] |
+| **Classic: Kalman Filter (Bank)** | 99.7% [0.3 μs] | 86.1% [23.4 μs] | 78.1% [10.9 μs] | 78.5% [37.6 μs] | 13.1% [50.4 μs] |
+| **Chronos-2 (LoRA SFT, Uni)** | 99.9% [0.2 μs] | 86.5% [17.6 μs] | 64.2% [19.0 μs] | 51.3% [48.7 μs] | **13.7% [48.6 μs]** |
+| **Chronos-2 (LoRA SFT, Multi)** | 100.0% [0.3 μs] | 83.1% [20.1 μs] | 60.0% [21.6 μs] | 53.6% [50.2 μs] | 13.5% [48.5 μs] |
+| **t0-gamma (Zero-Shot, Uni)** | 99.8% [0.6 μs] | 83.4% [19.3 μs] | 61.0% [23.7 μs] | 49.9% [53.9 μs] | 13.6% [49.3 μs] |
+| **Toto 2.0 (Zero-Shot, Uni)** | 99.9% [0.5 μs] | 79.6% [20.2 μs] | 55.8% [24.5 μs] | 58.5% [50.0 μs] | 13.7% [48.2 μs] |
+| **TimesFM 3.0 (LoRA SFT, Uni)** | 99.9% [0.7 μs] | 70.8% [19.7 μs] | 62.2% [18.7 μs] | 57.2% [45.4 μs] | 13.4% [48.4 μs] |
+| **Chronos-2 (Zero-Shot, Uni)** | 99.7% [0.5 μs] | 79.0% [23.0 μs] | 58.4% [25.8 μs] | 52.8% [56.5 μs] | 13.3% [51.1 μs] |
+| **Chronos-2 (Zero-Shot, Multi)** | 99.7% [0.8 μs] | 74.9% [26.1 μs] | 54.8% [28.8 μs] | 54.3% [54.9 μs] | 13.5% [50.6 μs] |
+| **Classic: HMM (Baum-Welch + Viterbi)** | 99.8% [0.4 μs] | 88.0% [36.5 μs] | 11.2% [45.3 μs] | 81.2% [37.7 μs] | 13.7% [48.5 μs] |
+| **TimesFM 3.0 (LoRA SFT, Multi)** | 99.9% [0.5 μs] | 65.2% [21.9 μs] | 55.9% [20.4 μs] | 57.5% [45.2 μs] | 13.5% [48.3 μs] |
+| **TiRex-2 (Zero-Shot, Uni)** | 99.6% [0.7 μs] | 71.0% [24.0 μs] | 36.5% [29.5 μs] | 38.8% [54.9 μs] | 13.6% [49.0 μs] |
+| **TimesFM 3.0 (Zero-Shot, Multi)** | 99.8% [0.5 μs] | 51.4% [31.2 μs] | 40.2% [37.2 μs] | 47.1% [54.5 μs] | 13.4% [48.6 μs] |
+| **TimesFM 3.0 (Zero-Shot, Uni)** | 99.5% [0.9 μs] | 42.6% [35.8 μs] | 35.4% [43.4 μs] | 47.9% [56.1 μs] | 13.4% [48.8 μs] |
+| **Classic: Rolling Median (W=32)** | **100.0% [0.1 μs]** | 27.5% [170.2 μs] | 6.4% [82.9 μs] | 33.1% [100.1 μs] | 13.4% [49.1 μs] |
 
 ---
 
 <details>
-<summary><b>Click to expand full 20-Condition Breakdown (Radar Type × Error Level)</b></summary>
+<summary><b>Click to expand full 20-Condition Breakdown (Radar Type × Error Level — Varying Profile)</b></summary>
 
 ### Full Condition-by-Condition Matrix
 
 | Radar Type | Error Level | TimesFM ZS | TimesFM LoRA | Chronos-2 ZS | Chronos-2 LoRA | TiRex-2 ZS | Toto 2.0 ZS | t0-gamma ZS | Period Est. (Classic) | Kalman Filter (Classic) |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | `stable` | `clean` | 0.00 μs | 0.00 μs | 0.00 μs | 0.00 μs | 0.00 μs | 0.00 μs | 0.00 μs | 0.00 μs | 0.00 μs |
-| `stable` | `error_lv1` | 0.29 μs | 0.20 μs | 0.19 μs | 0.07 μs | 0.21 μs | 0.09 μs | 5.94 μs | 0.01 μs | 0.08 μs |
-| `stable` | `error_lv2` | 1.65 μs | 0.67 μs | 0.65 μs | 0.36 μs | 0.74 μs | 0.57 μs | 1.08 μs | 0.04 μs | 0.61 μs |
-| `stable` | `error_lv3` | 1.44 μs | 1.21 μs | 6.70 μs | 3.13 μs | 2.71 μs | 0.92 μs | 1.21 μs | 0.09 μs | 0.74 μs |
-| `jitter` | `clean` | 39.94 μs | 39.89 μs | 40.55 μs | 40.25 μs | 40.31 μs | 40.25 μs | 40.79 μs | 40.17 μs | 42.01 μs |
-| `jitter` | `error_lv1` | 40.66 μs | 40.44 μs | 40.31 μs | 39.87 μs | 40.03 μs | 40.11 μs | 43.36 μs | 40.35 μs | 41.91 μs |
-| `jitter` | `error_lv2` | 41.58 μs | 40.61 μs | 40.97 μs | 40.47 μs | 40.87 μs | 40.65 μs | 41.63 μs | 40.02 μs | 41.17 μs |
-| `jitter` | `error_lv3` | 41.06 μs | 40.60 μs | 40.73 μs | 40.26 μs | 41.21 μs | 41.66 μs | 41.57 μs | 40.37 μs | 42.09 μs |
-| `stagger` | `clean` | 2.69 μs | 0.33 μs | 2.21 μs | 2.41 μs | 6.80 μs | 0.60 μs | 4.77 μs | 0.00 μs | 0.00 μs |
-| `stagger` | `error_lv1` | 41.04 μs | 28.37 μs | 41.82 μs | 32.01 μs | 36.65 μs | 19.82 μs | 28.63 μs | 20.62 μs | 21.08 μs |
-| `stagger` | `error_lv2` | 80.01 μs | 70.61 μs | 76.57 μs | 66.20 μs | 69.49 μs | 83.53 μs | 88.09 μs | 50.49 μs | 51.33 μs |
-| `stagger` | `error_lv3` | 98.25 μs | 95.80 μs | 96.80 μs | 87.71 μs | 93.03 μs | 88.52 μs | 94.75 μs | 83.82 μs | 84.14 μs |
-| `dwell_and_switch` | `clean` | 25.34 μs | 0.25 μs | 1.73 μs | 1.76 μs | 6.59 μs | 3.81 μs | 0.94 μs | 0.00 μs | 0.00 μs |
-| `dwell_and_switch` | `error_lv1` | 34.01 μs | 8.84 μs | 11.24 μs | 8.68 μs | 15.17 μs | 10.32 μs | 9.08 μs | 5.17 μs | 9.24 μs |
-| `dwell_and_switch` | `error_lv2` | 53.20 μs | 23.01 μs | 32.33 μs | 20.82 μs | 32.60 μs | 30.73 μs | 29.57 μs | 17.87 μs | 24.95 μs |
-| `dwell_and_switch` | `error_lv3` | 76.11 μs | 39.78 μs | 53.01 μs | 35.35 μs | 53.08 μs | 46.09 μs | 48.32 μs | 36.85 μs | 46.84 μs |
-| `sliding` | `clean` | 71.04 μs | 0.39 μs | 2.63 μs | 1.99 μs | 11.96 μs | 8.18 μs | 2.74 μs | 0.00 μs | 0.00 μs |
-| `sliding` | `error_lv1` | 57.23 μs | 6.74 μs | 17.51 μs | 9.48 μs | 19.26 μs | 15.28 μs | 13.86 μs | 4.54 μs | 4.89 μs |
-| `sliding` | `error_lv2` | 55.11 μs | 18.69 μs | 38.01 μs | 21.83 μs | 34.87 μs | 30.27 μs | 27.77 μs | 14.08 μs | 14.98 μs |
-| `sliding` | `error_lv3` | 60.90 μs | 33.10 μs | 49.72 μs | 35.05 μs | 48.57 μs | 43.73 μs | 39.65 μs | 19.06 μs | 22.38 μs |
+| `stable` | `error_lv1` | 0.12 μs | 0.14 μs | 0.19 μs | 0.07 μs | 0.17 μs | 0.09 μs | 0.17 μs | 0.01 μs | 0.06 μs |
+| `stable` | `error_lv2` | 2.10 μs | 1.29 μs | 0.80 μs | 0.30 μs | 0.90 μs | 0.57 μs | 0.53 μs | 0.04 μs | 0.50 μs |
+| `stable` | `error_lv3` | 1.34 μs | 1.24 μs | 1.02 μs | 0.61 μs | 1.86 μs | 1.33 μs | 1.69 μs | 0.08 μs | 0.67 μs |
+| `jitter` | `clean` | 48.70 μs | 48.67 μs | 48.83 μs | 48.49 μs | 48.55 μs | 48.05 μs | 48.95 μs | 48.67 μs | 50.54 μs |
+| `jitter` | `error_lv1` | 48.07 μs | 47.78 μs | 56.93 μs | 48.80 μs | 48.86 μs | 48.78 μs | 49.37 μs | 48.44 μs | 50.46 μs |
+| `jitter` | `error_lv2` | 49.13 μs | 48.88 μs | 49.62 μs | 48.49 μs | 48.79 μs | 47.84 μs | 48.69 μs | 47.74 μs | 50.19 μs |
+| `jitter` | `error_lv3` | 49.30 μs | 48.42 μs | 48.98 μs | 48.53 μs | 49.68 μs | 48.28 μs | 50.13 μs | 48.76 μs | 50.61 μs |
+| `stagger` | `clean` | 2.56 μs | 0.35 μs | 2.89 μs | 2.18 μs | 7.78 μs | 0.68 μs | 4.06 μs | 0.00 μs | 0.00 μs |
+| `stagger` | `error_lv1` | 40.86 μs | 25.12 μs | 42.39 μs | 32.22 μs | 39.49 μs | 29.97 μs | 36.80 μs | 18.30 μs | 19.07 μs |
+| `stagger` | `error_lv2` | 79.23 μs | 61.20 μs | 80.53 μs | 68.69 μs | 73.73 μs | 76.54 μs | 80.22 μs | 57.12 μs | 57.90 μs |
+| `stagger` | `error_lv3` | 101.62 μs | 95.00 μs | 100.07 μs | 91.79 μs | 98.63 μs | 92.72 μs | 94.60 μs | 72.09 μs | 73.30 μs |
+| `dwell_and_switch` | `clean` | 14.26 μs | 0.46 μs | 1.29 μs | 1.78 μs | 4.76 μs | 3.60 μs | 0.88 μs | 0.00 μs | 0.00 μs |
+| `dwell_and_switch` | `error_lv1` | 24.89 μs | 10.70 μs | 10.51 μs | 7.57 μs | 11.51 μs | 10.55 μs | 10.22 μs | 6.23 μs | 9.22 μs |
+| `dwell_and_switch` | `error_lv2` | 40.76 μs | 24.77 μs | 31.27 μs | 23.07 μs | 29.90 μs | 22.99 μs | 23.95 μs | 21.89 μs | 28.37 μs |
+| `dwell_and_switch` | `error_lv3` | 63.17 μs | 42.70 μs | 48.76 μs | 37.95 μs | 49.69 μs | 43.81 μs | 41.97 μs | 40.27 μs | 55.91 μs |
+| `sliding` | `clean` | 30.16 μs | 0.57 μs | 3.25 μs | 2.14 μs | 11.79 μs | 4.91 μs | 3.54 μs | 0.00 μs | 0.00 μs |
+| `sliding` | `error_lv1` | 33.70 μs | 9.81 μs | 17.92 μs | 11.33 μs | 20.85 μs | 14.55 μs | 14.62 μs | 4.88 μs | 5.46 μs |
+| `sliding` | `error_lv2` | 46.92 μs | 26.19 μs | 33.81 μs | 24.62 μs | 35.63 μs | 28.57 μs | 27.89 μs | 11.44 μs | 12.14 μs |
+| `sliding` | `error_lv3` | 62.71 μs | 38.39 μs | 48.07 μs | 38.03 μs | 49.90 μs | 49.84 μs | 48.83 μs | 25.40 μs | 26.20 μs |
 
 </details>
 
