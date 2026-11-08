@@ -13,7 +13,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from foundation_models.chronos2.data import CHANNELS, PROJECT_ROOT
+from foundation_models.common.dataset import CHANNELS, PROJECT_ROOT
 from foundation_models.chronos2.evaluate import RESULTS_ROOT
 
 
@@ -56,7 +56,7 @@ def _build_stages(device: str, no_plots: bool) -> list[Stage]:
                 "foundation_models.chronos2.train",
                 ("--profile-mode", profile, "--target-param", task, *shared),
                 (RESULTS_ROOT / "lora_sft" / _mode(profile, task) / "metrics.csv",),
-                PROJECT_ROOT / "models" / "chronos2_lora" / profile / task.lower() / "best_model",
+                PROJECT_ROOT / "models" / "lora_sft" / "chronos2" / profile / task.lower() / "best_model",
             ))
 
     for task in ("PRI", "multivariate"):

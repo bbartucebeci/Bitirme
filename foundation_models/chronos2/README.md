@@ -100,7 +100,7 @@ python -m foundation_models.chronos2.evaluate --profile-mode varying --target-pa
 ```
 
 Each task writes `metrics.csv`, `report.md`, and diagnostic plots under
-`results/chronos_2/zero_shot/`.
+`results/chronos2/zero_shot/`.
 
 ## LoRA fine-tuning
 
@@ -122,8 +122,8 @@ Run `train` separately for Frequency, PW, AOA, and Amplitude to obtain their
 dedicated adapters. The default step budget is three passes over the training
 sequence count with batch size 64. Chronos-2 samples training sequences with
 replacement, so this is a step-budget match, not identical epoch traversal.
-Checkpoints are written to `models/chronos2_lora/` and test metrics to
-`results/chronos_2/lora_sft/`. The checkpoint directory is ignored by Git.
+Checkpoints are written to `models/lora_sft/chronos2/` and test metrics to
+`results/chronos2/lora_sft/`. The checkpoint directory is ignored by Git.
 
 For a small integration run, add `--radar-type stable --error-level clean
 --max-train-seqs-per-dataset 4 --max-val-seqs-per-dataset 2 --max-test-seqs 2

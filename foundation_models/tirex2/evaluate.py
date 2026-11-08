@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from foundation_models.chronos2.data import (
+from foundation_models.common.dataset import (
     CHANNELS,
     DATASETS_ROOT,
     ERROR_LEVELS,
@@ -19,11 +19,11 @@ from foundation_models.chronos2.data import (
     ForecastWindow,
     load_split,
 )
-from foundation_models.chronos2.metrics import aggregate, score_single, score_window
+from foundation_models.common.metrics import aggregate, score_single, score_window
 from foundation_models.tirex2.adapter import MODEL_ID, load_pipeline, predict_median
 
 
-RESULTS_ROOT = PROJECT_ROOT / "results" / "tirex_2" / "zero_shot"
+RESULTS_ROOT = PROJECT_ROOT / "results" / "tirex2" / "zero_shot"
 
 
 def audit_coverage(

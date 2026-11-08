@@ -48,6 +48,6 @@ def predict_median(pipeline, contexts: list[np.ndarray], horizon: int, batch_siz
 
 
 def checkpoint_path(profile_mode: str, target_param: str) -> Path:
-    from foundation_models.chronos2.data import PROJECT_ROOT
+    from foundation_models.common.dataset import PROJECT_ROOT
 
-    return PROJECT_ROOT / "models" / "chronos2_lora" / profile_mode / target_param.lower() / "best_model"
+    return PROJECT_ROOT / "models" / "lora_sft" / "chronos2" / profile_mode / target_param.lower() / "best_model"

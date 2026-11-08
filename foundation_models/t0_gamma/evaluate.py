@@ -12,8 +12,8 @@ import numpy as np
 from foundation_models.common.dataset import load_dataset_sequences, clean_pri_context
 from foundation_models.common.metrics import compute_forecast_metrics
 from foundation_models.common.plotting import save_forecast_plot
+from foundation_models.common.summary import export_benchmark_results, PARAM_SPECS
 from foundation_models.t0_gamma.adapter import T0GammaForecaster
-from foundation_models.timesfm.evaluate import export_benchmark_results, PARAM_SPECS
 
 CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent.parent

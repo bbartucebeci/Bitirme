@@ -402,7 +402,7 @@ def evaluate_method_across_benchmarks(
     seq_count = 10 if smoke_test else 1000
 
     if results_dir is None:
-        results_dir = PROJECT_ROOT / "results" / "classic_methods" / method_slug / f"{profile_mode}_{spec['slug']}"
+        results_dir = PROJECT_ROOT / "results" / "classic" / method_slug / f"{profile_mode}_{spec['slug']}"
     results_dir.mkdir(parents=True, exist_ok=True)
     plots_dir = results_dir / "plots"
     plots_dir.mkdir(parents=True, exist_ok=True)

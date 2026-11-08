@@ -4,5 +4,5 @@ __pycache__/
 !results/**
 *.docx
 datasets/
-/models/chronos2_lora/
+/models/lora_sft/chronos2/
 interleaved datasets/

@@ -2,8 +2,8 @@
 
 This package evaluates the open-source TiRex-2 model on the same local
 `1000x128` single-radar CSVs and 96-context/32-target windows used by the
-Chronos-2 benchmark. It reuses the sequence loader and scoring functions in
-`foundation_models/chronos2/` without importing or changing the Chronos-2 model.
+Chronos-2 and TimesFM benchmarks. It uses the unified sequence loader and scoring functions in
+`foundation_models/common/` without importing or changing the TiRex-2 model.
 
 ## Scope
 
@@ -61,7 +61,7 @@ python -m foundation_models.tirex2.run_all --dry-run --device cuda
 python -m foundation_models.tirex2.run_all --resume --device cuda
 ```
 
-The full results go under `results/tirex_2/zero_shot/`, with `metrics.csv`,
+The full results go under `results/tirex2/zero_shot/`, with `metrics.csv`,
 `report.md`, and diagnostic plots for each task. A two-sequence smoke result
 does not qualify as complete, so `--resume` reruns it. If the dataset CSVs
 change, omit `--resume` to rerun all stages. Data are read only and are never

@@ -9,6 +9,24 @@ This document provides the consolidated cross-model benchmark across all five ti
 - **Emitter Masking**: True emitter pulses (`Radar_ID == "R_SINGLE"`) scored; receiver Poisson false alarms and echoes masked out.
 - **Tactical Acceptance Gate**: ±10.0 μs tolerance corridor around ground-truth PRI.
 
+## Master Benchmark Visualizations
+
+### 1. Cross-Model PRI Benchmark across Modulation Schemes & Noise
+![Master Benchmark PRI Bars](master_benchmark_pri_bars.png)
+*Figure 1: 6-panel grouped bar chart comparing MAE (μs, log scale) across Stable, Jitter, Stagger, Dwell & Switch, Sliding, and Macro Average for all 5 foundation models (ZS & LoRA) and top classical baselines.*
+
+### 2. Noise Degradation Trajectories (Clean → Level 3 Corruptions)
+![Noise Degradation Curves](noise_degradation_curves.png)
+*Figure 2: Noise degradation slopes illustrating stability and error growth as jitter and missing/spurious pulses increase from Clean to Error Level 3.*
+
+### 3. Auxiliary Modalities: Spectral (RF) & Spatial (AOA) Performance
+![Auxiliary RF and AOA Tracking](auxiliary_rf_aoa_comparison.png)
+*Figure 3: Carrier Frequency (MHz) and circular Angle of Arrival (degrees) tracking performance across radar types, demonstrating that LoRA fine-tuning improves multi-parameter EW state estimation.*
+
+### 4. Auxiliary Channel Temporal Anchoring (Univariate vs. 5-Channel Multivariate)
+![Univariate vs Multivariate Comparison](univariate_vs_multivariate_comparison.png)
+*Figure 4: Direct comparison of Univariate PRI forecasting vs. 5-Channel Joint Multivariate forecasting under noise, visualizing the temporal anchoring effect where auxiliary channels (RF, PW, AOA, Amplitude) preserve sequence synchronization during pulse dropouts.*
+
 ## 1. Zero-Shot Univariate PRI Benchmark (Fixed Profile)
 
 | Radar Type | Error Level | TimesFM 3.0 MAE (Hit%) | Chronos-2 MAE (Hit%) | TiRex-2 MAE (Hit%) | Toto 2.0 MAE (Hit%) | t0-gamma MAE (Hit%) | Best Classic Baseline |

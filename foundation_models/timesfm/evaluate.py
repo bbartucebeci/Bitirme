@@ -207,7 +207,7 @@ def main():
 
     regime = "lora_sft" if args.weights_dir is not None else "zero_shot"
     if args.results_dir is None:
-        target_dir = PROJECT_ROOT / "results" / "timesfm_3.0" / regime / f"{args.modality}_{args.profile_mode}" / param_slug
+        target_dir = PROJECT_ROOT / "results" / "timesfm" / regime / f"{args.modality}_{args.profile_mode}" / param_slug
     else:
         target_dir = args.results_dir
 

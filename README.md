@@ -415,18 +415,14 @@ The foundation models pipeline is decoupled from dataset generation formats. Dat
 foundation_models/
 ├── common/
 │   ├── dataset.py               # Centralized sequence loader & PyTorch DataLoader (Univariate & 5-Channel Multivariate)
-│   ├── metrics.py               # EW Metrics: MAE, RMSE, Tactical Range-Gate Hit Rate with emitter pulse masking
+│   ├── metrics.py               # EW Metrics: MAE, RMSE, Tactical Range-Gate Hit Rate with emitter pulse masking & circular AOA
 │   ├── plotting.py              # Single-parameter corridor plots & 5-panel synchronized multivariate dashboards
 │   └── summary.py               # Master summary compiler and automated markdown report organizer
-└── timesfm/
-    ├── adapter.py               # TimesFMLoRAEngine: Attention + MLP LoRA (seq_attn.query_proj, seq_attn.value_proj, ff0, ff1)
-    ├── evaluate.py              # Univariate evaluation CLI (Zero-Shot or LoRA SFT)
-    ├── train.py                 # Univariate Supervised Fine-Tuning CLI (Huber loss, validation, auto-eval)
-    ├── evaluate_multivariate.py # Joint 5-Channel evaluation CLI (Zero-Shot or LoRA SFT)
-    ├── train_multivariate.py    # Joint 5-Channel SFT CLI (Weighted Huber loss, validation, auto-eval)
-    ├── run_varying_zero_shot.py # High-throughput Zero-Shot suite runner for varying profile
-    ├── run_varying_pipeline.py  # End-to-end automated training & benchmarking pipeline for varying profile
-    └── run_cross_evaluation.py  # 4-way cross-profile generalization evaluation runner
+├── timesfm/                     # Google TimesFM 3.0 (Zero-Shot & LoRA SFT) -> see foundation_models/timesfm/README.md
+├── chronos2/                    # Amazon Chronos-2 (Zero-Shot & LoRA SFT) -> see foundation_models/chronos2/README.md
+├── tirex2/                      # NX-AI TiRex-2 (Zero-Shot in NumPy 2.x env) -> see foundation_models/tirex2/README.md
+├── toto2/                       # Datadog Toto 2.0 (Zero-Shot Noise Robustness) -> see foundation_models/toto2/README.md
+└── t0_gamma/                    # TheForecastingCompany t0-gamma (Zero-Shot Covariates) -> see foundation_models/t0_gamma/README.md
 ```
 
 #### Ground-Truth Outlier & False-Alarm Masking Principle
@@ -434,35 +430,40 @@ In noisy ESM channels (`error_lv3`), the receiver front-end injects Poisson nois
 1. Masks non-emitter pulses (`Radar_ID != "R_SINGLE"`) during loss computation and metric aggregation.
 2. Directly evaluates forecasted intervals against ground-truth emitter `PRI` rather than raw jittered/noise arrival timestamps.
 
-#### Clean Hierarchical Results Organization
-Reports and checkpoints are structured to eliminate redundancy:
+#### Clean Hierarchical Results & Checkpoints Layout
+Reports, metrics, and trained model weights follow standardized, method-first paths:
 ```text
-results/timesfm_3.0/
-├── summaries/                   # Consolidated Master Reports (Single source of truth)
-│   ├── fixed_summary.md         # Unified 5-Param Univariate + Joint Multivariate for Fixed Profile
-│   ├── varying_summary.md       # Unified 5-Param Univariate + Joint Multivariate for Varying Profile
-│   └── cross_profile_generalization_report.md # Full 4-Way Cross-Check Matrix & Analysis
-├── comparisons/                 # Detailed Zero-Shot vs. LoRA side-by-side markdown comparison tables
-│   ├── comparison_zero_shot_vs_lora_fixed_*.md
-│   ├── comparison_zero_shot_vs_lora_varying_*.md
-│   ├── comparison_zero_shot_vs_lora_multivariate_fixed.md
-│   └── comparison_zero_shot_vs_lora_multivariate_varying.md
-├── cross_evaluation/            # Raw metric CSVs and diagnostic plots for cross-profile evaluations
-│   ├── fixed_on_varying/        # Models trained on Fixed -> tested on Varying datasets
-│   └── varying_on_fixed/        # Models trained on Varying -> tested on Fixed datasets
-├── zero_shot/                   # Raw metric CSVs and diagnostic PNG plots for Zero-Shot runs
-└── lora_sft/                    # Raw metric CSVs and diagnostic PNG plots for LoRA SFT runs
+results/
+├── comparison/                  # Master cross-model benchmark hub & publication visual suite (results/comparison/README.md)
+│   ├── master_benchmark_pri_bars.png
+│   ├── noise_degradation_curves.png
+│   ├── auxiliary_rf_aoa_comparison.png
+│   └── univariate_vs_multivariate_comparison.png
+├── timesfm/                     # Google TimesFM 3.0 benchmarks (zero_shot, lora_sft, summaries, comparisons)
+├── chronos2/                    # Amazon Chronos-2 benchmarks (zero_shot, lora_sft, comparisons)
+├── tirex2/                      # NX-AI TiRex-2 benchmarks (zero_shot)
+├── toto2/                       # Datadog Toto 2.0 benchmarks (zero_shot)
+├── t0_gamma/                    # TheForecastingCompany t0-gamma benchmarks (zero_shot)
+└── classic/                     # Classical baselines (Period Estimation, Kalman Filter, ARIMA, HMM, etc.)
 
-models/timesfm_lora/
-├── pri/best_model               # Fixed univariate PRI adapter
-├── frequency/best_model         # Fixed univariate RF adapter
-├── pw/best_model                # Fixed univariate PW adapter
-├── aoa/best_model               # Fixed univariate AOA adapter
-├── amplitude/best_model         # Fixed univariate Amplitude adapter
-├── multivariate_fixed/best_model# Fixed joint 5-channel adapter
-├── varying/                     # Varying univariate adapters (pri, frequency, pw, aoa, amplitude)
-└── multivariate_varying/best_model # Varying joint 5-channel adapter
+models/lora_sft/
+├── timesfm/                     # TimesFM 3.0 LoRA fine-tuned adapters (PRI, RF, PW, AOA, Amplitude, Multivariate)
+└── chronos2/                    # Chronos-2 LoRA fine-tuned checkpoints
 ```
+
+#### Master Benchmark Visualizations
+
+![Master Benchmark PRI Bars](results/comparison/master_benchmark_pri_bars.png)
+*Figure 1: Cross-model PRI MAE across all 5 radar types and 4 noise regimes comparing TimesFM (ZS & LoRA), Chronos-2 (ZS & LoRA), TiRex-2, Toto 2.0, t0-gamma, and top Classical baselines.*
+
+![Noise Degradation Curves](results/comparison/noise_degradation_curves.png)
+*Figure 2: Noise degradation curves demonstrating error growth and tracking stability as channel corruption increases from Clean to Error Level 3.*
+
+![Auxiliary Modalities](results/comparison/auxiliary_rf_aoa_comparison.png)
+*Figure 3: Carrier Frequency (MHz) and circular Angle of Arrival (degrees) tracking performance under noise.*
+
+![Univariate vs Multivariate](results/comparison/univariate_vs_multivariate_comparison.png)
+*Figure 4: Demonstration of the Auxiliary Channel Temporal Anchoring effect in 5-channel joint multivariate forecasting.*
 
 ---
 
@@ -501,7 +502,7 @@ python -m foundation_models.timesfm.train --profile-mode fixed --target-param PR
 python -m foundation_models.timesfm.train --profile-mode varying --target-param PRI --epochs 3 --batch-size 64 --lr 1e-4
 ```
 * **Runtime**: ~3.5 minutes per parameter on an NVIDIA RTX 4060 GPU (~2.2 GB VRAM).
-* **Output**: Best checkpoints saved to `models/timesfm_lora/<profile>/<param>/best_model`. Automated post-training evaluation runs across all 20 test datasets (4,000 test sequences), and comparative reports are saved to `results/timesfm_3.0/comparisons/`.
+* **Output**: Best checkpoints saved to `models/lora_sft/timesfm/<profile>/<param>/best_model`. Automated post-training evaluation runs across all 20 test datasets (4,000 test sequences), and comparative reports are saved to `results/timesfm/comparisons/`.
 
 #### 4. Automated End-to-End Varying Pipeline Runner
 To train all 5 univariate parameters and the joint multivariate model sequentially in a single command:
@@ -551,7 +552,7 @@ python -m foundation_models.common.summary --profile-mode both
 | `--huber-beta` | Float | `Auto` | Huber loss linear transition threshold (in target parameter units). |
 | `--lora-r` | Int | `16` | LoRA rank decomposition dimension. |
 | `--lora-alpha` | Int | `32` | LoRA scaling factor (alpha / r = 2.0). |
-| `--save-dir` | Path | `models/timesfm_lora` | Output directory for checkpoints. |
+| `--save-dir` | Path | `models/lora_sft/timesfm` | Output directory for checkpoints. |
 
 ---
 
@@ -586,7 +587,7 @@ Evaluated across all 20 test datasets (4,000 sequences total, 200 per split) wit
 
 ### 10.5. Fixed Profile: Full 5-Parameter Benchmark Summary
 
-Comprehensive assessment across all 5 PDW parameters on the 4,000 test sequences (see [`summaries/fixed_summary.md`](results/timesfm_3.0/summaries/fixed_summary.md) for full breakdowns):
+Comprehensive assessment across all 5 PDW parameters on the 4,000 test sequences (see [`summaries/fixed_summary.md`](results/timesfm/summaries/fixed_summary.md) for full breakdowns):
 
 | Parameter | Unit | Tactical Gate | Zero-Shot Clean MAE | LoRA Clean MAE | Zero-Shot Lv3 Hit Rate | LoRA Lv3 Hit Rate | Primary Adaptation Takeaway |
 |---|---|---|---:|---:|---:|---:|---|
@@ -658,7 +659,7 @@ Evaluated across all 20 test datasets with randomized emitter parameters (4,000 
 
 ### 10.8. Varying Profile: Full 5-Parameter Benchmark Summary
 
-Assessment across all 5 PDW parameters on the 4,000 varying test sequences (see [`summaries/varying_summary.md`](results/timesfm_3.0/summaries/varying_summary.md) for complete details):
+Assessment across all 5 PDW parameters on the 4,000 varying test sequences (see [`summaries/varying_summary.md`](results/timesfm/summaries/varying_summary.md) for complete details):
 
 | Parameter | Unit | Tactical Gate | Zero-Shot Clean MAE | LoRA Clean MAE | Zero-Shot Lv3 Hit Rate | LoRA Lv3 Hit Rate | Primary Adaptation Takeaway |
 |---|---|---|---:|---:|---:|---:|---|
@@ -701,7 +702,7 @@ Direct comparison between **Dedicated Univariate Adapters** and the **Unified Jo
 
 ### 10.10. Cross-Profile Generalization Matrix (Fixed vs. Varying)
 
-To rigorously verify that the models do not overfit to fixed emitter settings and can generalize in operational electronic warfare environments, we evaluate a **4-Way Cross-Profile Matrix** across 16,000 test sequences (see [`summaries/cross_profile_generalization_report.md`](results/timesfm_3.0/summaries/cross_profile_generalization_report.md)):
+To rigorously verify that the models do not overfit to fixed emitter settings and can generalize in operational electronic warfare environments, we evaluate a **4-Way Cross-Profile Matrix** across 16,000 test sequences (see [`summaries/cross_profile_generalization_report.md`](results/timesfm/summaries/cross_profile_generalization_report.md)):
 
 | Radar Type | Error Level | Train: Fix / Test: Fix (μs) | Train: Fix / Test: Var (μs) | Train: Var / Test: Var (μs) | Train: Var / Test: Fix (μs) | Var-on-Fix Retention Δ (%) |
 |---|---|---:|---:|---:|---:|---:|
@@ -749,11 +750,12 @@ To rigorously verify that the models do not overfit to fixed emitter settings an
 ### 10.11. Additional Foundation Models & Classical Baselines
 
 In addition to TimesFM 3.0, PULSAR benchmarks four additional state-of-the-art time-series foundation models and six classical EW signal processing baselines across the `1000x128` single-radar datasets:
-* **Chronos-2** ([`foundation_models/chronos2/`](foundation_models/chronos2/README.md)): Zero-shot forecasts, LoRA fine-tuning, and fixed/varying cross-profile transfer (`results/chronos_2/`).
-* **TiRex-2** ([`foundation_models/tirex2/`](foundation_models/tirex2/README.md)): Zero-shot univariate benchmarking across fixed and varying radar profiles (`results/tirex_2/`).
-* **t0-gamma** (`foundation_models/t0_gamma/`): Univariate, covariate, and multivariate zero-shot evaluations (`results/t0_gamma/`).
-* **Toto 2.0** (`foundation_models/toto2/`): Univariate and multivariate zero-shot evaluations (`results/toto2/`).
-* **Classical Baselines** (`classic_methods/`): Period Estimation, Kalman Filter Bank, ARIMA, Hidden Markov Model, Exponential Smoothing, and Rolling Median (`results/classic_methods/`).
+* **TimesFM 3.0** ([`foundation_models/timesfm/`](foundation_models/timesfm/README.md)): Zero-shot and LoRA fine-tuning for univariate and 5-channel joint multivariate EW forecasting (`results/timesfm/`).
+* **Chronos-2** ([`foundation_models/chronos2/`](foundation_models/chronos2/README.md)): Zero-shot forecasts, LoRA fine-tuning, and fixed/varying cross-profile transfer (`results/chronos2/`).
+* **TiRex-2** ([`foundation_models/tirex2/`](foundation_models/tirex2/README.md)): Zero-shot univariate benchmarking across fixed and varying radar profiles (`results/tirex2/`).
+* **Toto 2.0** ([`foundation_models/toto2/`](foundation_models/toto2/README.md)): Lightweight 22M zero-shot forecaster with exceptional resilience against severe noise corruptions (`results/toto2/`).
+* **t0-gamma** ([`foundation_models/t0_gamma/`](foundation_models/t0_gamma/README.md)): 50M parameter foundation model supporting temporal forecasting and auxiliary covariate conditioning (`results/t0_gamma/`).
+* **Classical Baselines** ([`classic_methods/`](classic_methods/README.md)): Period Estimation, Kalman Filter Bank, ARIMA, Hidden Markov Model, Exponential Smoothing, and Rolling Median (`results/classic/`).
 * **Consolidated Master Benchmark**: See [`results/comparison/README.md`](results/comparison/README.md) for full side-by-side performance tables across foundation models and classical methods.
 
 ---

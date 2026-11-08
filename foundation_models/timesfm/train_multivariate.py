@@ -36,8 +36,8 @@ from foundation_models.timesfm.evaluate_multivariate import (
 CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent.parent
 DEFAULT_DATASETS_ROOT = PROJECT_ROOT / "datasets" / "single_radar"
-DEFAULT_CHECKPOINTS_DIR = PROJECT_ROOT / "models" / "timesfm_lora" / "multivariate_fixed"
-DEFAULT_RESULTS_ROOT = PROJECT_ROOT / "results" / "timesfm_3.0"
+DEFAULT_CHECKPOINTS_DIR = PROJECT_ROOT / "models" / "lora_sft" / "timesfm" / "multivariate_fixed"
+DEFAULT_RESULTS_ROOT = PROJECT_ROOT / "results" / "timesfm"
 
 
 def validate_multivariate_epoch(
@@ -222,7 +222,7 @@ def main():
 
     # 4. Training Loop
     best_val_loss = float("inf")
-    checkpoint_best = PROJECT_ROOT / "models" / "timesfm_lora" / f"multivariate_{args.profile_mode}" / "best_model"
+    checkpoint_best = PROJECT_ROOT / "models" / "lora_sft" / "timesfm" / f"multivariate_{args.profile_mode}" / "best_model"
     checkpoint_best.parent.mkdir(parents=True, exist_ok=True)
 
     print("\n" + "-" * 80)

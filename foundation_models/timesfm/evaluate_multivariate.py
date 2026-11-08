@@ -27,7 +27,7 @@ from foundation_models.timesfm.adapter import TimesFMLoRAEngine
 CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent.parent
 DEFAULT_DATASETS_ROOT = PROJECT_ROOT / "datasets" / "single_radar"
-DEFAULT_RESULTS_ROOT = PROJECT_ROOT / "results" / "timesfm_3.0"
+DEFAULT_RESULTS_ROOT = PROJECT_ROOT / "results" / "timesfm"
 
 
 def evaluate_single_multivariate_dataset(

@@ -24,7 +24,7 @@ from foundation_models.timesfm.evaluate_multivariate import (
 CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent.parent
 DATASETS_ROOT = PROJECT_ROOT / "datasets" / "single_radar" / "varying"
-RESULTS_ROOT = PROJECT_ROOT / "results" / "timesfm_3.0" / "zero_shot"
+RESULTS_ROOT = PROJECT_ROOT / "results" / "timesfm" / "zero_shot"
 
 RADAR_TYPES = ["stable", "jitter", "stagger", "dwell_and_switch", "sliding"]
 ERROR_LEVELS = ["clean", "error_lv1", "error_lv2", "error_lv3"]

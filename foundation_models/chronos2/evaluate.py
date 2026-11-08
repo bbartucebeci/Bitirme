@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from foundation_models.chronos2.adapter import MODEL_ID, load_pipeline, predict_median
-from foundation_models.chronos2.data import (
+from foundation_models.common.dataset import (
     CHANNELS,
     DATASETS_ROOT,
     ERROR_LEVELS,
@@ -21,10 +21,10 @@ from foundation_models.chronos2.data import (
     ForecastWindow,
     load_split,
 )
-from foundation_models.chronos2.metrics import aggregate, score_single, score_window
+from foundation_models.common.metrics import aggregate, score_single, score_window
 
 
-RESULTS_ROOT = PROJECT_ROOT / "results" / "chronos_2"
+RESULTS_ROOT = PROJECT_ROOT / "results" / "chronos2"
 
 
 def audit_coverage(

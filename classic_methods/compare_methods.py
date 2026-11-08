@@ -29,7 +29,7 @@ from classic_methods.kalman_filter import kalman_forecast
 from classic_methods.exponential_smoothing import exponential_smoothing_forecast
 from classic_methods.arima import arima_forecast
 
-RESULTS_ROOT = PROJECT_ROOT / "results" / "classic_methods"
+RESULTS_ROOT = PROJECT_ROOT / "results" / "classic"
 
 # (slug, plot label, short table label, forecast fn, colour, marker style)
 METHODS = [

@@ -6,7 +6,7 @@ Cross-evaluates:
 3. Varying PRI LoRA Model on Fixed Profile Test Sets (4,000 seqs)
 4. Varying Multivariate LoRA Model on Fixed Profile Test Sets (4,000 seqs)
 
-Outputs raw metrics to `results/timesfm_3.0/cross_evaluation/` and compiles the
+Outputs raw metrics to `results/timesfm/cross_evaluation/` and compiles the
 master 4-way cross-profile generalization report.
 """
 
@@ -34,8 +34,8 @@ from foundation_models.timesfm.evaluate_multivariate import (
 CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent.parent
 DATASETS_ROOT = PROJECT_ROOT / "datasets" / "single_radar"
-MODELS_ROOT = PROJECT_ROOT / "models" / "timesfm_lora"
-CROSS_EVAL_ROOT = PROJECT_ROOT / "results" / "timesfm_3.0" / "cross_evaluation"
+MODELS_ROOT = PROJECT_ROOT / "models" / "lora_sft" / "timesfm"
+CROSS_EVAL_ROOT = PROJECT_ROOT / "results" / "timesfm" / "cross_evaluation"
 
 RADAR_TYPES = ["stable", "jitter", "stagger", "dwell_and_switch", "sliding"]
 ERROR_LEVELS = ["clean", "error_lv1", "error_lv2", "error_lv3"]

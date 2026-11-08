@@ -23,7 +23,7 @@ from foundation_models.timesfm.evaluate import evaluate_single_dataset, export_b
 CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent.parent
 DEFAULT_DATASETS_ROOT = PROJECT_ROOT / "datasets" / "single_radar"
-DEFAULT_CHECKPOINTS_DIR = PROJECT_ROOT / "models" / "timesfm_lora"
+DEFAULT_CHECKPOINTS_DIR = PROJECT_ROOT / "models" / "lora_sft" / "timesfm"
 
 
 def validate_epoch(
@@ -288,7 +288,7 @@ def main():
     print("\nLoading Best Fine-Tuned Model for Full Test Split Evaluation...")
     tfm_eval = TimesFMLoRAEngine.load_for_inference(weights_dir=checkpoint_subdir)
 
-    target_results_dir = PROJECT_ROOT / "results" / "timesfm_3.0" / "lora_sft" / f"univariate_{args.profile_mode}" / param_slug
+    target_results_dir = PROJECT_ROOT / "results" / "timesfm" / "lora_sft" / f"univariate_{args.profile_mode}" / param_slug
     plots_dir = target_results_dir / "plots"
 
     radar_types = ["stable", "jitter", "stagger", "dwell_and_switch", "sliding"]
@@ -328,10 +328,10 @@ def main():
         )
 
         # 6. Generate Side-by-Side Comparison if Zero-Shot exists
-        zero_shot_dir = PROJECT_ROOT / "results" / "timesfm_3.0" / "zero_shot" / f"univariate_{args.profile_mode}" / param_slug
+        zero_shot_dir = PROJECT_ROOT / "results" / "timesfm" / "zero_shot" / f"univariate_{args.profile_mode}" / param_slug
         zero_shot_csv = zero_shot_dir / "metrics.csv"
         lora_csv = target_results_dir / "metrics.csv"
-        comparisons_dir = PROJECT_ROOT / "results" / "timesfm_3.0" / "comparisons"
+        comparisons_dir = PROJECT_ROOT / "results" / "timesfm" / "comparisons"
         comparisons_dir.mkdir(parents=True, exist_ok=True)
         comparison_md = comparisons_dir / f"comparison_zero_shot_vs_lora_{args.profile_mode}_{param_slug}.md"
 

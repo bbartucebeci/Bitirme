@@ -1,15 +1,15 @@
 """PULSAR: Centralized benchmark report compiler and results organizer.
 
 Compiles:
-1. `results/timesfm_3.0/summaries/fixed_summary.md`: Unified master report for Fixed profile
+1. `results/timesfm/summaries/fixed_summary.md`: Unified master report for Fixed profile
    (Univariate 5-channel + Multivariate + Side-by-side comparison).
-2. `results/timesfm_3.0/summaries/varying_summary.md`: Unified master report for Varying profile
+2. `results/timesfm/summaries/varying_summary.md`: Unified master report for Varying profile
    (Univariate 5-channel + Multivariate + Side-by-side comparison).
-3. `results/timesfm_3.0/summaries/cross_profile_generalization_report.md`: Complete 4-way
+3. `results/timesfm/summaries/cross_profile_generalization_report.md`: Complete 4-way
    generalization matrix (Fixed on Fixed, Fixed on Varying, Varying on Varying, Varying on Fixed).
 
 Organizes detailed comparison files into:
-   `results/timesfm_3.0/comparisons/`
+   `results/timesfm/comparisons/`
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ import pandas as pd
 
 CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent.parent
-RESULTS_ROOT = PROJECT_ROOT / "results" / "timesfm_3.0"
+RESULTS_ROOT = PROJECT_ROOT / "results" / "timesfm"
 SUMMARIES_DIR = RESULTS_ROOT / "summaries"
 COMPARISONS_DIR = RESULTS_ROOT / "comparisons"
 CROSS_EVAL_DIR = RESULTS_ROOT / "cross_evaluation"
@@ -36,6 +36,49 @@ PARAMS = [
     {"slug": "aoa", "name": "Angle of Arrival (AOA)", "unit": "deg", "tol": "±2°"},
     {"slug": "amplitude", "name": "Received Peak Power (Amplitude)", "unit": "dBm", "tol": "±2 dBm"},
 ]
+
+PARAM_SPECS = {
+    "PRI": {"name": "PRI", "slug": "pri", "unit": "us", "default_tol": 10.0, "scale": 1000.0},
+    "Frequency": {"name": "Carrier Frequency", "slug": "frequency", "unit": "MHz", "default_tol": 2.0, "scale": 1000.0},
+    "PW": {"name": "Pulse Width", "slug": "pw", "unit": "us", "default_tol": 0.1, "scale": 1.0},
+    "AOA": {"name": "Angle of Arrival", "slug": "aoa", "unit": "deg", "default_tol": 2.0, "scale": 100.0},
+    "Amplitude": {"name": "Amplitude", "slug": "amplitude", "unit": "dBm", "default_tol": 2.0, "scale": 50.0},
+}
+
+
+def export_benchmark_results(
+    results: List[Dict[str, Any]],
+    results_dir: Path,
+    title: str,
+    unit: str = "us",
+):
+    """Saves metrics CSV and readable report Markdown."""
+    results_dir.mkdir(parents=True, exist_ok=True)
+    df = pd.DataFrame(results)
+
+    csv_path = results_dir / "metrics.csv"
+    df.to_csv(csv_path, index=False)
+    print(f"\n[SAVED] Metrics CSV: {csv_path}")
+
+    mae_col = f"mae_{unit}" if f"mae_{unit}" in results[0] else "mae_us"
+    rmse_col = f"rmse_{unit}" if f"rmse_{unit}" in results[0] else "rmse_us"
+    tol_val = results[0].get("tolerance", 10.0)
+
+    md_path = results_dir / "report.md"
+    md_content = [
+        f"# {title}\n",
+        f"**Evaluated on**: {time.strftime('%Y-%m-%d %H:%M:%S')}\n",
+        f"**Context History**: {results[0]['context_length']} pulses | **Forecast Horizon**: {results[0]['horizon_length']} pulses\n",
+        f"\n| Radar Type | Error Level | Seqs | MAE ({unit}) | RMSE ({unit}) | Gate Hit Rate (+/-{tol_val:g}{unit}) |",
+        "|---|---|---:|---:|---:|---:|",
+    ]
+    for r in results:
+        md_content.append(
+            f"| `{r['radar_type']}` | `{r['error_level']}` | {r['evaluated_sequences']} | "
+            f"**{r[mae_col]:.2f}** | {r[rmse_col]:.2f} | {r['gate_hit_rate_pct']:.1f}% |"
+        )
+    md_path.write_text("\n".join(md_content), encoding="utf-8")
+    print(f"[SAVED] Report Markdown: {md_path}")
 
 
 def reorganize_markdown_files():

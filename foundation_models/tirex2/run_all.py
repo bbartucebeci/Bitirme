@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from foundation_models.chronos2.data import CHANNELS
+from foundation_models.common.dataset import CHANNELS
 from foundation_models.tirex2.evaluate import RESULTS_ROOT
 
 

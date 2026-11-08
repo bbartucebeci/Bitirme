@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 
 from foundation_models.chronos2.adapter import MODEL_ID, load_pipeline
-from foundation_models.chronos2.data import (
+from foundation_models.common.dataset import (
     CHANNELS,
     DATASETS_ROOT,
     ERROR_LEVELS,
@@ -101,7 +101,7 @@ def main() -> None:
     steps = args.steps or args.epochs * math.ceil(len(train_series) / args.batch_size)
     print(f"[DATA] {len(train_series)} train, {len(val_series)} validation sequences; {steps} steps")
 
-    output_dir = PROJECT_ROOT / "models" / "chronos2_lora" / args.profile_mode / args.target_param.lower()
+    output_dir = PROJECT_ROOT / "models" / "lora_sft" / "chronos2" / args.profile_mode / args.target_param.lower()
     pipeline = load_pipeline(args.model_id, args.device)
     finetuned = pipeline.fit(
         inputs=train_series,
