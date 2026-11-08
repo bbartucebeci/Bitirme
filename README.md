@@ -284,6 +284,13 @@ Datasets are structured to guarantee zero data leakage:
 * **Validation Split**: $10\%$ (100 sequences)
 * **Test Split**: $20\%$ (200 sequences)
 
+For newly generated single-radar datasets, `1000x128` means 1000 independent
+sequences with 128 observed intervals each. Every sequence CSV has 129 rows:
+the first row is the arrival-time anchor, followed by 128 observed pulses.
+Missing pulses appear as larger gaps between observed TOAs. Older CSVs made
+with a fixed simulation duration may have different row counts; regenerate
+them to use the 129-row format. Interleaved datasets retain variable row counts.
+
 ```text
 datasets/single_radar/fixed/stable/1000x128_clean/
 ├── metadata.yaml             # Complete machine-readable configuration & row counts
@@ -333,6 +340,7 @@ The unified generator tool is located at [`dataset_generator/generate_datasets.p
 * `--config-dir`: Path to folder containing YAML configurations (default: `configs/`).
 * `--smoke-test`: Generates 10 test sequences per dataset instead of 1000 for rapid debugging.
 * `--seed`: Master random seed for reproducible sampling (default: `20261020`).
+* `--pulses-per-sequence`: Observed intervals per single-radar sequence (`128`, `256`, `512`, or `1024`; default: `128`).
 
 ### Common Commands:
 
@@ -736,15 +744,28 @@ To rigorously verify that the models do not overfit to fixed emitter settings an
    * `dwell_and_switch error_lv3` (Fixed): UV $39.78\ \mu\text{s} \rightarrow$ MV **$37.96\ \mu\text{s}$**.
    Because auxiliary channels (Frequency, PW, AOA, Amp) do not drop timing pulses simultaneously, they serve as steady temporal anchors that prevent transformer attention heads from losing emitter sync.
 
+---
+
+### 10.11. Additional Foundation Models (Chronos-2, TiRex-2, t0-gamma, Toto 2.0)
+
+In addition to TimesFM 3.0, PULSAR benchmarks four additional state-of-the-art time-series foundation models across the `1000x128` single-radar datasets:
+* **Chronos-2** ([`foundation_models/chronos2/`](foundation_models/chronos2/README.md)): Zero-shot forecasts, LoRA fine-tuning, and fixed/varying cross-profile transfer (`results/chronos_2/`).
+* **TiRex-2** ([`foundation_models/tirex2/`](foundation_models/tirex2/README.md)): Zero-shot univariate benchmarking across fixed and varying radar profiles (`results/tirex_2/`).
+* **t0-gamma** (`foundation_models/t0_gamma/`): Univariate, covariate, and multivariate zero-shot evaluations (`results/t0_gamma/`).
+* **Toto 2.0** (`foundation_models/toto2/`): Univariate and multivariate zero-shot evaluations (`results/toto2/`).
+* **Cross-Model Comparison**: See [`results/comparison/README.md`](results/comparison/README.md) for side-by-side comparisons across foundation models.
+
+---
+
 ## 11. Roadmap: Hardware Acceleration & FPGA Deployment
 
-As specified in [`PULSAR.md`](file:///c:/Users/Bu%20Bilgisayar/Desktop/Lessons/Bitirme%20Projesi/Bitirme/PULSAR.md), the final phase of PULSAR targets real-time hardware execution:
+As specified in [`PULSAR.md`](PULSAR.md), the final phase of PULSAR targets real-time hardware execution:
 
 ```mermaid
 flowchart LR
-    P1["Phase 1: Synthetic PDW Generation<br/>(Physics, Clock Noise, Benchmarks)"] --> P2["Phase 2: Foundation Models & SFT<br/>(TimesFM 3.0, Zero-Shot, LoRA SFT)"]
+    P1["Phase 1: Synthetic PDW Generation<br/>(Physics, Clock Noise, Benchmarks)"] --> P2["Phase 2: Foundation Models & SFT<br/>(TimesFM 3.0, Chronos-2, TiRex-2, t0-gamma, Toto 2.0)"]
     P2 --> P3["Phase 3: Real-Time FPGA Deployment<br/>(Quantization, Vivado HLS, Nanosecond EW)"]
 ```
 
-* **Model Quantization**: INT8/FP8 post-training quantization and knowledge distillation from TimesFM 3.0 to lightweight 1D-CNN/Transformer architectures.
+* **Model Quantization**: INT8/FP8 post-training quantization and knowledge distillation from foundation models to lightweight 1D-CNN/Transformer architectures.
 * **FPGA Implementation**: High-Level Synthesis (Vivado HLS) targeting AMD/Xilinx Zynq UltraScale+ MPSoC for sub-microsecond pulse deinterleaving and jamming gate placement.
