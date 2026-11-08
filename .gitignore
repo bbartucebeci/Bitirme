@@ -1,6 +1,7 @@
 __pycache__/
 .vscode/
 *.csv
+!results/**
 *.docx
 datasets/
 interleaved datasets/
