@@ -100,11 +100,12 @@ def evaluate_single_dataset_covariate(
 
         if plots_dir is not None and idx == 0:
             plots_dir.mkdir(parents=True, exist_ok=True)
-            plot_path = plots_dir / f"{radar_type}_{error_level}_{seq_id}.png"
+            plot_path = plots_dir / f"{radar_type}_{error_level}.png"
+            title = f"t0-gamma Covariate {param_display_name} Forecast | {dataset_display} ({seq_id})"
             try:
                 save_forecast_plot(
                     plot_path,
-                    title=f"t0-gamma Covariate {param_display_name} | {radar_type} | {error_level}",
+                    title=title,
                     context=ctx,
                     ground_truth=gt,
                     predictions=preds,

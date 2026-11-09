@@ -85,13 +85,15 @@ def evaluate_single_dataset(
         rmse_list.append(metrics["rmse"])
         hit_rate_list.append(metrics["hit_rate_pct"])
 
-        if plots_dir is not None:
+        # Diagnostic plot for the first sequence
+        if plots_dir is not None and idx == 0:
             plots_dir.mkdir(parents=True, exist_ok=True)
-            plot_path = plots_dir / f"{radar_type}_{error_level}_{seq_id}.png"
+            plot_path = plots_dir / f"{radar_type}_{error_level}.png"
+            title = f"Toto 2.0 {param_display_name} Forecast | {dataset_display} ({seq_id})"
             try:
                 save_forecast_plot(
                     plot_path,
-                    title=f"Toto 2.0 {param_display_name} | {radar_type} | {error_level}",
+                    title=title,
                     context=ctx,
                     ground_truth=gt,
                     predictions=preds,
