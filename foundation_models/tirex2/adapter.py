@@ -9,9 +9,10 @@ MODEL_ID = "NX-AI/TiRex-2"
 MEDIAN_QUANTILE_INDEX = 4  # The official nine quantiles run from 0.1 to 0.9.
 
 
-def load_pipeline(model_id: str = MODEL_ID, device: str = "auto"):
+def load_pipeline(model_id: str = MODEL_ID, device: str = "cpu"):
     try:
         import torch
+        torch._dynamo.config.disable = True
         from tirex2 import load_model
     except ImportError as exc:
         raise RuntimeError(
@@ -19,7 +20,8 @@ def load_pipeline(model_id: str = MODEL_ID, device: str = "auto"):
             "in a separate TiRex-2 environment."
         ) from exc
 
-    chosen_device = ("cuda" if torch.cuda.is_available() else "cpu") if device == "auto" else device
+    # On Windows without MSVC, pure PyTorch CPU execution avoids Triton/FlashRNN compiler gates
+    chosen_device = "cpu" if device in ("auto", "cpu") else device
     if chosen_device not in ("cpu", "cuda"):
         raise ValueError("device must be auto, cpu, or cuda")
     if chosen_device == "cuda" and not torch.cuda.is_available():

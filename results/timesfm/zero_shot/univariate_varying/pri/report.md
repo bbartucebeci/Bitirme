@@ -1,6 +1,6 @@
 # TimesFM 3.0 Zero-Shot Benchmark Report [PRI Varying]
 
-**Evaluated on**: 2026-10-26 22:12:22
+**Evaluated on**: 2026-11-09 01:00:37
 
 **Context History**: 96 pulses | **Forecast Horizon**: 32 pulses
 

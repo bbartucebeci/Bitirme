@@ -35,10 +35,10 @@
   "rank_pattern": {},
   "revision": null,
   "target_modules": [
-    "ff1",
     "seq_attn.value_proj",
+    "seq_attn.query_proj",
     "ff0",
-    "seq_attn.query_proj"
+    "ff1"
   ],
   "target_parameters": null,
   "task_type": null,
