@@ -129,6 +129,7 @@ def evaluate_single_multivariate_dataset(
         f"RF MAE: {row['mae_frequency']:5.2f} MHz | "
         f"PW MAE: {row['mae_pw']:4.2f} us"
     )
+    return row
 
 
 def export_multivariate_benchmark_results(
@@ -171,12 +172,13 @@ def main():
     parser.add_argument("--context-len", type=int, default=96)
     parser.add_argument("--horizon", type=int, default=32)
     parser.add_argument("--max-test-seqs", type=int, default=200)
+    parser.add_argument("--weights-dir", type=Path, default=None, help="Path to fine-tuned LoRA checkpoint directory")
     parser.add_argument("--results-dir", type=Path, default=None)
     parser.add_argument("--no-plots", action="store_true")
 
     args = parser.parse_args()
 
-    regime = "zero_shot"
+    regime = "lora_sft" if args.weights_dir is not None else "zero_shot"
     if args.results_dir is None:
         target_dir = DEFAULT_RESULTS_ROOT / regime / f"multivariate_{args.profile_mode}"
     else:
@@ -187,7 +189,7 @@ def main():
     radar_types = ["stable", "jitter", "stagger", "dwell_and_switch", "sliding"]
     error_levels = ["clean", "error_lv1", "error_lv2", "error_lv3"]
 
-    model = T0GammaForecaster.load_for_inference(model_id=args.model_id)
+    model = T0GammaForecaster.load_for_inference(model_id=args.model_id, weights_dir=args.weights_dir)
 
     print("=" * 80)
     print(f"t0-gamma Joint 5-Channel Multivariate Evaluation [{regime.upper()}]")
@@ -232,7 +234,7 @@ def main():
     print("=" * 80)
 
     if results:
-        title = f"t0-gamma Zero-Shot Joint 5-Channel Benchmark [{args.profile_mode.capitalize()}]"
+        title = f"t0-gamma {'LoRA Fine-Tuned (SFT)' if regime == 'lora_sft' else 'Zero-Shot'} Joint 5-Channel Benchmark [{args.profile_mode.capitalize()}]"
         export_multivariate_benchmark_results(results, target_dir, title=title)
 
 

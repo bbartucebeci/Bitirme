@@ -121,6 +121,7 @@ def main():
     parser.add_argument("--max-test-seqs", type=int, default=200)
     parser.add_argument("--tolerance", type=float, default=None)
     parser.add_argument("--tolerance-us", type=float, default=None)
+    parser.add_argument("--weights-dir", type=Path, default=None, help="Path to fine-tuned LoRA checkpoint directory")
     parser.add_argument("--results-dir", type=Path, default=None)
     parser.add_argument("--no-plots", action="store_true")
 
@@ -133,8 +134,9 @@ def main():
     param_slug = spec["slug"]
     tolerance = args.tolerance or args.tolerance_us or spec["default_tol"]
 
+    regime = "lora_sft" if args.weights_dir is not None else "zero_shot"
     if args.results_dir is None:
-        target_dir = DEFAULT_RESULTS_ROOT / "zero_shot" / f"univariate_{args.profile_mode}" / param_slug
+        target_dir = DEFAULT_RESULTS_ROOT / regime / f"univariate_{args.profile_mode}" / param_slug
     else:
         target_dir = args.results_dir
 
@@ -142,10 +144,10 @@ def main():
     radar_types = ["stable", "jitter", "stagger", "dwell_and_switch", "sliding"] if args.radar_type == "all" else [args.radar_type]
     error_levels = ["clean", "error_lv1", "error_lv2", "error_lv3"] if args.error_level == "all" else [args.error_level]
 
-    model = T0GammaForecaster.load_for_inference(model_id=args.model_id)
+    model = T0GammaForecaster.load_for_inference(model_id=args.model_id, weights_dir=args.weights_dir)
 
     print("=" * 70)
-    print(f"t0-gamma Univariate Evaluation | {param_name} | {args.profile_mode}")
+    print(f"t0-gamma Univariate Evaluation [{regime.upper()}] | {param_name} | {args.profile_mode}")
     print(f"Model: {args.model_id}")
     print("=" * 70)
 
@@ -186,7 +188,7 @@ def main():
     print(f"\nCompleted in {total:.1f}s")
 
     if results:
-        title = f"t0-gamma Zero-Shot Univariate Benchmark [{param_name} {args.profile_mode.capitalize()}]"
+        title = f"t0-gamma {'LoRA Fine-Tuned (SFT)' if regime == 'lora_sft' else 'Zero-Shot'} Univariate Benchmark [{param_name} {args.profile_mode.capitalize()}]"
         export_benchmark_results(results, target_dir, title=title, unit=param_unit)
 
 

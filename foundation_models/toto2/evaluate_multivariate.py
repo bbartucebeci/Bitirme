@@ -129,6 +129,7 @@ def evaluate_single_multivariate_dataset(
         f"RF MAE: {row['mae_frequency']:5.2f} MHz | "
         f"PW MAE: {row['mae_pw']:4.2f} us"
     )
+    return row
 
 
 def export_multivariate_benchmark_results(
