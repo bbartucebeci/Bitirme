@@ -1,0 +1,5 @@
+deinterleaver,predictor,error_level,tracks_evaluated,hit_rate_pct,mae_us,rmse_us,avg_latency_ms
+online_stream,period_estimation,clean,99,85.23,10.174,25.027,4.167
+online_stream,period_estimation,error_lv1,100,82.59,24.348,60.109,6.185
+online_stream,period_estimation,error_lv2,100,76.59,33.819,101.903,6.017
+online_stream,period_estimation,error_lv3,100,69.81,58.804,160.198,6.777

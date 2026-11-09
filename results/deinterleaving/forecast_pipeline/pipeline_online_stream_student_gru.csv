@@ -1,0 +1,5 @@
+deinterleaver,predictor,error_level,tracks_evaluated,hit_rate_pct,mae_us,rmse_us,avg_latency_ms
+online_stream,student_gru,clean,25,20.75,48.668,67.023,6.959
+online_stream,student_gru,error_lv1,25,15.38,64.789,105.714,6.684
+online_stream,student_gru,error_lv2,25,8.37,69.109,138.147,6.722
+online_stream,student_gru,error_lv3,25,8.37,86.458,170.321,6.33

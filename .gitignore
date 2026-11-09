@@ -7,3 +7,4 @@ datasets/
 /models/lora_sft/chronos2/
 interleaved datasets/
 Screenshot*.png
+models/distillation/*.pt

@@ -1,0 +1,5 @@
+deinterleaver,predictor,error_level,tracks_evaluated,hit_rate_pct,mae_us,rmse_us,avg_latency_ms
+oracle,period_estimation,clean,99,85.23,10.174,25.027,2.704
+oracle,period_estimation,error_lv1,100,82.59,24.348,60.109,4.773
+oracle,period_estimation,error_lv2,100,76.59,33.819,101.903,6.135
+oracle,period_estimation,error_lv3,100,69.72,58.617,159.712,6.143

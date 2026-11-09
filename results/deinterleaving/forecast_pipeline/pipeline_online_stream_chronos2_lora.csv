@@ -1,0 +1,5 @@
+deinterleaver,predictor,error_level,tracks_evaluated,hit_rate_pct,mae_us,rmse_us,avg_latency_ms
+online_stream,chronos2_lora,clean,25,85.12,9.231,19.585,72.91
+online_stream,chronos2_lora,error_lv1,25,69.0,31.344,69.048,49.195
+online_stream,chronos2_lora,error_lv2,25,53.63,42.909,116.546,50.358
+online_stream,chronos2_lora,error_lv3,25,41.25,67.292,167.68,46.728

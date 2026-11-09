@@ -1,0 +1,5 @@
+deinterleaver,predictor,error_level,tracks_evaluated,hit_rate_pct,mae_us,rmse_us,avg_latency_ms
+online_stream,kalman_filter,clean,99,83.52,11.445,29.554,57.818
+online_stream,kalman_filter,error_lv1,100,79.91,25.251,63.504,60.341
+online_stream,kalman_filter,error_lv2,100,75.16,34.381,102.895,63.169
+online_stream,kalman_filter,error_lv3,100,67.03,59.078,160.727,62.031
