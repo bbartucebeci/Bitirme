@@ -42,11 +42,11 @@ class Radar:
         self.scan_period = scan_period
         self.scan_phase = np.random.uniform(0, 360.0) if scan_period > 0 else 0.0
         self.aoa_drift_rate = aoa_drift_rate
-        self.clock_bias = getattr(self, "clock_bias", 0.0)
-        self.clock_offset = getattr(self, "clock_offset", 0.0)
-        self.clock_drift = getattr(self, "clock_drift", 0.0)
-        self.jitter_k = getattr(self, "jitter_k", 0.0)
-        self.jitter_std = getattr(self, "jitter_std", 0.0)
+        self.clock_bias = clock_bias if clock_bias is not None else getattr(self, "clock_bias", 0.0)
+        self.clock_offset = clock_offset if clock_offset is not None else getattr(self, "clock_offset", 0.0)
+        self.clock_drift = clock_drift if clock_drift is not None else getattr(self, "clock_drift", 0.0)
+        self.jitter_k = jitter_k if jitter_k is not None else getattr(self, "jitter_k", 0.0)
+        self.jitter_std = jitter_std if jitter_std is not None else getattr(self, "jitter_std", 0.0)
 
     def _generate_frequencies(self, num_pulses: int, freq_noise_std: float = 0.0) -> np.ndarray:
         if self.freq_mode == "constant":
@@ -82,9 +82,12 @@ class Radar:
         # 2. Generate frequencies BEFORE POI drop, so the internal hopper state advances correctly!
         freqs = self._generate_frequencies(num_pulses, freq_noise_std)
 
-        # 3. Apply the shared transmitter clock-noise model to the pulse timing law.
-        pris = apply_transmitter_clock_noise(
+        # 3. Apply the shared transmitter clock-noise model to pulse timing and the
+        #    carrier-frequency synthesizer. TOA/PRI remain on the original timing law,
+        #    while the RF center frequency is perturbed separately as a sidecar model.
+        pris, freqs = apply_transmitter_clock_noise(
             pris,
+            freqs,
             self.clock_bias,
             self.clock_offset,
             self.clock_drift,
@@ -187,16 +190,74 @@ class Radar:
 # ---------------------------------------------------------------------------
 
 
-def apply_transmitter_clock_noise(periods: np.ndarray, clock_bias: float = 0.0,
+def apply_transmitter_clock_noise(periods: np.ndarray, frequencies: np.ndarray,
+                                 clock_bias: float = 0.0,
                                  clock_offset: float = 0.0,
                                  clock_drift: float = 0.0,
                                  jitter_k: float = 0.0,
-                                 jitter_std: float = 0.0) -> np.ndarray:
+                                 jitter_std: float = 0.0):
+    """Apply the transmitter clock model to pulse timing and carrier frequency.
+
+    The timing model keeps the original physically interpreted TOA/PRI law:
+
+        t_obs = t + clock_bias - clock_offset * t - 0.5 * clock_drift * t**2 + jitter
+
+    This is the correct clock-noise law for pulse spacing and TOA generation. The
+    frequency distortion is modeled separately as a side effect on the RF center
+    frequency, using the elapsed actual time:
+
+        f_obs = f * (1 + offset + drift * time_actual)
+
+    where `time_actual` is the elapsed real transmission time in seconds.
+
+    Parameters
+    ----------
+    periods : np.ndarray
+        Nominal pulse periods (PRI values) in microseconds.
+    frequencies : np.ndarray
+        Carrier frequencies associated with each pulse. This argument is mandatory and
+        must match the shape of `periods`.
+    clock_bias : float, default 0.0
+        Constant timing bias in microseconds.
+    clock_offset : float, default 0.0
+        Fractional frequency offset term that perturbs the ideal clock rate.
+    clock_drift : float, default 0.0
+        Secular drift coefficient; its effect accumulates with elapsed time.
+    jitter_k : float, default 0.0
+        AR(1) coefficient for correlated timing jitter.
+    jitter_std : float, default 0.0
+        Standard deviation of the jitter innovation in microseconds.
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray]
+        `(adjusted_periods, adjusted_freqs)`, where:
+        - `adjusted_periods` is the TOA/PRI timing law with the original clock-noise
+          model applied;
+        - `adjusted_freqs` is the observed carrier-frequency array using the
+          frequency-only sidecar model.
+    """
     t = np.asarray(periods, dtype=float)
+    freqs = np.asarray(frequencies, dtype=float)
+
+    if t.shape != freqs.shape:
+        raise ValueError("Clock-noise frequency correction requires the same shape as the periods array.")
+
+    if t.size == 0:
+        return t.copy(), freqs.copy()
+
     jitter = np.zeros_like(t, dtype=float)
     for i in range(1, t.size):
         jitter[i] = jitter_k * jitter[i - 1] + np.random.normal(0.0, jitter_std)
-    return t + clock_bias - clock_offset * t - 0.5 * clock_drift * t ** 2 + jitter
+
+    # Keep the original TOA/PRI timing law unchanged.
+    adjusted_periods = t + clock_bias - clock_offset * t - 0.5 * clock_drift * (t * 1e-6) ** 2 * 1e6 + jitter
+
+    # Separate frequency model applied on top of the timing law.
+    time_actual_s = np.cumsum(t) * 1e-6
+    observed_freq_scale = 1.0 + clock_offset + clock_drift * time_actual_s
+    adjusted_freqs = freqs * observed_freq_scale
+    return adjusted_periods, adjusted_freqs
 
 
 def apply_environmental_impacts(df: pd.DataFrame, N: float = 0.0, rain: 
