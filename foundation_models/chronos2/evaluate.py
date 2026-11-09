@@ -22,6 +22,7 @@ from foundation_models.common.dataset import (
     load_split,
 )
 from foundation_models.common.metrics import aggregate, score_single, score_window
+from foundation_models.common.plotting import save_forecast_plot, save_multivariate_forecast_plot
 
 
 RESULTS_ROOT = PROJECT_ROOT / "results" / "chronos2"
@@ -58,24 +59,30 @@ def _save_plot(
     prediction: np.ndarray,
     target_param: str,
 ) -> None:
-    names = CHANNELS if target_param == "multivariate" else (target_param,)
-    fig, axes = plt.subplots(len(names), 1, figsize=(11, 2.6 * len(names)), squeeze=False)
-    for idx, name in enumerate(names):
-        axis = axes[idx, 0]
-        x_context = np.arange(window.context.shape[1])
-        x_future = np.arange(window.context.shape[1], window.context.shape[1] + window.target.shape[1])
-        axis.plot(x_context, window.context[idx], label="observed context")
-        axis.plot(x_future, window.target[idx], label="target")
-        axis.plot(x_future, prediction[idx], label="Chronos-2 median")
-        axis.set_ylabel(f"{name} ({UNITS[name]})")
-        axis.grid(alpha=0.25)
-        axis.legend(loc="best")
-    axes[-1, 0].set_xlabel("Pulse position within sequence")
-    fig.suptitle(f"{target_param}: {window.sequence_id}")
-    fig.tight_layout()
-    plot_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(plot_path, dpi=140)
-    plt.close(fig)
+    if target_param == "multivariate":
+        save_multivariate_forecast_plot(
+            plot_path=plot_path,
+            title=f"Chronos-2 Joint 5-Channel Forecast | ({window.sequence_id})",
+            context_5xN=window.context,
+            ground_truth_5xN=window.target,
+            predictions_5xN=prediction,
+            tolerances=[TOLERANCES[ch] for ch in CHANNELS],
+            param_names=list(CHANNELS),
+            units=[UNITS[ch] for ch in CHANNELS],
+        )
+    else:
+        tol = TOLERANCES.get(target_param, 10.0 if target_param == "PRI" else 1.0)
+        unit = UNITS.get(target_param, "μs" if target_param == "PRI" else "units")
+        save_forecast_plot(
+            plot_path=plot_path,
+            title=f"Chronos-2 {target_param} Forecast | ({window.sequence_id})",
+            context=window.context[0],
+            ground_truth=window.target[0],
+            predictions=prediction[0],
+            tolerance=tol,
+            param_label=target_param,
+            unit=unit,
+        )
 
 
 def evaluate_condition(
