@@ -1,0 +1,21 @@
+method,radar_type,error_level,evaluated_sequences,rmse_us,mae_us,medae_us,mape_pct,gate_hit_rate_pct,latency_us_per_seq
+Period Estimation (P_max=24) (template gate),stable,clean,200,0.0,0.0,0.0,0.0,100.0,299782.24
+Period Estimation (P_max=24) (template gate),stable,error_lv1,200,0.008,0.008,0.006,0.001,100.0,322691.05
+Period Estimation (P_max=24) (template gate),stable,error_lv2,200,0.044,0.044,0.035,0.004,100.0,329062.63
+Period Estimation (P_max=24) (template gate),stable,error_lv3,200,0.086,0.086,0.072,0.009,100.0,323564.18
+Period Estimation (P_max=24) (template gate),jitter,clean,200,49.992,40.275,34.654,4.048,15.58,150945.27
+Period Estimation (P_max=24) (template gate),jitter,error_lv1,200,49.282,39.546,32.934,3.984,15.92,137793.96
+Period Estimation (P_max=24) (template gate),jitter,error_lv2,200,49.871,40.049,33.807,4.031,16.18,130108.76
+Period Estimation (P_max=24) (template gate),jitter,error_lv3,200,49.618,39.88,33.598,4.015,15.87,120203.37
+Period Estimation (P_max=24) (template gate),stagger,clean,200,0.0,0.0,0.0,0.0,100.0,309035.41
+Period Estimation (P_max=24) (template gate),stagger,error_lv1,200,19.121,13.364,0.025,1.401,93.33,280838.88
+Period Estimation (P_max=24) (template gate),stagger,error_lv2,200,62.385,45.769,0.14,4.739,77.12,236554.8
+Period Estimation (P_max=24) (template gate),stagger,error_lv3,200,111.386,77.334,0.44,7.921,61.15,213728.67
+Period Estimation (P_max=24) (template gate),dwell_and_switch,clean,200,0.0,0.0,0.0,0.0,100.0,86158.84
+Period Estimation (P_max=24) (template gate),dwell_and_switch,error_lv1,200,19.12,5.897,0.046,0.61,98.05,80326.38
+Period Estimation (P_max=24) (template gate),dwell_and_switch,error_lv2,200,42.467,13.975,0.234,1.434,95.43,73464.32
+Period Estimation (P_max=24) (template gate),dwell_and_switch,error_lv3,200,63.816,21.431,0.482,2.196,93.02,72764.87
+Period Estimation (P_max=24) (template gate),sliding,clean,200,0.0,0.0,0.0,0.0,100.0,60322.43
+Period Estimation (P_max=24) (template gate),sliding,error_lv1,200,11.312,4.299,0.046,0.465,90.71,54307.68
+Period Estimation (P_max=24) (template gate),sliding,error_lv2,200,29.01,11.399,0.286,1.193,75.14,48870.95
+Period Estimation (P_max=24) (template gate),sliding,error_lv3,200,47.607,20.835,0.924,2.193,59.39,44958.02

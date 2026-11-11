@@ -1,0 +1,21 @@
+method,radar_type,error_level,evaluated_sequences,rmse_us,mae_us,medae_us,mape_pct,gate_hit_rate_pct,latency_us_per_seq
+IMM Filter (level/trend/periodic),stable,clean,200,0.0,0.0,0.0,0.0,100.0,133775.05
+IMM Filter (level/trend/periodic),stable,error_lv1,200,0.05,0.041,0.027,0.004,100.0,137607.09
+IMM Filter (level/trend/periodic),stable,error_lv2,200,0.193,0.161,0.13,0.016,99.84,152764.96
+IMM Filter (level/trend/periodic),stable,error_lv3,200,0.901,0.439,0.175,0.045,99.97,149316.33
+IMM Filter (level/trend/periodic),jitter,clean,200,62.134,49.838,41.514,5.057,13.8,146753.68
+IMM Filter (level/trend/periodic),jitter,error_lv1,200,60.974,48.968,39.512,4.973,14.1,151910.47
+IMM Filter (level/trend/periodic),jitter,error_lv2,200,61.98,49.826,39.938,5.078,13.16,132367.19
+IMM Filter (level/trend/periodic),jitter,error_lv3,200,62.515,50.255,40.055,5.091,13.04,132841.0
+IMM Filter (level/trend/periodic),stagger,clean,200,0.0,0.0,0.0,0.0,100.0,149969.64
+IMM Filter (level/trend/periodic),stagger,error_lv1,200,23.18,15.717,0.046,1.638,90.14,205884.35
+IMM Filter (level/trend/periodic),stagger,error_lv2,200,71.75,51.595,0.745,5.263,70.02,225603.55
+IMM Filter (level/trend/periodic),stagger,error_lv3,200,113.517,81.304,7.763,8.235,52.03,230625.36
+IMM Filter (level/trend/periodic),dwell_and_switch,clean,200,0.0,0.0,0.0,0.0,100.0,230443.99
+IMM Filter (level/trend/periodic),dwell_and_switch,error_lv1,200,18.857,6.662,0.056,0.688,94.9,210050.76
+IMM Filter (level/trend/periodic),dwell_and_switch,error_lv2,200,72.934,32.525,0.343,3.445,81.4,232531.25
+IMM Filter (level/trend/periodic),dwell_and_switch,error_lv3,200,96.281,51.181,0.967,5.289,69.08,237535.74
+IMM Filter (level/trend/periodic),sliding,clean,200,0.0,0.0,0.0,0.0,100.0,244133.8
+IMM Filter (level/trend/periodic),sliding,error_lv1,200,10.352,4.21,0.048,0.427,89.61,236956.7
+IMM Filter (level/trend/periodic),sliding,error_lv2,200,29.609,13.27,0.404,1.343,72.69,202312.66
+IMM Filter (level/trend/periodic),sliding,error_lv3,200,47.868,23.917,2.647,2.384,54.25,281574.83

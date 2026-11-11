@@ -118,14 +118,24 @@ def period_estimation_forecast(
     horizon_len: int = 32,
     target_param: str = "PRI",
     max_period: int = 24,
+    gate: str = "esm",
 ) -> np.ndarray:
-    """Forecasts future PDW values via Period Estimation + Tail Phase-Locking."""
+    """Forecasts future PDW values via Period Estimation + Tail Phase-Locking.
+
+    gate: "esm" (default, clean_pri_context) or "template" (template-based gap filling,
+    see template_gate.py). Only used for PRI targets.
+    """
     raw = np.asarray(context, dtype=np.float64)
     if len(raw) == 0:
         return np.zeros(horizon_len, dtype=np.float64)
 
     if target_param.upper() in ["PRI", "MEASURED_DELTA_TOA"]:
-        x = clean_pri_context(raw)
+        if gate == "esm":
+            x = clean_pri_context(raw)
+        else:
+            from classic_methods.template_gate import apply_gate
+
+            x = apply_gate(raw, gate)
     else:
         x = raw.copy()
 
@@ -161,6 +171,8 @@ def main():
     parser.add_argument("--radar-type", choices=RADAR_TYPES + ["all"], default="all")
     parser.add_argument("--error-level", choices=ERROR_LEVELS + ["all"], default="all")
     parser.add_argument("--max-period", type=int, default=24, help="Maximum candidate period length (pulses)")
+    parser.add_argument("--gate", choices=["esm", "template"], default="esm",
+                        help="ESM gate: default median gate or template-based gap filling")
     parser.add_argument("--context-len", type=int, default=96)
     parser.add_argument("--horizon", type=int, default=32)
     parser.add_argument("--max-test-seqs", type=int, default=200)
@@ -171,12 +183,13 @@ def main():
     elevels = ERROR_LEVELS if args.error_level == "all" else [args.error_level]
 
     predict_fn = lambda ctx, h, p: period_estimation_forecast(
-        ctx, horizon_len=h, target_param=p, max_period=args.max_period
+        ctx, horizon_len=h, target_param=p, max_period=args.max_period, gate=args.gate
     )
+    template = args.gate == "template"
 
     evaluate_method_across_benchmarks(
-        method_name=f"Period Estimation (P_max={args.max_period})",
-        method_slug="period_estimation",
+        method_name=f"Period Estimation (P_max={args.max_period})" + (" (template gate)" if template else ""),
+        method_slug="period_estimation" + ("_template_gate" if template else ""),
         predict_fn=predict_fn,
         profile_mode=args.profile_mode,
         target_param=args.target_param,

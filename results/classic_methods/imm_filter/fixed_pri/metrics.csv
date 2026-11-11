@@ -1,0 +1,21 @@
+method,radar_type,error_level,evaluated_sequences,rmse_us,mae_us,medae_us,mape_pct,gate_hit_rate_pct,latency_us_per_seq
+IMM Filter (level/trend/periodic),stable,clean,200,0.0,0.0,0.0,0.0,100.0,129696.88
+IMM Filter (level/trend/periodic),stable,error_lv1,200,0.04,0.034,0.026,0.003,100.0,138658.32
+IMM Filter (level/trend/periodic),stable,error_lv2,200,0.686,0.305,0.135,0.03,99.94,150784.75
+IMM Filter (level/trend/periodic),stable,error_lv3,200,0.635,0.341,0.119,0.034,99.97,148173.25
+IMM Filter (level/trend/periodic),jitter,clean,200,51.477,41.471,35.438,4.167,15.09,148523.25
+IMM Filter (level/trend/periodic),jitter,error_lv1,200,51.513,41.359,34.329,4.168,15.38,153248.09
+IMM Filter (level/trend/periodic),jitter,error_lv2,200,51.478,41.41,34.756,4.169,14.99,125195.96
+IMM Filter (level/trend/periodic),jitter,error_lv3,200,51.021,40.937,34.265,4.122,15.25,140752.24
+IMM Filter (level/trend/periodic),stagger,clean,200,0.0,0.0,0.0,0.0,100.0,151633.79
+IMM Filter (level/trend/periodic),stagger,error_lv1,200,20.767,14.285,0.048,1.495,91.0,211392.13
+IMM Filter (level/trend/periodic),stagger,error_lv2,200,65.429,48.202,0.837,4.983,71.93,223659.79
+IMM Filter (level/trend/periodic),stagger,error_lv3,200,113.967,82.018,8.54,8.378,52.31,237486.68
+IMM Filter (level/trend/periodic),dwell_and_switch,clean,200,0.0,0.0,0.0,0.0,100.0,229886.55
+IMM Filter (level/trend/periodic),dwell_and_switch,error_lv1,200,28.666,10.371,0.049,1.075,93.35,218898.18
+IMM Filter (level/trend/periodic),dwell_and_switch,error_lv2,200,68.649,31.537,0.378,3.269,79.05,223435.63
+IMM Filter (level/trend/periodic),dwell_and_switch,error_lv3,200,95.708,48.35,1.086,5.034,69.27,239552.71
+IMM Filter (level/trend/periodic),sliding,clean,200,0.0,0.0,0.0,0.0,100.0,242957.59
+IMM Filter (level/trend/periodic),sliding,error_lv1,200,11.752,4.474,0.049,0.483,90.46,232436.74
+IMM Filter (level/trend/periodic),sliding,error_lv2,200,30.234,12.054,0.386,1.258,73.68,193419.85
+IMM Filter (level/trend/periodic),sliding,error_lv3,200,49.907,22.599,1.944,2.369,56.56,282560.56

@@ -1,0 +1,21 @@
+method,radar_type,error_level,evaluated_sequences,rmse_us,mae_us,medae_us,mape_pct,gate_hit_rate_pct,latency_us_per_seq
+"ARIMA (Box-Jenkins, AIC-selected)",stable,clean,200,0.0,0.0,0.0,0.0,100.0,572315.91
+"ARIMA (Box-Jenkins, AIC-selected)",stable,error_lv1,200,0.032,0.008,0.0,0.001,99.98,1083869.03
+"ARIMA (Box-Jenkins, AIC-selected)",stable,error_lv2,200,0.239,0.123,0.002,0.012,99.95,926510.23
+"ARIMA (Box-Jenkins, AIC-selected)",stable,error_lv3,200,0.341,0.129,0.004,0.013,99.97,791781.74
+"ARIMA (Box-Jenkins, AIC-selected)",jitter,clean,200,49.919,40.236,34.703,4.044,15.5,514786.53
+"ARIMA (Box-Jenkins, AIC-selected)",jitter,error_lv1,200,49.409,39.682,33.386,3.999,15.55,503939.77
+"ARIMA (Box-Jenkins, AIC-selected)",jitter,error_lv2,200,49.716,39.876,33.235,4.011,16.32,511044.0
+"ARIMA (Box-Jenkins, AIC-selected)",jitter,error_lv3,200,49.775,39.999,33.733,4.029,15.81,483859.69
+"ARIMA (Box-Jenkins, AIC-selected)",stagger,clean,200,0.0,0.0,0.0,0.0,100.0,1004275.14
+"ARIMA (Box-Jenkins, AIC-selected)",stagger,error_lv1,200,20.277,14.381,0.11,1.509,91.64,973487.84
+"ARIMA (Box-Jenkins, AIC-selected)",stagger,error_lv2,200,64.039,47.388,0.769,4.905,74.87,828350.34
+"ARIMA (Box-Jenkins, AIC-selected)",stagger,error_lv3,200,117.926,84.691,4.675,8.635,55.37,672522.67
+"ARIMA (Box-Jenkins, AIC-selected)",dwell_and_switch,clean,200,0.0,0.0,0.0,0.0,100.0,2097554.97
+"ARIMA (Box-Jenkins, AIC-selected)",dwell_and_switch,error_lv1,200,27.844,11.406,0.101,1.172,94.92,1004406.33
+"ARIMA (Box-Jenkins, AIC-selected)",dwell_and_switch,error_lv2,200,74.648,38.786,0.532,4.007,81.32,742191.81
+"ARIMA (Box-Jenkins, AIC-selected)",dwell_and_switch,error_lv3,200,115.627,77.008,1.373,7.959,57.54,669955.22
+"ARIMA (Box-Jenkins, AIC-selected)",sliding,clean,200,0.0,0.0,0.0,0.0,100.0,2078791.08
+"ARIMA (Box-Jenkins, AIC-selected)",sliding,error_lv1,200,12.548,5.018,0.108,0.538,89.57,1590901.05
+"ARIMA (Box-Jenkins, AIC-selected)",sliding,error_lv2,200,32.804,13.837,0.632,1.442,72.92,2036519.32
+"ARIMA (Box-Jenkins, AIC-selected)",sliding,error_lv3,200,53.159,25.379,2.762,2.648,55.32,1786055.16

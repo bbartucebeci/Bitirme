@@ -1,0 +1,21 @@
+method,radar_type,error_level,evaluated_sequences,rmse_us,mae_us,medae_us,mape_pct,gate_hit_rate_pct,latency_us_per_seq
+Period Estimation (P_max=24),stable,clean,200,0.0,0.0,0.0,0.0,100.0,106.12
+Period Estimation (P_max=24),stable,error_lv1,200,0.008,0.008,0.006,0.001,100.0,10330.29
+Period Estimation (P_max=24),stable,error_lv2,200,0.044,0.044,0.035,0.004,100.0,11503.05
+Period Estimation (P_max=24),stable,error_lv3,200,0.086,0.086,0.073,0.009,100.0,10365.95
+Period Estimation (P_max=24),jitter,clean,200,49.992,40.275,34.654,4.048,15.58,9276.61
+Period Estimation (P_max=24),jitter,error_lv1,200,49.282,39.546,32.934,3.984,15.92,10222.53
+Period Estimation (P_max=24),jitter,error_lv2,200,49.871,40.049,33.807,4.031,16.18,9644.29
+Period Estimation (P_max=24),jitter,error_lv3,200,49.618,39.88,33.598,4.015,15.87,10481.99
+Period Estimation (P_max=24),stagger,clean,200,0.0,0.0,0.0,0.0,100.0,9233.06
+Period Estimation (P_max=24),stagger,error_lv1,200,19.121,13.364,0.025,1.401,93.33,9726.01
+Period Estimation (P_max=24),stagger,error_lv2,200,63.536,46.702,0.162,4.824,76.48,13945.33
+Period Estimation (P_max=24),stagger,error_lv3,200,113.487,80.176,0.485,8.195,59.41,13173.77
+Period Estimation (P_max=24),dwell_and_switch,clean,200,0.0,0.0,0.0,0.0,100.0,15184.67
+Period Estimation (P_max=24),dwell_and_switch,error_lv1,200,24.199,7.961,0.046,0.823,97.08,12668.51
+Period Estimation (P_max=24),dwell_and_switch,error_lv2,200,58.632,22.901,0.254,2.365,91.5,11750.71
+Period Estimation (P_max=24),dwell_and_switch,error_lv3,200,89.669,39.099,0.54,3.997,85.95,18604.79
+Period Estimation (P_max=24),sliding,clean,200,0.0,0.0,0.0,0.0,100.0,17511.57
+Period Estimation (P_max=24),sliding,error_lv1,200,11.313,4.299,0.047,0.465,90.71,16038.61
+Period Estimation (P_max=24),sliding,error_lv2,200,29.438,11.626,0.296,1.215,74.45,15187.85
+Period Estimation (P_max=24),sliding,error_lv3,200,48.578,21.513,0.97,2.255,58.27,13882.6

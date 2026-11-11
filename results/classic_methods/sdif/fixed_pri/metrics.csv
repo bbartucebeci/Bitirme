@@ -1,0 +1,21 @@
+method,radar_type,error_level,evaluated_sequences,rmse_us,mae_us,medae_us,mape_pct,gate_hit_rate_pct,latency_us_per_seq
+SDIF Histogram + TOA Grid,stable,clean,200,0.0,0.0,0.0,0.0,100.0,7190.26
+SDIF Histogram + TOA Grid,stable,error_lv1,200,0.0,0.0,0.0,0.0,100.0,8904.24
+SDIF Histogram + TOA Grid,stable,error_lv2,200,0.002,0.002,0.002,0.0,100.0,7630.41
+SDIF Histogram + TOA Grid,stable,error_lv3,200,0.004,0.004,0.004,0.0,100.0,7990.62
+SDIF Histogram + TOA Grid,jitter,clean,200,49.992,40.275,34.654,4.048,15.58,20955.49
+SDIF Histogram + TOA Grid,jitter,error_lv1,200,49.281,39.546,32.934,3.984,15.92,18226.66
+SDIF Histogram + TOA Grid,jitter,error_lv2,200,49.872,40.049,33.807,4.031,16.2,19792.0
+SDIF Histogram + TOA Grid,jitter,error_lv3,200,49.616,39.88,33.598,4.015,15.82,16642.2
+SDIF Histogram + TOA Grid,stagger,clean,200,0.0,0.0,0.0,0.0,100.0,9317.23
+SDIF Histogram + TOA Grid,stagger,error_lv1,200,19.118,13.363,0.027,1.401,93.33,10344.53
+SDIF Histogram + TOA Grid,stagger,error_lv2,200,62.383,45.771,0.194,4.739,77.12,8191.57
+SDIF Histogram + TOA Grid,stagger,error_lv3,200,111.396,77.339,0.434,7.921,61.15,8806.73
+SDIF Histogram + TOA Grid,dwell_and_switch,clean,200,0.0,0.0,0.0,0.0,100.0,19927.72
+SDIF Histogram + TOA Grid,dwell_and_switch,error_lv1,200,19.12,5.897,0.046,0.61,98.05,23325.55
+SDIF Histogram + TOA Grid,dwell_and_switch,error_lv2,200,42.464,13.969,0.233,1.433,95.43,18879.98
+SDIF Histogram + TOA Grid,dwell_and_switch,error_lv3,200,63.821,21.44,0.497,2.197,93.02,19083.19
+SDIF Histogram + TOA Grid,sliding,clean,200,0.0,0.0,0.0,0.0,100.0,10802.15
+SDIF Histogram + TOA Grid,sliding,error_lv1,200,11.311,4.298,0.048,0.465,90.71,11072.8
+SDIF Histogram + TOA Grid,sliding,error_lv2,200,28.622,11.213,0.285,1.176,75.64,9915.58
+SDIF Histogram + TOA Grid,sliding,error_lv3,200,47.601,20.837,0.847,2.193,59.39,9824.75

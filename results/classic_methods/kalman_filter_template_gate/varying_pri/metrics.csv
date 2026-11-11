@@ -1,0 +1,21 @@
+method,radar_type,error_level,evaluated_sequences,rmse_us,mae_us,medae_us,mape_pct,gate_hit_rate_pct,latency_us_per_seq
+Kalman Filter Bank (template gate),stable,clean,200,0.0,0.0,0.0,0.0,100.0,494245.99
+Kalman Filter Bank (template gate),stable,error_lv1,200,0.039,0.034,0.029,0.004,100.0,481790.48
+Kalman Filter Bank (template gate),stable,error_lv2,200,0.204,0.178,0.155,0.018,100.0,453413.83
+Kalman Filter Bank (template gate),stable,error_lv3,200,0.374,0.327,0.32,0.034,100.0,451999.58
+Kalman Filter Bank (template gate),jitter,clean,200,62.457,50.111,41.775,5.084,13.73,292925.43
+Kalman Filter Bank (template gate),jitter,error_lv1,200,61.295,49.255,40.071,5.003,13.96,316420.0
+Kalman Filter Bank (template gate),jitter,error_lv2,200,62.283,50.067,39.869,5.102,13.13,295773.47
+Kalman Filter Bank (template gate),jitter,error_lv3,200,62.799,50.499,40.659,5.114,13.24,284612.37
+Kalman Filter Bank (template gate),stagger,clean,200,0.0,0.0,0.0,0.0,100.0,588157.47
+Kalman Filter Bank (template gate),stagger,error_lv1,200,21.653,14.702,0.033,1.528,92.66,533713.43
+Kalman Filter Bank (template gate),stagger,error_lv2,200,69.311,49.806,0.245,5.082,75.39,554487.0
+Kalman Filter Bank (template gate),stagger,error_lv3,200,113.948,80.255,0.843,8.109,60.4,584238.39
+Kalman Filter Bank (template gate),dwell_and_switch,clean,200,0.0,0.0,0.0,0.0,100.0,274644.21
+Kalman Filter Bank (template gate),dwell_and_switch,error_lv1,200,8.069,2.131,0.049,0.231,99.26,268330.1
+Kalman Filter Bank (template gate),dwell_and_switch,error_lv2,200,30.642,8.519,0.224,0.896,97.26,258439.79
+Kalman Filter Bank (template gate),dwell_and_switch,error_lv3,200,55.0,16.671,0.481,1.679,94.92,248337.07
+Kalman Filter Bank (template gate),sliding,clean,200,0.0,0.0,0.0,0.0,100.0,273262.89
+Kalman Filter Bank (template gate),sliding,error_lv1,200,9.251,3.672,0.045,0.369,90.87,265694.91
+Kalman Filter Bank (template gate),sliding,error_lv2,200,25.988,11.321,0.284,1.172,76.25,281367.31
+Kalman Filter Bank (template gate),sliding,error_lv3,200,44.534,20.333,1.065,2.055,57.42,272697.58

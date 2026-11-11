@@ -1,0 +1,21 @@
+method,radar_type,error_level,evaluated_sequences,rmse_us,mae_us,medae_us,mape_pct,gate_hit_rate_pct,latency_us_per_seq
+Kalman Filter Bank (template gate),stable,clean,200,0.0,0.0,0.0,0.0,100.0,476796.36
+Kalman Filter Bank (template gate),stable,error_lv1,200,0.039,0.034,0.031,0.003,100.0,473044.42
+Kalman Filter Bank (template gate),stable,error_lv2,200,0.21,0.183,0.158,0.018,100.0,489814.51
+Kalman Filter Bank (template gate),stable,error_lv3,200,0.383,0.332,0.312,0.033,100.0,451842.03
+Kalman Filter Bank (template gate),jitter,clean,200,51.801,41.711,35.796,4.191,15.27,293406.57
+Kalman Filter Bank (template gate),jitter,error_lv1,200,51.829,41.608,34.854,4.193,15.21,293477.33
+Kalman Filter Bank (template gate),jitter,error_lv2,200,51.626,41.534,34.817,4.181,14.97,293100.32
+Kalman Filter Bank (template gate),jitter,error_lv3,200,51.411,41.257,34.597,4.155,15.26,306556.2
+Kalman Filter Bank (template gate),stagger,clean,200,0.0,0.0,0.0,0.0,100.0,575739.16
+Kalman Filter Bank (template gate),stagger,error_lv1,200,19.128,13.37,0.03,1.402,93.33,606701.1
+Kalman Filter Bank (template gate),stagger,error_lv2,200,62.402,45.789,0.194,4.741,77.12,559889.02
+Kalman Filter Bank (template gate),stagger,error_lv3,200,111.401,77.382,0.593,7.926,61.15,549621.45
+Kalman Filter Bank (template gate),dwell_and_switch,clean,200,0.0,0.0,0.0,0.0,100.0,300616.16
+Kalman Filter Bank (template gate),dwell_and_switch,error_lv1,200,19.119,5.896,0.043,0.61,98.05,316889.98
+Kalman Filter Bank (template gate),dwell_and_switch,error_lv2,200,42.456,13.958,0.214,1.432,95.43,308587.04
+Kalman Filter Bank (template gate),dwell_and_switch,error_lv3,200,63.816,21.42,0.46,2.195,93.02,284375.09
+Kalman Filter Bank (template gate),sliding,clean,200,0.0,0.0,0.0,0.0,100.0,278251.64
+Kalman Filter Bank (template gate),sliding,error_lv1,200,11.311,4.298,0.045,0.464,90.71,289133.63
+Kalman Filter Bank (template gate),sliding,error_lv2,200,29.005,11.392,0.26,1.193,75.14,292089.45
+Kalman Filter Bank (template gate),sliding,error_lv3,200,47.603,20.827,0.896,2.192,59.39,269767.0
