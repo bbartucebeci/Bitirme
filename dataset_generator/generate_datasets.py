@@ -17,6 +17,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
+import zlib
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -454,6 +455,8 @@ def build_single_dataset(
         pd.DataFrame(profiles_rows).to_csv(dest_dir / "profiles.csv", index=False)
 
     def gen_wrapper(sid: str):
+        key = f"{seed}|{radar_type}|{profile_mode}|{freq_mode}|{error_level}|{pulses_per_sequence}|{sid}"
+        np.random.seed(zlib.crc32(key.encode("utf-8")))
         return generate_single_radar_sequence(
             radar_type=radar_type,
             profile=profiles_dict[sid],
@@ -472,6 +475,7 @@ def build_single_dataset(
         "radar_type": radar_type,
         "profile_mode": profile_mode,
         "freq_mode": freq_mode,
+        "seed": seed,
         "sequence_count": sequence_count,
         "expected_pulses_per_sequence": pulses_per_sequence,
         "error_level": error_level,
@@ -502,6 +506,7 @@ def build_interleaved_dataset(
     error_level: str,
     sequence_count: int,
     pulses_per_sequence: int,
+    seed: int,
     error_config: Dict[str, Any],
     interleaved_cfg: Dict[str, Any],
 ):
@@ -520,6 +525,8 @@ def build_interleaved_dataset(
     test_ids = seq_ids[train_count + val_count:]
 
     def gen_wrapper(sid: str):
+        key = f"{seed}|interleaved|{error_level}|{pulses_per_sequence}|{sid}"
+        np.random.seed(zlib.crc32(key.encode("utf-8")))
         return generate_interleaved_sequence(
             sequence_id=sid,
             error_config=error_config,
@@ -536,6 +543,7 @@ def build_interleaved_dataset(
         "name": dataset_name,
         "radar_type": "interleaved",
         "radars": [r["radar_id"] for r in interleaved_cfg["radars"]],
+        "seed": seed,
         "sequence_count": sequence_count,
         "expected_pulses_per_sequence": pulses_per_sequence,
         "error_level": error_level,
@@ -658,6 +666,7 @@ def main():
                 error_level=elvl,
                 sequence_count=sequence_count,
                 pulses_per_sequence=pulses_per_sequence,
+                seed=args.seed,
                 error_config=error_levels_cfg[elvl],
                 interleaved_cfg=profiles_cfg["interleaved_scenario"],
             )
