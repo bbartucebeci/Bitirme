@@ -141,3 +141,61 @@ python -m foundation_models.chronos2.run_cross_evaluation --target-param multiva
 These test fixed-trained checkpoints on varying-profile data and vice versa.
 The current scripts cover single-radar data; interleaved data need a separate
 task definition and emitter mask.
+
+## 1024-interval PRI context sweep
+
+This experiment uses the existing `1000x1024` single-radar CSVs with horizon 32
+and context lengths 96, 256, 512, and 992. Run from the repository root.
+The lab CSVs were generated on `benchmark_addition`; changing branches does not
+require regenerating them. Check their `metadata.yaml` files, especially the
+dataset seed and frequency mode, before comparing with any older result.
+
+The classical branch's committed `results/windows_1024.json` may have been made
+from different CSVs. Build a fresh manifest from the lab CSVs under the ignored
+`datasets/` directory, then pass that same file to both methods:
+
+```powershell
+$python = "$env:USERPROFILE\bitirme-chronos2-venv\Scripts\python.exe"
+$manifest = ".\datasets\windows_1024_lab.json"
+& $python -m foundation_models.chronos2.make_window_manifest --dataset-size 1000x1024 --context-lens 96 256 512 992 --horizon 32 --seed 20261116 --output $manifest
+& $python classic_methods/run_context_sweep.py --dataset-size 1000x1024 --window-manifest $manifest --out-dir .\datasets\classic_1024_lab --workers 4
+```
+
+The manifest selects one test start per sequence and length. For train and
+validation, Chronos draws one independent deterministic start per sequence
+using the window seed and split. Test starts are read strictly from the manifest.
+The manifest also records a SHA-256 hash of each test CSV. Chronos verifies
+those hashes before evaluation. The unchanged classical runner reads the same
+window starts, but does not check the hashes; use a fresh output directory
+whenever the manifest or dataset changes. The older committed manifest lacks
+the hashes needed by Chronos and must not be used for this run. The generator
+reports any target windows with no emitter pulses; audit those counts before
+comparing scores because the unchanged classical metric includes such windows.
+The anchor row is removed first. A complete window is required; no context
+shortening or padding is used. `L=992` always starts at zero.
+
+After confirming that PyTorch imports and CUDA is available on the lab PC, run
+one limited integration job before full training:
+
+```powershell
+& $python -m foundation_models.chronos2.train --profile-mode fixed --target-param PRI --dataset-size 1000x1024 --context-len 96 --horizon 32 --window-mode random --window-seed 20261116 --window-manifest $manifest --radar-type stable --error-level clean --max-train-seqs-per-dataset 4 --max-val-seqs-per-dataset 2 --max-test-seqs 2 --steps 1 --batch-size 2 --device cuda --no-plots
+```
+
+For the full run, omit the radar, error, sequence-limit and step-limit flags.
+Run `train` once for each profile (`fixed`, `varying`) and each of the four
+context lengths. Set a GPU-safe batch size for each length; the default step
+budget represents three passes over the selected training sequences. Checkpoints
+and metrics include the dataset, window mode, length, horizon and window seed in
+their paths, so the eight adapters remain separate. The limited integration job
+also gets a distinct path. Generated 1024-interval Chronos results and models
+are ignored by Git.
+
+To examine context length without changing the target pulses, evaluate each
+random-window-trained adapter with `--window-mode tail` and its explicit
+`--weights-dir`. This forecasts the final 32 intervals for every length. Build
+a separate classical manifest with
+`python -m foundation_models.chronos2.make_window_manifest --window-mode tail --output .\datasets\windows_1024_tail_lab.json`
+and run the classical sweep with that manifest and a new output directory.
+The main random
+window sweep shares exact targets between methods at each length, while target
+positions can differ across lengths.

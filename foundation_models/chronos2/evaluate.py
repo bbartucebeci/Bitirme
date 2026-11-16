@@ -23,6 +23,7 @@ from foundation_models.common.dataset import (
 )
 from foundation_models.common.metrics import aggregate, score_single, score_window
 from foundation_models.common.plotting import save_forecast_plot, save_multivariate_forecast_plot
+from foundation_models.common.windowing import WINDOW_MODES, WINDOW_SEED, experiment_tag, load_test_manifest
 
 
 RESULTS_ROOT = PROJECT_ROOT / "results" / "chronos2"
@@ -37,13 +38,17 @@ def audit_coverage(
     max_test_seqs: int | None = None,
     radar_type: str | None = None,
     error_level: str | None = None,
+    window_mode: str = "first",
+    window_seed: int = WINDOW_SEED,
+    window_manifest: dict | None = None,
 ) -> pd.DataFrame:
-    """Check every selected 96-to-32 test split before loading model weights."""
+    """Check every selected test split before loading model weights."""
     rows = []
     for rtype in ((radar_type,) if radar_type else RADAR_TYPES):
         for level in ((error_level,) if error_level else ERROR_LEVELS):
             path = DATASETS_ROOT / profile_mode / rtype / f"{dataset_size}_{level}"
-            loaded = load_split(path, "test", target_param, context_len, horizon_len, max_test_seqs)
+            loaded = load_split(path, "test", target_param, context_len, horizon_len, max_test_seqs,
+                                window_mode, window_seed, window_manifest)
             rows.append({
                 "radar_type": rtype, "error_level": level,
                 "sequence_files": loaded.total_sequences,
@@ -95,6 +100,9 @@ def evaluate_condition(
     max_test_seqs: int | None,
     plot_path: Path | None,
     clean_context: bool = False,
+    window_mode: str = "first",
+    window_seed: int = WINDOW_SEED,
+    window_manifest: dict | None = None,
 ) -> dict[str, float]:
     loaded = load_split(
         dataset_dir,
@@ -103,6 +111,9 @@ def evaluate_condition(
         context_len=context_len,
         horizon_len=horizon_len,
         limit=max_test_seqs,
+        window_mode=window_mode,
+        window_seed=window_seed,
+        window_manifest=window_manifest,
     )
     windows = loaded.windows
     if not windows:
@@ -124,7 +135,8 @@ def evaluate_condition(
             if target_param == "multivariate":
                 score = score_window(prediction, window.target, window.emitter_mask)
             else:
-                score = score_single(prediction[0], window.target[0], window.emitter_mask, target_param)
+                score = score_single(prediction[0], window.target[0], window.emitter_mask,
+                                     target_param, unrounded=True)
             if score is not None:
                 scores.append(score)
         if start == 0 and plot_path is not None:
@@ -151,6 +163,9 @@ def run_evaluation(
     error_level: str | None = None,
     plots: bool = True,
     clean_context: bool = False,
+    window_mode: str = "first",
+    window_seed: int = WINDOW_SEED,
+    window_manifest: dict | None = None,
 ) -> pd.DataFrame:
     if target_param not in (*CHANNELS, "multivariate"):
         raise ValueError(f"Unknown target parameter: {target_param}")
@@ -162,6 +177,8 @@ def run_evaluation(
         raise ValueError(f"Unknown error level: {error_level}")
     if batch_size <= 0:
         raise ValueError("batch_size must be positive")
+    if window_mode == "random" and window_manifest is None:
+        raise ValueError("Random test evaluation requires --window-manifest")
     radar_types = (radar_type,) if radar_type else RADAR_TYPES
     error_levels = (error_level,) if error_level else ERROR_LEVELS
     selected = [
@@ -179,6 +196,7 @@ def run_evaluation(
         metrics = evaluate_condition(
             pipeline, dataset_dir, target_param, context_len, horizon_len,
             batch_size, max_test_seqs, plot_path, clean_context=clean_context,
+            window_mode=window_mode, window_seed=window_seed, window_manifest=window_manifest,
         )
         row = {"radar_type": rtype, "error_level": level, **metrics}
         rows.append(row)
@@ -193,6 +211,7 @@ def run_evaluation(
             f"# Chronos-2 {target_param} benchmark ({profile_mode})",
             "",
             f"Dataset size: `{dataset_size}`. Context: {context_len}. Horizon: {horizon_len}.",
+            f"Window mode: `{window_mode}`. Window seed: `{window_seed}`.",
             "Scores are means of per-sequence emitter-only MAE, RMSE, and hit rate.",
             "The AOA circular metrics are additional; ordinary AOA metrics match the TimesFM definition.",
             "Sequences with no emitter pulses in the target window are excluded and counted.",
@@ -212,6 +231,9 @@ def main() -> None:
     parser.add_argument("--dataset-size", default="1000x128")
     parser.add_argument("--context-len", type=int, default=96)
     parser.add_argument("--horizon", type=int, default=32)
+    parser.add_argument("--window-mode", choices=WINDOW_MODES, default="first")
+    parser.add_argument("--window-seed", type=int, default=WINDOW_SEED)
+    parser.add_argument("--window-manifest", type=Path, help="Test-window JSON generated from this dataset")
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--max-test-seqs", type=int)
     parser.add_argument("--radar-type", choices=RADAR_TYPES)
@@ -225,11 +247,18 @@ def main() -> None:
     args = parser.parse_args()
     if args.target_param == "all" and args.weights_dir is not None:
         parser.error("--target-param all requires zero-shot mode; fine-tuned checkpoints are task-specific")
+    manifest = None
+    if args.window_mode == "random":
+        if args.window_manifest is None:
+            parser.error("--window-mode random requires --window-manifest")
+        manifest = load_test_manifest(args.window_manifest, args.dataset_size,
+                                      args.context_len, args.horizon, args.window_seed)
 
     tasks = (*CHANNELS, "multivariate") if args.target_param == "all" else (args.target_param,)
     coverage = audit_coverage(
         args.profile_mode, tasks[0], args.dataset_size, args.context_len,
         args.horizon, args.max_test_seqs, args.radar_type, args.error_level,
+        args.window_mode, args.window_seed, manifest,
     )
     print(coverage.to_string(index=False))
     if args.coverage_only:
@@ -239,13 +268,30 @@ def main() -> None:
 
     pipeline = load_pipeline(str(args.weights_dir) if args.weights_dir else args.model_id, args.device)
     regime = "lora_sft" if args.weights_dir else "zero_shot"
+    tag = experiment_tag(args.dataset_size, args.window_mode, args.context_len,
+                         args.horizon, args.window_seed)
+    scope = []
+    if args.radar_type:
+        scope.append(args.radar_type)
+    if args.error_level:
+        scope.append(args.error_level)
+    if args.max_test_seqs is not None:
+        scope.append(f"test{args.max_test_seqs}")
+    if scope:
+        tag += "_" + "_".join(scope)
     for task in tasks:
         mode = f"multivariate_{args.profile_mode}" if task == "multivariate" else f"univariate_{args.profile_mode}/{task.lower()}"
+        legacy = (args.dataset_size == "1000x128" and args.window_mode == "first"
+                  and args.context_len == 96 and args.horizon == 32 and not args.clean_context)
+        result_dir = RESULTS_ROOT / regime / mode
+        if not legacy:
+            result_dir = result_dir / (tag + ("_cleaned" if args.clean_context else ""))
         run_evaluation(
             pipeline, args.profile_mode, task, args.dataset_size,
             args.context_len, args.horizon, args.batch_size, args.max_test_seqs,
-            RESULTS_ROOT / regime / mode, args.radar_type, args.error_level,
+            result_dir, args.radar_type, args.error_level,
             not args.no_plots, clean_context=args.clean_context,
+            window_mode=args.window_mode, window_seed=args.window_seed, window_manifest=manifest,
         )
 
 

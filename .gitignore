@@ -2,6 +2,8 @@ __pycache__/
 .vscode/
 *.csv
 !results/**
+/results/chronos2/**/10x1024_*/
+/results/chronos2/**/1000x1024_*/
 *.docx
 datasets/
 /models/lora_sft/chronos2/

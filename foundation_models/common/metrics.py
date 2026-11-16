@@ -123,7 +123,10 @@ def score_window(prediction: np.ndarray, target: np.ndarray, mask: np.ndarray) -
     return result
 
 
-def score_single(prediction: np.ndarray, target: np.ndarray, mask: np.ndarray, name: str) -> dict[str, float] | None:
+def score_single(
+    prediction: np.ndarray, target: np.ndarray, mask: np.ndarray, name: str,
+    unrounded: bool = False,
+) -> dict[str, float] | None:
     """Keep the TimesFM MAE/RMSE/hit-rate definitions for one parameter."""
     if prediction.shape != target.shape or prediction.shape != (len(mask),):
         raise ValueError("Prediction, target, and emitter mask lengths differ")
@@ -132,16 +135,19 @@ def score_single(prediction: np.ndarray, target: np.ndarray, mask: np.ndarray, n
     errors = np.abs(prediction[mask] - target[mask])
     if not np.isfinite(errors).all():
         raise ValueError(f"Non-finite {name} forecast or target")
+    def maybe_round(value: float, digits: int) -> float:
+        return value if unrounded else round(value, digits)
+
     result = {
-        "mae": round(float(errors.mean()), 3),
-        "rmse": round(float(np.sqrt(np.mean(errors**2))), 3),
-        "hit_rate_pct": round(float(np.mean(errors <= TOLERANCES[name]) * 100.0), 2),
+        "mae": maybe_round(float(errors.mean()), 3),
+        "rmse": maybe_round(float(np.sqrt(np.mean(errors**2))), 3),
+        "hit_rate_pct": maybe_round(float(np.mean(errors <= TOLERANCES[name]) * 100.0), 2),
         "valid_pulses_evaluated": int(mask.sum()),
     }
     if name == "AOA":
         angular_errors = np.minimum(errors % 360.0, 360.0 - errors % 360.0)
-        result["circular_mae"] = round(float(angular_errors.mean()), 3)
-        result["circular_hit_rate_pct"] = round(
+        result["circular_mae"] = maybe_round(float(angular_errors.mean()), 3)
+        result["circular_hit_rate_pct"] = maybe_round(
             float(np.mean(angular_errors <= TOLERANCES[name]) * 100.0), 2
         )
     return result

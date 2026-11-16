@@ -19,6 +19,7 @@ from foundation_models.common.dataset import (
     training_series,
 )
 from foundation_models.chronos2.evaluate import RESULTS_ROOT, run_evaluation
+from foundation_models.common.windowing import WINDOW_MODES, WINDOW_SEED, experiment_tag, load_test_manifest
 
 
 def _load_training_split(
@@ -31,12 +32,15 @@ def _load_training_split(
     limit: int | None,
     radar_types: tuple[str, ...],
     error_levels: tuple[str, ...],
+    window_mode: str = "first",
+    window_seed: int = WINDOW_SEED,
 ) -> list[np.ndarray]:
     all_series = []
     for radar_type in radar_types:
         for error_level in error_levels:
             dataset_dir = DATASETS_ROOT / profile_mode / radar_type / f"{dataset_size}_{error_level}"
-            loaded = load_split(dataset_dir, split, target_param, context_len, horizon_len, limit)
+            loaded = load_split(dataset_dir, split, target_param, context_len, horizon_len, limit,
+                                window_mode, window_seed)
             print(f"[DATA] {split} {profile_mode}/{radar_type}/{error_level}: "
                   f"{len(loaded.windows)} usable, {loaded.skipped_short} short")
             if not loaded.windows:
@@ -54,6 +58,9 @@ def main() -> None:
     parser.add_argument("--dataset-size", default="1000x128")
     parser.add_argument("--context-len", type=int, default=96)
     parser.add_argument("--horizon", type=int, default=32)
+    parser.add_argument("--window-mode", choices=WINDOW_MODES, default="first")
+    parser.add_argument("--window-seed", type=int, default=WINDOW_SEED)
+    parser.add_argument("--window-manifest", type=Path, help="Test-window JSON generated from this dataset")
     parser.add_argument("--epochs", type=int, default=3, help="Sets the default step budget")
     parser.add_argument("--steps", type=int, help="Override the default 3-epoch-equivalent step budget")
     parser.add_argument("--batch-size", type=int, default=64)
@@ -78,6 +85,12 @@ def main() -> None:
         parser.error("--steps must be positive")
     if args.lr <= 0:
         parser.error("--lr must be positive")
+    manifest = None
+    if args.window_mode == "random" and not args.skip_eval:
+        if args.window_manifest is None:
+            parser.error("--window-mode random requires --window-manifest unless --skip-eval is set")
+        manifest = load_test_manifest(args.window_manifest, args.dataset_size,
+                                      args.context_len, args.horizon, args.window_seed)
 
     import torch
 
@@ -92,16 +105,37 @@ def main() -> None:
         args.profile_mode, args.dataset_size, "train", args.target_param,
         args.context_len, args.horizon, args.max_train_seqs_per_dataset,
         radar_types, error_levels,
+        args.window_mode, args.window_seed,
     )
     val_series = _load_training_split(
         args.profile_mode, args.dataset_size, "val", args.target_param,
         args.context_len, args.horizon, args.max_val_seqs_per_dataset,
         radar_types, error_levels,
+        args.window_mode, args.window_seed,
     )
     steps = args.steps or args.epochs * math.ceil(len(train_series) / args.batch_size)
     print(f"[DATA] {len(train_series)} train, {len(val_series)} validation sequences; {steps} steps")
 
     output_dir = PROJECT_ROOT / "models" / "lora_sft" / "chronos2" / args.profile_mode / args.target_param.lower()
+    legacy = (args.dataset_size == "1000x128" and args.window_mode == "first"
+              and args.context_len == 96 and args.horizon == 32)
+    tag = experiment_tag(args.dataset_size, args.window_mode, args.context_len,
+                         args.horizon, args.window_seed)
+    scope = []
+    if args.radar_type:
+        scope.append(args.radar_type)
+    if args.error_level:
+        scope.append(args.error_level)
+    if args.max_train_seqs_per_dataset is not None:
+        scope.append(f"train{args.max_train_seqs_per_dataset}")
+    if args.max_val_seqs_per_dataset is not None:
+        scope.append(f"val{args.max_val_seqs_per_dataset}")
+    if args.steps is not None:
+        scope.append(f"steps{args.steps}")
+    if scope:
+        tag += "_" + "_".join(scope)
+    if not legacy:
+        output_dir = output_dir / tag
     pipeline = load_pipeline(args.model_id, args.device)
     finetuned = pipeline.fit(
         inputs=train_series,
@@ -128,11 +162,15 @@ def main() -> None:
 
     if not args.skip_eval:
         mode = f"multivariate_{args.profile_mode}" if args.target_param == "multivariate" else f"univariate_{args.profile_mode}/{args.target_param.lower()}"
+        result_dir = RESULTS_ROOT / "lora_sft" / mode
+        if not legacy:
+            result_dir = result_dir / tag
         run_evaluation(
             finetuned, args.profile_mode, args.target_param, args.dataset_size,
             args.context_len, args.horizon, args.batch_size, args.max_test_seqs,
-            RESULTS_ROOT / "lora_sft" / mode, args.radar_type, args.error_level,
+            result_dir, args.radar_type, args.error_level,
             not args.no_plots,
+            window_mode=args.window_mode, window_seed=args.window_seed, window_manifest=manifest,
         )
 
 

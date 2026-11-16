@@ -11,6 +11,8 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import yaml
 
+from foundation_models.common.windowing import WINDOW_SEED, file_sha256, select_start
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATASETS_ROOT = PROJECT_ROOT / "datasets" / "single_radar"
 RADAR_TYPES = ("stable", "jitter", "stagger", "dwell_and_switch", "sliding")
@@ -26,6 +28,7 @@ class ForecastWindow:
     context: np.ndarray  # channels x context length
     target: np.ndarray  # channels x horizon
     emitter_mask: np.ndarray  # horizon
+    start: int = 0  # zero-based interval index after the anchor
 
 
 @dataclass(frozen=True)
@@ -68,8 +71,11 @@ def load_split(
     context_len: int = 96,
     horizon_len: int = 32,
     limit: int | None = None,
+    window_mode: str = "first",
+    window_seed: int = WINDOW_SEED,
+    window_manifest: dict[str, Any] | None = None,
 ) -> LoadedSplit:
-    """Use the first context+horizon pulses; never join distinct sequences."""
+    """Select one complete context-to-target window per independent sequence."""
     if target_param not in (*CHANNELS, "multivariate"):
         raise ValueError(f"Unknown target parameter: {target_param}")
     if split not in ("train", "val", "test"):
@@ -105,19 +111,32 @@ def load_split(
             frame = frame.iloc[1:].reset_index(drop=True)
         if len(frame) < context_len + horizon_len:
             continue
-        frame = frame.iloc[: context_len + horizon_len]
-
+        if window_mode == "random" and split == "test":
+            if window_manifest is None:
+                raise ValueError("Random test windows require a test manifest")
+            sequence_key = (f"{metadata['profile_mode']}/{metadata['radar_type']}/"
+                            f"{metadata['error_level']}/{sequence_id}")
+            expected_hash = window_manifest.get("sequence_sha256", {}).get(sequence_key)
+            csv_file = split_dir / f"{sequence_id}.csv"
+            if expected_hash is None or not csv_file.is_file() or file_sha256(csv_file) != expected_hash:
+                raise ValueError(f"{sequence_id}: test CSV differs from the window manifest")
         missing = {"Radar_ID", "Measured_Delta_TOA", *CHANNELS} - set(frame.columns)
         if missing:
             raise ValueError(f"{sequence_id}: missing columns {sorted(missing)}")
+        start = select_start(
+            len(frame), context_len, horizon_len, window_mode, split,
+            str(metadata["profile_mode"]), str(metadata["radar_type"]),
+            str(metadata["error_level"]), sequence_id, window_seed, window_manifest,
+        )
+        frame = frame.iloc[start : start + context_len + horizon_len].reset_index(drop=True)
         mask = frame["Radar_ID"].eq("R_SINGLE").to_numpy(dtype=bool)
         names = CHANNELS if target_param == "multivariate" else (target_param,)
         context_columns = tuple("Measured_Delta_TOA" if name == "PRI" else name for name in names)
-        context = frame.loc[: context_len - 1, list(context_columns)].to_numpy(dtype=np.float32).T
-        target = frame.loc[context_len : context_len + horizon_len - 1, list(names)].to_numpy(dtype=np.float32).T
+        context = frame.loc[: context_len - 1, list(context_columns)].to_numpy(dtype=np.float32).T.copy()
+        target = frame.loc[context_len : context_len + horizon_len - 1, list(names)].to_numpy(dtype=np.float32).T.copy()
         if not np.isfinite(context).all():
             raise ValueError(f"{sequence_id}: non-finite context values")
-        windows.append(ForecastWindow(sequence_id, context, target, mask[context_len:]))
+        windows.append(ForecastWindow(sequence_id, context, target, mask[context_len:], start))
     return LoadedSplit(windows, len(frames), len(frames) - len(windows))
 
 
