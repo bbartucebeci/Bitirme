@@ -39,13 +39,19 @@ sequence inclusion rule.
 
 ## Setup
 
-From the repository root, in an environment with Python 3.10–3.12 and an
-appropriate PyTorch installation:
+Use the dedicated Chronos-2 virtual environment. Install a CUDA-enabled
+PyTorch build appropriate for the machine first, then install this model's
+dependencies from the repository root:
 
 ```powershell
-python -m pip install -r requirements.txt
-python -m pip install -r foundation_models/chronos2/requirements.txt
+$python = "$env:USERPROFILE\bitirme-chronos2-venv\Scripts\python.exe"
+& $python -m pip install -r foundation_models/chronos2/requirements.txt
+& $python -c "import torch, pandas, yaml, matplotlib, peft; from chronos import Chronos2Pipeline; print('Chronos-2 ready; CUDA:', torch.cuda.is_available())"
 ```
+
+The root `requirements.txt` covers every foundation model in the repository;
+the Chronos-2 file includes the data, plotting, LoRA, and classical-sweep
+packages needed here. The generator can use its own separate environment.
 
 The default model is `amazon/chronos-2`. The first actual model run downloads
 its weights. Use `--device cpu` if CUDA is unavailable.

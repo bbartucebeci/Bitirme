@@ -1,3 +1,11 @@
-# Install on top of the repository's requirements.txt.
+# Install in the dedicated Chronos-2 environment after a CUDA-enabled PyTorch build.
+# The root requirements.txt includes unrelated model families.
+numpy>=1.24.0,<2.0.0
+pandas>=2.0.0,<3.0.0
+pyyaml>=6.0
+matplotlib>=3.7.0
 chronos-forecasting>=2.2.0,<3.0
+peft>=0.9.0
 tabulate>=0.9.0
+# For the classical sweep on the same test windows.
+statsmodels>=0.14.0
