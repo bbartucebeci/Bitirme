@@ -49,6 +49,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from classic_methods.common import (
+    DEFAULT_DATASET_SIZE,
     ERROR_LEVELS,
     PARAM_SPECS,
     RADAR_TYPES,
@@ -124,6 +125,10 @@ def main():
     parser.add_argument("--horizon", type=int, default=32)
     parser.add_argument("--max-test-seqs", type=int, default=200)
     parser.add_argument("--smoke-test", action="store_true")
+    parser.add_argument("--dataset-size", default=DEFAULT_DATASET_SIZE,
+                        help="Dataset folder size tag <sequences>x<pulses> (default: 1000x1024)")
+    parser.add_argument("--window-manifest", type=Path, default=None,
+                        help="JSON of random context starts (make_window_manifest.py); default: start at pulse 0")
     args = parser.parse_args()
 
     rtypes = RADAR_TYPES if args.radar_type == "all" else [args.radar_type]
@@ -145,6 +150,8 @@ def main():
         horizon_len=args.horizon,
         max_test_seqs=args.max_test_seqs,
         smoke_test=args.smoke_test,
+        dataset_size=args.dataset_size,
+        window_manifest=args.window_manifest,
     )
 
 

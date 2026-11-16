@@ -65,6 +65,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from classic_methods.common import (
+    DEFAULT_DATASET_SIZE,
     ERROR_LEVELS,
     PARAM_SPECS,
     RADAR_TYPES,
@@ -203,7 +204,9 @@ def select_model(z: np.ndarray, max_period: int = 24) -> Dict:
     one-step L1 error, together with the final state of that model."""
     n = len(z)
     max_p = int(min(max_period, max(2, n // 3)))
-    eval_start = max_p + 1  # common scoring window for all candidates
+    # Common scoring window for all candidates: pulses max_p + 1 .. n - 1 of the (gated)
+    # context, i.e. 25 .. L-1 for max_period = 24. It grows with the context length L.
+    eval_start = max_p + 1
 
     candidates = [("level", 1), ("trend", 1)] + [("periodic", p) for p in range(2, max_p + 1)]
     best: Dict = {"score": np.inf}
@@ -272,6 +275,10 @@ def main():
     parser.add_argument("--horizon", type=int, default=32)
     parser.add_argument("--max-test-seqs", type=int, default=200)
     parser.add_argument("--smoke-test", action="store_true")
+    parser.add_argument("--dataset-size", default=DEFAULT_DATASET_SIZE,
+                        help="Dataset folder size tag <sequences>x<pulses> (default: 1000x1024)")
+    parser.add_argument("--window-manifest", type=Path, default=None,
+                        help="JSON of random context starts (make_window_manifest.py); default: start at pulse 0")
     args = parser.parse_args()
 
     rtypes = RADAR_TYPES if args.radar_type == "all" else [args.radar_type]
@@ -291,6 +298,8 @@ def main():
         horizon_len=args.horizon,
         max_test_seqs=args.max_test_seqs,
         smoke_test=args.smoke_test,
+        dataset_size=args.dataset_size,
+        window_manifest=args.window_manifest,
     )
 
 

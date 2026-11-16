@@ -8,8 +8,10 @@ Tactical Gate Hit Rate, and Inference Latency).
 
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
+import zlib
 import time
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -24,6 +26,69 @@ DEFAULT_DATASETS_ROOT = PROJECT_ROOT / "datasets" / "single_radar"
 
 RADAR_TYPES = ["stable", "jitter", "stagger", "dwell_and_switch", "sliding"]
 ERROR_LEVELS = ["clean", "error_lv1", "error_lv2", "error_lv3"]
+
+# Dataset folder size tag "<sequence_count>x<pulses_per_sequence>" (folder = f"{size}_{level}").
+DEFAULT_DATASET_SIZE = "1000x1024"
+DEFAULT_WINDOW_SEED = 20261116
+
+
+def resolve_dataset_size(dataset_size: str = DEFAULT_DATASET_SIZE, smoke_test: bool = False) -> str:
+    """Returns the folder size tag; smoke tests use 10 sequences of the same length."""
+    count, pulses = dataset_size.lower().split("x")
+    return f"10x{pulses}" if smoke_test else f"{count}x{pulses}"
+
+
+# ---------------------------------------------------------------------------
+# Window manifest (random context start, fixed seed)
+# ---------------------------------------------------------------------------
+
+def window_key(profile_mode: str, radar_type: str, error_level: str, sequence_id: str, context_len: int) -> str:
+    return f"{profile_mode}/{radar_type}/{error_level}/{sequence_id}/{int(context_len)}"
+
+
+def draw_window_start(n_pulses: int, context_len: int, horizon_len: int, seed: int, key: str) -> int:
+    """Draws the context start s uniformly from [0, n - L - H] (0 if the sequence is too short).
+
+    The draw is seeded per key (crc32 of seed|key), so it does not depend on draw order.
+    """
+    max_start = n_pulses - context_len - horizon_len
+    if max_start <= 0:
+        return 0
+    rng = np.random.default_rng(zlib.crc32(f"{seed}|{key}".encode("utf-8")))
+    return int(rng.integers(0, max_start + 1))
+
+
+def load_window_manifest(path: Optional[Path]) -> Optional[Dict[str, Any]]:
+    if path is None:
+        return None
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def extract_window(
+    ctx_vals: np.ndarray,
+    tgt_vals: np.ndarray,
+    mask_vals: np.ndarray,
+    context_len: int,
+    horizon_len: int,
+    start: int = 0,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Context = pulses s .. s+L-1, horizon = s+L .. s+L+H-1 (pulse indices after the anchor).
+
+    If the sequence is too short for s + L + H (missed pulses), the legacy fallback is used:
+    s = 0 and the context is shortened to n - H pulses.
+    """
+    total_len = len(ctx_vals)
+    s0 = int(start)
+    if s0 + context_len + horizon_len <= total_len:
+        c0, c1 = s0, s0 + context_len
+    else:
+        c0, c1 = 0, total_len - horizon_len
+    return (
+        ctx_vals[c0:c1],
+        tgt_vals[c1 : c1 + horizon_len],
+        mask_vals[c1 : c1 + horizon_len],
+    )
 
 PARAM_SPECS = {
     "PRI": {"name": "PRI", "slug": "pri", "unit": "us", "default_tol": 10.0},
@@ -40,13 +105,15 @@ def ensure_datasets_exist(
     radar_types: List[str] = RADAR_TYPES,
     error_levels: List[str] = ERROR_LEVELS,
     smoke_test: bool = False,
+    dataset_size: str = DEFAULT_DATASET_SIZE,
 ) -> None:
     """Checks if benchmark datasets exist; generates them if missing."""
-    seq_count = 10 if smoke_test else 1000
+    size_tag = resolve_dataset_size(dataset_size, smoke_test)
+    pulses = int(size_tag.split("x")[1])
     missing = False
     for rtype in radar_types:
         for elevel in error_levels:
-            folder = datasets_root / profile_mode / rtype / f"{seq_count}x128_{elevel}" / "test"
+            folder = datasets_root / profile_mode / rtype / f"{size_tag}_{elevel}" / "test"
             if not folder.exists():
                 missing = True
                 break
@@ -63,6 +130,8 @@ def ensure_datasets_exist(
             profile_mode,
             "--error-level",
             "all",
+            "--pulses-per-sequence",
+            str(pulses),
         ]
         if smoke_test:
             cmd.append("--smoke-test")
@@ -386,23 +455,38 @@ def evaluate_method_across_benchmarks(
     max_test_seqs: int = 200,
     smoke_test: bool = False,
     results_dir: Optional[Path] = None,
+    dataset_size: str = DEFAULT_DATASET_SIZE,
+    window_manifest: Optional[Path] = None,
 ) -> pd.DataFrame:
-    """Runs a classic forecasting method across all radar types and error levels."""
+    """Runs a classic forecasting method across all radar types and error levels.
+
+    window_manifest: JSON written by classic_methods/make_window_manifest.py. When given, the
+    context of every test sequence starts at the manifest's start index for (profile, law,
+    level, sequence, L); otherwise it starts at pulse 0 (legacy protocol).
+    """
     ensure_datasets_exist(
         datasets_root=DEFAULT_DATASETS_ROOT,
         profile_mode=profile_mode,
         radar_types=radar_types,
         error_levels=error_levels,
         smoke_test=smoke_test,
+        dataset_size=dataset_size,
     )
+    windows = load_window_manifest(window_manifest)
+    if windows is not None:
+        man_h = int(windows["meta"]["horizon_len"])
+        if man_h != horizon_len:
+            raise ValueError(f"Window manifest horizon {man_h} != requested horizon {horizon_len}")
 
     spec = PARAM_SPECS.get(target_param, PARAM_SPECS["PRI"])
     unit = spec["unit"]
     tolerance = spec["default_tol"]
-    seq_count = 10 if smoke_test else 1000
+    size_tag = resolve_dataset_size(dataset_size, smoke_test)
 
     if results_dir is None:
         results_dir = PROJECT_ROOT / "results" / "classic" / method_slug / f"{profile_mode}_{spec['slug']}"
+        if windows is not None:
+            results_dir = results_dir.parent / f"{results_dir.name}_{size_tag}_L{context_len}"
     results_dir.mkdir(parents=True, exist_ok=True)
     plots_dir = results_dir / "plots"
     plots_dir.mkdir(parents=True, exist_ok=True)
@@ -415,7 +499,7 @@ def evaluate_method_across_benchmarks(
 
     for rtype in radar_types:
         for elevel in error_levels:
-            folder_name = f"{seq_count}x128_{elevel}"
+            folder_name = f"{size_tag}_{elevel}"
             dataset_dir = DEFAULT_DATASETS_ROOT / profile_mode / rtype / folder_name
             if not dataset_dir.exists():
                 print(f"[SKIP] Missing dataset: {dataset_dir}")
@@ -435,16 +519,14 @@ def evaluate_method_across_benchmarks(
                 if total_len <= horizon_len + 8:
                     continue
 
-                if total_len >= context_len + horizon_len:
-                    ctx = ctx_vals[:context_len]
-                    gt = tgt_vals[context_len : context_len + horizon_len]
-                    mask = mask_vals[context_len : context_len + horizon_len]
-                else:
-                    # Fallback when POI drops reduce sequence length slightly below 128
-                    split_idx = total_len - horizon_len
-                    ctx = ctx_vals[:split_idx]
-                    gt = tgt_vals[split_idx : split_idx + horizon_len]
-                    mask = mask_vals[split_idx : split_idx + horizon_len]
+                start = 0
+                if windows is not None:
+                    key = window_key(profile_mode, rtype, elevel, seq_id, context_len)
+                    if key not in windows["windows"]:
+                        raise KeyError(f"Window manifest has no entry for {key}")
+                    start = int(windows["windows"][key])
+                # Falls back to s = 0, context = n - H when POI drops make the sequence too short
+                ctx, gt, mask = extract_window(ctx_vals, tgt_vals, mask_vals, context_len, horizon_len, start)
 
                 t0 = time.perf_counter()
                 preds = predict_fn(ctx, horizon_len, target_param)

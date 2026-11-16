@@ -17,6 +17,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
+import zlib
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -462,6 +463,10 @@ def build_single_dataset(
         pd.DataFrame(profiles_rows).to_csv(dest_dir / "profiles.csv", index=False)
 
     def gen_wrapper(sid: str):
+        # Seed the global RNG per sequence: all pulse-level randomness in radar_generator
+        # (jitter, start offset, missed/false pulses, multipath, TOA noise) uses np.random.
+        key = f"{seed}|{radar_type}|{profile_mode}|{error_level}|{pulses_per_sequence}|{sid}"
+        np.random.seed(zlib.crc32(key.encode("utf-8")))
         return generate_single_radar_sequence(
             radar_type=radar_type,
             profile=profiles_dict[sid],
