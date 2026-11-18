@@ -6,6 +6,7 @@ __pycache__/
 /results/chronos2/**/1000x1024_*/
 *.docx
 datasets/
+/outputs/
 /models/lora_sft/chronos2/
 interleaved datasets/
 Screenshot*.png

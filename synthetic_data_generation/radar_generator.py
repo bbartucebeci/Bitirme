@@ -15,7 +15,7 @@ class Radar:
                  scan_period: float = 0.0, aoa_drift_rate: float = 0.0, stretch_pw_on_multipath: bool = False,
                  clock_bias: Optional[float] = None, clock_offset: Optional[float] = None, clock_drift: Optional[float] = None,
                  jitter_k: Optional[float] = None, jitter_std: Optional[float] = None,
-                 pattern_phase: int = 0, **kwargs):
+                 pattern_phase: int = 0, track_source_ids: bool = False, **kwargs):
         """
         Base Radar Class.
         :param pw_mean: Pulse width in microseconds.
@@ -44,6 +44,7 @@ class Radar:
         self.scan_phase = np.random.uniform(0, 360.0) if scan_period > 0 else 0.0
         self.aoa_drift_rate = aoa_drift_rate
         self.pattern_phase = int(pattern_phase)
+        self.track_source_ids = bool(track_source_ids)
         self.clock_bias = getattr(self, "clock_bias", 0.0)
         self.clock_offset = getattr(self, "clock_offset", 0.0)
         self.clock_drift = getattr(self, "clock_drift", 0.0)
@@ -146,6 +147,10 @@ class Radar:
             "Amplitude": amps,
             "AOA": aoas
         })
+        if self.track_source_ids:
+            if self.poi != 1.0 or self.multipath_prob != 0.0:
+                raise ValueError("Source tracing requires a complete emitter stream without POI loss or echoes")
+            df["source_pulse_id"] = np.arange(num_pulses, dtype=int)
         
         # Apply Emitter-Level Multipath Echoes
         if self.multipath_prob > 0 and num_pulses > 0:

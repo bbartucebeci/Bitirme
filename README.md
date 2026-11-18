@@ -295,16 +295,17 @@ them to use the 129-row format. Interleaved datasets retain variable row counts.
 datasets/single_radar/fixed/stable/1000x128_clean/
 ├── metadata.yaml             # Complete machine-readable configuration & row counts
 ├── train/
-│   ├── sequences.csv         # Combined CSV for batch training loaders
 │   ├── seq_0000.csv          # Individual sequence files for sequential iterators
 │   └── ...
 ├── val/
-│   ├── sequences.csv
 │   └── seq_XXXX.csv
 └── test/
-    ├── sequences.csv
     └── seq_XXXX.csv
 ```
+
+New writes use per-sequence files only; historical combined CSVs remain readable.
+For the replacement 1024-context/consecutive-future dataset and its single-copy
+source storage, see [the v2 protocol](dataset_generator/CONSECUTIVE_FUTURE.md).
 
 ---
 

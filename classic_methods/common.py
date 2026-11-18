@@ -144,7 +144,8 @@ def load_sequence_arrays(
     target_param: str = "PRI",
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Reads a single PDW CSV file and extracts context, ground-truth, and emitter mask."""
-    df = pd.read_csv(csv_path)
+    from dataset_generator.sequence_io import read_sequence_frame
+    df = read_sequence_frame(csv_path)
 
     # Drop anchor pulse at index 0 where Measured_Delta_TOA == 0.0
     if len(df) > 1 and "Measured_Delta_TOA" in df.columns and float(df["Measured_Delta_TOA"].iloc[0]) == 0.0:
@@ -175,6 +176,8 @@ def load_dataset_sequences(
     target_param: str = "PRI",
 ) -> List[Tuple[str, np.ndarray, np.ndarray, np.ndarray]]:
     """Loads sequences for a dataset directory and split."""
+    from dataset_generator.sequence_io import reject_legacy_window_loader
+    reject_legacy_window_loader(dataset_dir)
     split_dir = dataset_dir / split
     if not split_dir.exists():
         raise FileNotFoundError(f"Split directory not found: {split_dir}")

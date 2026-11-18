@@ -13,6 +13,7 @@ import yaml
 from dataset_generator.catalog import RADAR_TYPES, ERROR_LEVELS
 
 from foundation_models.common.windowing import WINDOW_SEED, file_sha256, select_start
+from dataset_generator.sequence_io import read_sequence_frame, is_boundary_dataset, boundary_start, reject_legacy_window_loader
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATASETS_ROOT = PROJECT_ROOT / "datasets" / "single_radar"
@@ -49,7 +50,7 @@ def _sequence_frames(split_dir: Path, limit: int | None) -> list[tuple[str, pd.D
     files = sorted(split_dir.glob("seq_*.csv"))
     if files:
         selected = files[:limit] if limit is not None else files
-        return [(file.stem, pd.read_csv(file)) for file in selected]
+        return [(file.stem, read_sequence_frame(file)) for file in selected]
 
     combined = split_dir / "sequences.csv"
     if not combined.is_file():
@@ -89,6 +90,8 @@ def load_split(
         metadata = yaml.safe_load(handle)
     expected_count = int(metadata["split"][split]["sequence_count"])
     expected_pulses = int(metadata["expected_pulses_per_sequence"])
+    if is_boundary_dataset(metadata) or window_mode == "boundary":
+        boundary_start(metadata, context_len, horizon_len, window_mode)
     if context_len + horizon_len > expected_pulses:
         raise ValueError(f"{dataset_dir}: window exceeds {expected_pulses} generated intervals")
 
@@ -110,7 +113,7 @@ def load_split(
             frame = frame.iloc[1:].reset_index(drop=True)
         if len(frame) < context_len + horizon_len:
             continue
-        if window_mode == "random" and split == "test":
+        if split == "test" and (window_mode == "random" or (window_mode == "boundary" and window_manifest is not None)):
             if window_manifest is None:
                 raise ValueError("Random test windows require a test manifest")
             sequence_key = (f"{metadata['profile_mode']}/{metadata['radar_type']}/"
@@ -122,11 +125,17 @@ def load_split(
         missing = {"Radar_ID", "Measured_Delta_TOA", *CHANNELS} - set(frame.columns)
         if missing:
             raise ValueError(f"{sequence_id}: missing columns {sorted(missing)}")
-        start = select_start(
+        start = boundary_start(metadata, context_len, horizon_len, window_mode) if is_boundary_dataset(metadata) else select_start(
             len(frame), context_len, horizon_len, window_mode, split,
             str(metadata["profile_mode"]), str(metadata["radar_type"]),
             str(metadata["error_level"]), sequence_id, window_seed, window_manifest,
         )
+        if window_mode=="boundary" and window_manifest is not None:
+            from foundation_models.common.windowing import window_key
+            key=window_key(metadata["profile_mode"],metadata["radar_type"],metadata["error_level"],sequence_id,context_len)
+            meta=window_manifest.get("meta",{})
+            if meta.get("window_mode")!="boundary" or meta.get("horizon_len")!=horizon_len or window_manifest["windows"].get(key)!=start:
+                raise ValueError(f"{sequence_id}: manifest does not match the stored forecast boundary")
         frame = frame.iloc[start : start + context_len + horizon_len].reset_index(drop=True)
         mask = frame["Radar_ID"].eq("R_SINGLE").to_numpy(dtype=bool)
         names = CHANNELS if target_param == "multivariate" else (target_param,)
@@ -157,6 +166,20 @@ def training_series(windows: list[ForecastWindow]) -> list[np.ndarray]:
     if not series:
         raise ValueError("No trainable sequences with emitter targets")
     return series
+
+
+def _boundary_training_sequences(dataset_dir, split, target_param, length, horizon, limit):
+    """Adapt explicit boundary windows to the existing training Dataset contract."""
+    metadata=yaml.safe_load((dataset_dir/"metadata.yaml").read_text(encoding="utf-8"))
+    if not is_boundary_dataset(metadata):
+        return None
+    loaded=load_split(dataset_dir,split,target_param,length,horizon,limit,window_mode="boundary")
+    result=[]
+    for window in loaded.windows:
+        series=np.concatenate((window.context,window.target),axis=1)
+        if target_param!="multivariate":series=series[0]
+        result.append((window.sequence_id,series,series.copy(),np.r_[np.ones(length,dtype=bool),window.emitter_mask]))
+    return result
 
 
 def clean_pri_context(context: np.ndarray, target_len: Optional[int] = None) -> np.ndarray:
@@ -235,7 +258,7 @@ def load_sequence_arrays(
         - ground_truth_vals: 1D float32 array (true emitter parameter sequence)
         - emitter_mask: 1D bool array (True where pulse belongs to true emitter, False for NOISE/ECHO)
     """
-    df = pd.read_csv(csv_path)
+    df = read_sequence_frame(csv_path)
 
     # Drop arrival-time anchor at pulse 0 (Measured_Delta_TOA == 0.0)
     if len(df) > 1 and "Measured_Delta_TOA" in df.columns and float(df["Measured_Delta_TOA"].iloc[0]) == 0.0:
@@ -278,6 +301,7 @@ def load_dataset_sequences(
     Returns:
         List of tuples: (sequence_id, context_vals, ground_truth_vals, emitter_mask)
     """
+    reject_legacy_window_loader(dataset_dir)
     split_dir = dataset_dir / split
     if not split_dir.exists():
         raise FileNotFoundError(f"Split directory not found: {split_dir}")
@@ -384,7 +408,8 @@ def create_unified_pdw_dataloader(
             folder_name = f"{dataset_size}_{elevel}"
             dataset_dir = datasets_root / rtype / folder_name
             if dataset_dir.exists():
-                seqs = load_dataset_sequences(
+                seqs = _boundary_training_sequences(dataset_dir, split, target_param, context_len, horizon_len, max_seqs_per_dataset)
+                if seqs is None:seqs = load_dataset_sequences(
                     dataset_dir,
                     split=split,
                     max_seqs=max_seqs_per_dataset,
@@ -425,7 +450,7 @@ def load_multivariate_sequence_arrays(
         - tgt_channels: (5, sequence_len) float32 array
         - emitter_mask: (sequence_len,) bool array
     """
-    df = pd.read_csv(csv_path)
+    df = read_sequence_frame(csv_path)
 
     if len(df) > 1 and "Measured_Delta_TOA" in df.columns and float(df["Measured_Delta_TOA"].iloc[0]) == 0.0:
         df = df.iloc[1:].reset_index(drop=True)
@@ -467,6 +492,7 @@ def load_multivariate_dataset_sequences(
     Returns:
         List of (sequence_id, ctx_channels (5, N), tgt_channels (5, N), mask (N,))
     """
+    reject_legacy_window_loader(Path(dataset_dir))
     split_dir = Path(dataset_dir) / split
     if not split_dir.exists():
         raise FileNotFoundError(f"Split directory not found: {split_dir}")
@@ -566,7 +592,8 @@ def create_unified_multivariate_dataloader(
             folder_name = f"{dataset_size}_{elevel}"
             dataset_dir = datasets_root / rtype / folder_name
             if dataset_dir.exists():
-                seqs = load_multivariate_dataset_sequences(
+                seqs = _boundary_training_sequences(dataset_dir, split, "multivariate", context_len, horizon_len, max_seqs_per_dataset)
+                if seqs is None:seqs = load_multivariate_dataset_sequences(
                     dataset_dir,
                     split=split,
                     max_seqs=max_seqs_per_dataset,

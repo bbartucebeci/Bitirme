@@ -9,6 +9,7 @@ from pathlib import Path
 import pandas as pd
 import yaml
 from dataset_generator.catalog import RADAR_TYPES, ERROR_LEVELS
+from dataset_generator.sequence_io import read_sequence_frame, is_boundary_dataset, boundary_start
 
 from foundation_models.common.windowing import (
     WINDOW_SEED,
@@ -30,7 +31,7 @@ def main() -> None:
     parser.add_argument("--context-lens", type=int, nargs="+", default=CONTEXT_LENS)
     parser.add_argument("--horizon", type=int, default=32)
     parser.add_argument("--seed", type=int, default=WINDOW_SEED)
-    parser.add_argument("--window-mode", choices=("random", "tail"), default="random")
+    parser.add_argument("--window-mode", choices=("random", "tail", "boundary"), default="random")
     parser.add_argument("--profiles", nargs="+", choices=("fixed", "varying"), default=("fixed", "varying"))
     parser.add_argument("--radar-types", nargs="+", choices=RADAR_TYPES, default=RADAR_TYPES)
     parser.add_argument("--error-levels", nargs="+", choices=ERROR_LEVELS, default=ERROR_LEVELS)
@@ -59,7 +60,7 @@ def main() -> None:
                 if len(files) != expected_files:
                     raise ValueError(f"{test_dir}: expected {expected_files} sequence CSVs, found {len(files)}")
                 for csv_file in files:
-                    frame = pd.read_csv(csv_file, usecols=["Radar_ID", "Measured_Delta_TOA"])
+                    frame = read_sequence_frame(csv_file)
                     if len(frame) > 1 and float(frame["Measured_Delta_TOA"].iloc[0]) == 0.0:
                         frame = frame.iloc[1:]
                     n = len(frame)
@@ -73,7 +74,8 @@ def main() -> None:
                         key = window_key(profile, radar_type, level, csv_file.stem, length)
                         if length + args.horizon > n:
                             raise ValueError(f"{csv_file}: {length}+{args.horizon} exceeds {n}")
-                        start = (draw_random_start(n, length, args.horizon, args.seed, key)
+                        start = (boundary_start(metadata, length, args.horizon, args.window_mode) if is_boundary_dataset(metadata) or args.window_mode == "boundary" else
+                                 draw_random_start(n, length, args.horizon, args.seed, key)
                                  if args.window_mode == "random" else n - length - args.horizon)
                         windows[key] = start
                         if not emitter[start + length : start + length + args.horizon].any():

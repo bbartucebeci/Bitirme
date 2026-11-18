@@ -200,7 +200,8 @@ class ComplexPRITest(unittest.TestCase):
             folder=Path(directory)/"single_radar/fixed/markov_agile/10x1024_clean"
             for name,count in (("train",7),("val",1),("test",2)):
                 self.assertEqual(len(list((folder/name).glob("seq_*.csv"))),count)
-                self.assertEqual(len(pd.read_csv(folder/name/"sequences.csv")),count*1025)
+                self.assertFalse((folder/name/"sequences.csv").exists())
+                self.assertEqual(sum(len(pd.read_csv(p)) for p in (folder/name).glob("seq_*.csv")),count*1025)
             self.assertEqual(len(pd.read_csv(folder/"generation.csv")),10)
             with self.assertRaises(FileExistsError):
                 build_single_dataset(**kwargs)

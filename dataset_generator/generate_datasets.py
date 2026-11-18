@@ -14,6 +14,7 @@ Generates reproducible train/val/test datasets with:
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
@@ -48,6 +49,7 @@ from radar_generator import (
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 from dataset_generator.catalog import COMPLEX_DATASETS_ROOT, RADAR_TYPES, ERROR_LEVELS, sinusoidal_repeat_period
+from dataset_generator.sequence_io import SCHEMA_V2
 
 RADAR_CLASSES = {
     "stable": StableRadar,
@@ -528,16 +530,12 @@ def write_split(
     generate_fn,
 ) -> int:
     split_dir.mkdir(parents=True, exist_ok=True)
-    dfs = []
+    row_count = 0
     for seq_id in seq_ids:
         df_seq = generate_fn(seq_id)
         df_seq.to_csv(split_dir / f"{seq_id}.csv", index=False)
-        dfs.append(df_seq)
-
-    combined = pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
-    if not combined.empty:
-        combined.to_csv(split_dir / "sequences.csv", index=False)
-    return len(combined)
+        row_count += int(df_seq.attrs.get("model_row_count", len(df_seq)))
+    return row_count
 
 
 def build_single_dataset(
@@ -551,7 +549,16 @@ def build_single_dataset(
     error_config: Dict[str, Any],
     profiles_cfg: Dict[str, Any],
     freq_mode: str = "as_configured",
+    protocol: str = "observed",
+    context_intervals: int = 1024,
+    max_horizon: int = 32,
 ):
+    if protocol not in ("observed", SCHEMA_V2):
+        raise ValueError(f"Unknown dataset protocol: {protocol}")
+    if protocol == SCHEMA_V2:
+        if min(context_intervals, max_horizon) <= 0:
+            raise ValueError("Context and horizon budgets must be positive")
+        pulses_per_sequence = context_intervals + max_horizon
     dataset_folder = f"{sequence_count}x{pulses_per_sequence}_{error_level}"
     dataset_name = f"single_{radar_type}_{dataset_folder}"
 
@@ -598,16 +605,26 @@ def build_single_dataset(
         key = f"{seed}|{radar_type}|{profile_mode}|{error_level}|{pulses_per_sequence}|{sid}"
         sequence_seed = zlib.crc32(key.encode("utf-8"))
         np.random.seed(sequence_seed)
-        result = generate_single_radar_sequence(
-            radar_type=radar_type,
-            profile=profiles_dict[sid],
-            error_config=error_config,
-            sequence_id=sid,
-            error_level=error_level,
-            pulses_per_sequence=pulses_per_sequence,
-        )
-        generation_rows.append({"sequence_id": sid, "sequence_seed": sequence_seed,
-                                "initialization_json": json.dumps(result.attrs["initialization"], sort_keys=True)})
+        if protocol == SCHEMA_V2:
+            from dataset_generator.consecutive_future import generate_consecutive_sequence
+            loss_seed = zlib.crc32(f"{sequence_seed}|loss_v2".encode())
+            result = generate_consecutive_sequence(radar_type, profiles_dict[sid], error_config,
+                                                   sid, error_level, context_intervals, max_horizon, loss_seed)
+        else:
+            result = generate_single_radar_sequence(
+                radar_type=radar_type,
+                profile=profiles_dict[sid],
+                error_config=error_config,
+                sequence_id=sid,
+                error_level=error_level,
+                pulses_per_sequence=pulses_per_sequence,
+            )
+        record = {"sequence_id": sid, "sequence_seed": sequence_seed,
+                  "initialization_json": json.dumps(result.attrs["initialization"], sort_keys=True)}
+        if protocol == SCHEMA_V2:
+            record.update({key:result.attrs[key] for key in ("loss_seed","capture_budget","capture_attempts")})
+            record["source_rows"] = len(result)
+        generation_rows.append(record)
         return result
 
     train_rows = write_split(dest_dir / "train", train_ids, gen_wrapper)
@@ -622,7 +639,8 @@ def build_single_dataset(
         "freq_mode": freq_mode,
         "effective_freq_mode": next(iter(profiles_dict.values()))["freq_mode"],
         "seed": seed,
-        "schema_version": "complex_pri_v1",
+        "schema_version": SCHEMA_V2 if protocol == SCHEMA_V2 else "complex_pri_v1",
+        "storage_layout": "source_stream_per_sequence" if protocol == SCHEMA_V2 else "per_sequence_csv",
         "profile_definition": profiles_cfg["fixed_profiles"] if profile_mode == "fixed" else profiles_cfg["varying_profile_sampling"],
         "profile_config_sha256": hashlib.sha256(json.dumps(profiles_cfg, sort_keys=True).encode()).hexdigest(),
         "fixed_profile": fixed_prof if profile_mode == "fixed" else None,
@@ -646,6 +664,13 @@ def build_single_dataset(
             "AOA": "degrees",
         },
     }
+
+    if protocol == SCHEMA_V2:
+        metadata.pop("observed_rows_per_sequence")
+        metadata.update(context_intervals=context_intervals, max_horizon=max_horizon,
+                        target_policy="consecutive_source_pulses", window_mode="boundary",
+                        model_rows_per_sequence=pulses_per_sequence+1,
+                        trace_in_sequence_csv=True, loss_masks_scope="hypothetical_receiver_retention")
 
     with (dest_dir / "metadata.yaml").open("w", encoding="utf-8") as f:
         yaml.safe_dump(metadata, f, sort_keys=False)
@@ -750,7 +775,7 @@ def main():
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=COMPLEX_DATASETS_ROOT,
+        default=None,
         help="Root directory to output datasets into",
     )
     parser.add_argument(
@@ -771,18 +796,32 @@ def main():
         help="Random seed for reproducibility",
     )
     parser.add_argument(
+        "--protocol", choices=("observed", SCHEMA_V2), default="observed",
+        help="Opt-in versioned context/consecutive-source-future protocol",
+    )
+    parser.add_argument("--context-intervals", type=int, default=1024)
+    parser.add_argument("--max-horizon", type=int, default=32)
+    parser.add_argument(
     "--pulses-per-sequence",
     type=int,
     choices=[128, 256, 512, 1024],
     default=128,
     )
     args = parser.parse_args()
+    if min(args.context_intervals, args.max_horizon) <= 0:
+        parser.error("Context and horizon must be positive")
+    if args.protocol == SCHEMA_V2 and args.radar_type in ("interleaved", "all"):
+        parser.error("consecutive_future_v2 is scoped to single-radar datasets; use all_single")
+    if args.output_dir is None:
+        args.output_dir = (PROJECT_ROOT/"datasets"/SCHEMA_V2/("smoke" if args.smoke_test else "production")/
+                           f"C{args.context_intervals}_H{args.max_horizon}" if args.protocol == SCHEMA_V2
+                           else COMPLEX_DATASETS_ROOT)
 
     # Load modular configs
     error_levels_cfg, profiles_cfg, clock_noise_cfg = load_all_configs(args.config_dir)
 
     sequence_count = 10 if args.smoke_test else 1000
-    pulses_per_sequence = args.pulses_per_sequence
+    pulses_per_sequence = args.context_intervals+args.max_horizon if args.protocol == SCHEMA_V2 else args.pulses_per_sequence
 
     error_levels = list(error_levels_cfg.keys()) if args.error_level == "all" else [args.error_level]
     profile_modes = ["fixed", "varying"] if args.profile_mode == "both" else [args.profile_mode]
@@ -794,6 +833,29 @@ def main():
     else:
         radar_types = [args.radar_type]
 
+    collection = None
+    if args.protocol == SCHEMA_V2:
+        if args.output_dir.exists() and any(args.output_dir.iterdir()):
+            parser.error(f"A v2 collection requires a fresh output root; do not mix runs or protocols: {args.output_dir}")
+        collection = {"schema_version":SCHEMA_V2,"status":"building",
+                      "created_utc":datetime.now(timezone.utc).isoformat(),
+                      "purpose":"smoke" if args.smoke_test else "production",
+                      "dataset_size":f"{sequence_count}x{pulses_per_sequence}",
+                      "context_intervals":args.context_intervals,"max_horizon":args.max_horizon,
+                      "seed":args.seed,"profiles":profile_modes,"radar_types":radar_types,"error_levels":error_levels,
+                      "expected_conditions":len(profile_modes)*len(radar_types)*len(error_levels),
+                      "completed_conditions":[],"code_sha256":{}}
+        for relative in ("dataset_generator/generate_datasets.py","dataset_generator/consecutive_future.py",
+                         "dataset_generator/sequence_io.py","synthetic_data_generation/radar_generator.py"):
+            collection["code_sha256"][relative]=hashlib.sha256((PROJECT_ROOT/relative).read_bytes()).hexdigest()
+
+    def save_collection():
+        args.output_dir.mkdir(parents=True,exist_ok=True)
+        target=args.output_dir/"collection.json"
+        temporary=target.with_suffix(".json.tmp")
+        temporary.write_text(json.dumps(collection,indent=2)+"\n",encoding="utf-8")
+        temporary.replace(target)
+
     # Preflight all destinations before writing any combination.
     for rtype in radar_types:
         for pmode in profile_modes:
@@ -803,6 +865,7 @@ def main():
                     parser.error(f"Output already contains data: {destination}")
 
     # Generate single radar benchmarks
+    if collection is not None:save_collection()
     for rtype in radar_types:
         for pmode in profile_modes:
             for elvl in error_levels:
@@ -817,7 +880,13 @@ def main():
                     error_config=error_levels_cfg[elvl],
                     profiles_cfg=profiles_cfg,
                     freq_mode=args.freq_mode,
+                    protocol=args.protocol,
+                    context_intervals=args.context_intervals,
+                    max_horizon=args.max_horizon,
                 )
+                if collection is not None:
+                    collection["completed_conditions"].append(f"{pmode}/{rtype}/{elvl}")
+                    save_collection()
 
     # Generate interleaved benchmarks
     if args.radar_type in ["interleaved", "all"]:
@@ -830,6 +899,10 @@ def main():
                 error_config=error_levels_cfg[elvl],
                 interleaved_cfg=profiles_cfg["interleaved_scenario"],
             )
+    if collection is not None:
+        collection["status"]="complete"
+        collection["completed_utc"]=datetime.now(timezone.utc).isoformat()
+        save_collection()
 
 
 if __name__ == "__main__":

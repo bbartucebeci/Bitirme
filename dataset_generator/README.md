@@ -1,5 +1,10 @@
 # Complex PRI single-radar benchmark
 
+The replacement **observed context + consecutive-source future** protocol is
+documented in [CONSECUTIVE_FUTURE.md](CONSECUTIVE_FUTURE.md), including the dataset
+inventory, single-copy storage, generation commands and boundary-aware loaders.
+The observed-future v1 protocol below remains available for historical experiments.
+
 This benchmark has eight source laws (`stable`, `jitter`, `stagger`,
 `dwell_and_switch`, `sliding`, `sinusoidal`, `triangular_sliding`, `markov_agile`),
 two profile modes, and eight error levels (`clean`, `error_lv1`–`error_lv7`).
@@ -54,7 +59,8 @@ captures need not average to that mean. Do not normalize them after generation.
 The first/remaining 70/10/20 percent of sequence IDs form train/validation/test.
 For 1000 sequences this is 700/100/200; smoke tests use 7/1/2.
 
-Each split retains both per-sequence CSVs and combined `sequences.csv`.
+Newly written splits store only per-sequence CSVs. Historical combined
+`sequences.csv` files remain readable; no new combined copies are produced.
 `profiles.csv` records varying source definitions. `generation.csv` records each
 sequence seed and actual initialization (phase or Markov initial state/source
 seed). `metadata.yaml` records the effective RF mode, seed, profile definition,
@@ -82,7 +88,7 @@ python -B -m dataset_generator.validate_datasets --datasets-root datasets/comple
 python -B -m unittest foundation_models.chronos2.test_windows -v
 ```
 
-The validator checks every CSV, split membership and combined CSV equality;
+The validator checks every CSV, split membership and historical combined CSV equality when present;
 model/classical random windows are compared after the existing float32 model
 conversion. All four context lengths also share the last 32 targets in tail mode.
 No model training, model download or benchmark-wide inference is needed.

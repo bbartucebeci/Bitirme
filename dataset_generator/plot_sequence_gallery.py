@@ -15,6 +15,7 @@ import pandas as pd
 import yaml
 
 from dataset_generator.catalog import RADAR_TYPES, ERROR_LEVELS
+from dataset_generator.sequence_io import read_sequence_frame
 
 PROFILES = ("fixed", "varying")
 CHANNELS = (
@@ -30,7 +31,7 @@ MIN_AXIS_SPAN = {"PRI":10., "Frequency":2., "PW":.05, "Amplitude":1., "AOA":2.}
 def load_sequence(path: Path, pulse_count: int, start: int = 0) -> pd.DataFrame:
     if pulse_count <= 0 or start < 0:
         raise ValueError("Pulse count must be positive and start nonnegative")
-    frame = pd.read_csv(path).sort_values("pulse_index").reset_index(drop=True)
+    frame = read_sequence_frame(path).sort_values("pulse_index").reset_index(drop=True)
     required = {"Radar_ID", "PRI", "Measured_Delta_TOA", "pulse_index", *(item[1] for item in CHANNELS)}
     if required - set(frame.columns):
         raise ValueError(f"{path}: missing columns {sorted(required-set(frame.columns))}")
@@ -54,6 +55,9 @@ def plot_profile(profile,radar,channel,value_column,unit_label,selected,levels,o
         x=frame.pulse_index.to_numpy(); genuine=frame.Radar_ID.eq("R_SINGLE").to_numpy()
         values=frame[value_column].to_numpy(dtype=float)
         axis.plot(x,values,color="#1775a5",linewidth=1.,marker=".",markersize=1.8)
+        if "segment" in frame and frame.segment.eq("horizon").any():
+            boundary=float(frame.loc[frame.segment.eq("horizon"),"pulse_index"].iloc[0])-.5
+            axis.axvline(boundary,color="#222222",linestyle=":",linewidth=1.)
         bounds=values
         if channel=="PRI":
             source=frame.PRI.to_numpy(dtype=float)
@@ -69,7 +73,7 @@ def plot_profile(profile,radar,channel,value_column,unit_label,selected,levels,o
         axis.ticklabel_format(axis="y",style="plain",useOffset=False)
         axis.yaxis.set_major_locator(MaxNLocator(nbins=5))
         axis.set_title(f"{level} · {sequence_id}",fontsize=11)
-        axis.set_xlabel("Observed pulse index (anchor excluded)",fontsize=9)
+        axis.set_xlabel("Selected pulse index; dotted line starts consecutive future" if "segment" in frame else "Observed pulse index (anchor excluded)",fontsize=9)
         axis.set_ylabel(unit_label,fontsize=9)
         axis.grid(alpha=.18); axis.tick_params(labelsize=8)
     for axis in list(axes.flat)[len(levels):]:axis.set_visible(False)
