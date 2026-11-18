@@ -143,7 +143,7 @@ def summarize(out_dir: Path, context_lens):
         fig.savefig(d / f"{NEW_COMPLEX_PRI}_{rtype}_mae_vs_error_level.png", dpi=130)
         plt.close(fig)
 
-    agg.to_csv(out_dir / "metrics_all.csv", index=False)
+    agg.to_csv(out_dir / "metrics_by_condition.csv", index=False)
     md = [f"# Kalman filter bank on {NEW_COMPLEX_PRI} — overview", "",
           "PRI MAE (µs), mean over 200 test sequences, H=32. Per-radar detail in `by_radar/<type>/summary.md`.", ""]
     for prof in ("fixed", "varying"):
