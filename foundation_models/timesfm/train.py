@@ -1,6 +1,8 @@
 """Supervised Fine-Tuning (SFT) for TimesFM 3.0 via LoRA on PDW Datasets."""
 
 from __future__ import annotations
+
+from dataset_generator.catalog import RADAR_TYPES as BENCHMARK_RADAR_TYPES, ERROR_LEVELS as BENCHMARK_ERROR_LEVELS, check_dataset_selection
 import argparse
 import math
 from pathlib import Path
@@ -127,6 +129,8 @@ def build_comparison_report(
 def main():
     parser = argparse.ArgumentParser(description="PULSAR: TimesFM 3.0 Supervised Fine-Tuning (LoRA SFT)")
     parser.add_argument("--profile-mode", choices=["fixed", "varying"], default="fixed")
+    parser.add_argument("--datasets-root", type=Path, default=DEFAULT_DATASETS_ROOT, help="Root containing fixed/ and varying/")
+    parser.add_argument("--dataset-size", default="1000x128")
     parser.add_argument("--target-param", "--target-col", dest="target_param", choices=list(PARAM_SPECS.keys()) + ["Measured_Delta_TOA"], default="PRI", help="Target parameter column")
     parser.add_argument("--epochs", type=int, default=3, help="Number of training epochs (default: 3)")
     parser.add_argument("--batch-size", type=int, default=64, help="Batch size (default: 64)")
@@ -142,6 +146,14 @@ def main():
     parser.add_argument("--tolerance-us", type=float, default=None, help="Deprecated alias for --tolerance")
 
     args = parser.parse_args()
+    selected_radars = BENCHMARK_RADAR_TYPES if getattr(args, "radar_type", "all") == "all" else (args.radar_type,)
+    selected_levels = BENCHMARK_ERROR_LEVELS if getattr(args, "error_level", "all") == "all" else (args.error_level,)
+    check_dataset_selection(args.datasets_root, args.profile_mode, args.dataset_size, selected_radars, selected_levels)
+
+    data_tag = None
+    if args.datasets_root.resolve() != DEFAULT_DATASETS_ROOT.resolve() or args.dataset_size != "1000x128":
+        data_tag = args.datasets_root.parent.name + "_" + args.dataset_size
+        args.save_dir = args.save_dir / data_tag
 
     param_key = "PRI" if args.target_param == "Measured_Delta_TOA" else args.target_param
     spec = PARAM_SPECS.get(param_key, {"name": param_key, "slug": param_key.lower(), "unit": "units", "default_tol": 1.0, "scale": 1.0})
@@ -153,7 +165,7 @@ def main():
     scale = args.scale or spec["scale"]
     huber_beta = args.huber_beta or spec["default_tol"] / 2.0
 
-    datasets_root = DEFAULT_DATASETS_ROOT / args.profile_mode
+    datasets_root = args.datasets_root / args.profile_mode
 
     print("=" * 75)
     print(f"PULSAR: TimesFM 3.0 LoRA SFT Training [{param_name}]")
@@ -171,9 +183,10 @@ def main():
     lora_engine.print_trainable_parameters()
 
     # 2. Build Unified DataLoaders
-    print(f"\nLoading unified training (14,000 seqs) and validation (2,000 seqs) for {param_name}...")
+    print(f"\nLoading unified train/validation splits from {args.dataset_size} datasets for {param_name}...")
     train_loader = create_unified_pdw_dataloader(
         datasets_root=datasets_root,
+        dataset_size=args.dataset_size,
         profile_mode=args.profile_mode,
         split="train",
         target_param=param_key,
@@ -184,6 +197,7 @@ def main():
     )
     val_loader = create_unified_pdw_dataloader(
         datasets_root=datasets_root,
+        dataset_size=args.dataset_size,
         profile_mode=args.profile_mode,
         split="val",
         target_param=param_key,
@@ -289,15 +303,16 @@ def main():
     tfm_eval = TimesFMLoRAEngine.load_for_inference(weights_dir=checkpoint_subdir)
 
     target_results_dir = PROJECT_ROOT / "results" / "timesfm" / "lora_sft" / f"univariate_{args.profile_mode}" / param_slug
+    if data_tag: target_results_dir = target_results_dir / data_tag
     plots_dir = target_results_dir / "plots"
 
-    radar_types = ["stable", "jitter", "stagger", "dwell_and_switch", "sliding"]
-    error_levels = ["clean", "error_lv1", "error_lv2", "error_lv3"]
+    radar_types = list(BENCHMARK_RADAR_TYPES)
+    error_levels = list(BENCHMARK_ERROR_LEVELS)
 
     test_results = []
     for rtype in radar_types:
         for elevel in error_levels:
-            folder_name = f"1000x128_{elevel}"
+            folder_name = f"{args.dataset_size}_{elevel}"
             dataset_dir = datasets_root / rtype / folder_name
             dataset_display = f"{rtype}/{folder_name}"
 
@@ -329,9 +344,11 @@ def main():
 
         # 6. Generate Side-by-Side Comparison if Zero-Shot exists
         zero_shot_dir = PROJECT_ROOT / "results" / "timesfm" / "zero_shot" / f"univariate_{args.profile_mode}" / param_slug
+        if data_tag: zero_shot_dir = zero_shot_dir / data_tag
         zero_shot_csv = zero_shot_dir / "metrics.csv"
         lora_csv = target_results_dir / "metrics.csv"
         comparisons_dir = PROJECT_ROOT / "results" / "timesfm" / "comparisons"
+        if data_tag: comparisons_dir = comparisons_dir / data_tag
         comparisons_dir.mkdir(parents=True, exist_ok=True)
         comparison_md = comparisons_dir / f"comparison_zero_shot_vs_lora_{args.profile_mode}_{param_slug}.md"
 

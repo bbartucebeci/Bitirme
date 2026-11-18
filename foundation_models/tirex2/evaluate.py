@@ -36,12 +36,13 @@ def audit_coverage(
     max_test_seqs: int | None,
     radar_type: str | None,
     error_level: str | None,
+    datasets_root: Path = DATASETS_ROOT,
 ) -> pd.DataFrame:
     """Check selected test CSVs before downloading or loading TiRex-2."""
     rows = []
     for rtype in ((radar_type,) if radar_type else RADAR_TYPES):
         for level in ((error_level,) if error_level else ERROR_LEVELS):
-            dataset_dir = DATASETS_ROOT / profile_mode / rtype / f"{dataset_size}_{level}"
+            dataset_dir = datasets_root / profile_mode / rtype / f"{dataset_size}_{level}"
             loaded = load_split(dataset_dir, "test", target_param, context_len, horizon_len, max_test_seqs)
             rows.append({
                 "radar_type": rtype,
@@ -134,9 +135,10 @@ def run_evaluation(
     radar_type: str | None,
     error_level: str | None,
     plots: bool,
+    datasets_root: Path = DATASETS_ROOT,
 ) -> pd.DataFrame:
     selected = [
-        (rtype, level, DATASETS_ROOT / profile_mode / rtype / f"{dataset_size}_{level}")
+        (rtype, level, datasets_root / profile_mode / rtype / f"{dataset_size}_{level}")
         for rtype in ((radar_type,) if radar_type else RADAR_TYPES)
         for level in ((error_level,) if error_level else ERROR_LEVELS)
     ]
@@ -150,6 +152,8 @@ def run_evaluation(
         else Path(f"univariate_{profile_mode}") / target_param.lower()
     )
     output_dir = RESULTS_ROOT / mode
+    if datasets_root.resolve() != DATASETS_ROOT.resolve() or dataset_size != "1000x128":
+        output_dir = output_dir / (datasets_root.parent.name + "_" + dataset_size)
     rows = []
     for rtype, level, dataset_dir in selected:
         plot_path = output_dir / "plots" / f"{rtype}_{level}.png" if plots else None
@@ -191,6 +195,7 @@ def main() -> None:
     parser.add_argument("--profile-mode", choices=("fixed", "varying", "both"), default="fixed")
     parser.add_argument("--target-param", choices=(*CHANNELS, "multivariate", "all"), default="PRI")
     parser.add_argument("--dataset-size", default="1000x128")
+    parser.add_argument("--datasets-root", type=Path, default=DATASETS_ROOT)
     parser.add_argument("--context-len", type=int, default=96)
     parser.add_argument("--horizon", type=int, default=32)
     parser.add_argument("--batch-size", type=int, default=64)
@@ -213,6 +218,7 @@ def main() -> None:
         coverage = audit_coverage(
             profile, tasks[0], args.dataset_size, args.context_len, args.horizon,
             args.max_test_seqs, args.radar_type, args.error_level,
+            datasets_root=args.datasets_root,
         )
         print(f"[COVERAGE] {profile}\n{coverage.to_string(index=False)}", flush=True)
         if args.coverage_only:
@@ -230,6 +236,7 @@ def main() -> None:
                 model, profile, task, args.dataset_size, args.context_len,
                 args.horizon, args.batch_size, args.max_test_seqs,
                 args.radar_type, args.error_level, not args.no_plots,
+                datasets_root=args.datasets_root,
             )
 
 

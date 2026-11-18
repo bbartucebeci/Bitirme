@@ -1,6 +1,8 @@
 """Evaluation CLI for Google TimesFM 3.0 (Zero-Shot or LoRA-Fine-Tuned)."""
 
 from __future__ import annotations
+
+from dataset_generator.catalog import RADAR_TYPES as BENCHMARK_RADAR_TYPES, ERROR_LEVELS as BENCHMARK_ERROR_LEVELS, check_dataset_selection
 import argparse
 from pathlib import Path
 import time
@@ -180,10 +182,12 @@ def export_benchmark_results(
 def main():
     parser = argparse.ArgumentParser(description="PULSAR: TimesFM 3.0 Evaluation Suite")
     parser.add_argument("--profile-mode", choices=["fixed", "varying"], default="fixed")
+    parser.add_argument("--datasets-root", type=Path, default=DEFAULT_DATASETS_ROOT, help="Root containing fixed/ and varying/")
+    parser.add_argument("--dataset-size", default="1000x128")
     parser.add_argument("--modality", choices=["univariate", "multivariate"], default="univariate")
     parser.add_argument("--target-param", "--target-col", dest="target_param", choices=list(PARAM_SPECS.keys()) + ["Measured_Delta_TOA"], default="PRI", help="Target PDW parameter")
-    parser.add_argument("--radar-type", choices=["stable", "jitter", "stagger", "dwell_and_switch", "sliding", "all"], default="all")
-    parser.add_argument("--error-level", choices=["clean", "error_lv1", "error_lv2", "error_lv3", "all"], default="all")
+    parser.add_argument("--radar-type", choices=[*BENCHMARK_RADAR_TYPES, "all"], default="all")
+    parser.add_argument("--error-level", choices=[*BENCHMARK_ERROR_LEVELS, "all"], default="all")
     parser.add_argument("--weights-dir", type=Path, default=None, help="Path to fine-tuned LoRA checkpoint directory")
     parser.add_argument("--context-len", type=int, default=96)
     parser.add_argument("--horizon", type=int, default=32)
@@ -195,6 +199,10 @@ def main():
     parser.add_argument("--no-plots", action="store_true")
 
     args = parser.parse_args()
+    selected_radars = BENCHMARK_RADAR_TYPES if getattr(args, "radar_type", "all") == "all" else (args.radar_type,)
+    selected_levels = BENCHMARK_ERROR_LEVELS if getattr(args, "error_level", "all") == "all" else (args.error_level,)
+    check_dataset_selection(args.datasets_root, args.profile_mode, args.dataset_size, selected_radars, selected_levels)
+
 
     # Map parameter specifications
     param_key = "PRI" if args.target_param == "Measured_Delta_TOA" else args.target_param
@@ -211,10 +219,12 @@ def main():
     else:
         target_dir = args.results_dir
 
+    if args.datasets_root.resolve() != DEFAULT_DATASETS_ROOT.resolve() or args.dataset_size != "1000x128":
+        target_dir = target_dir / (args.datasets_root.parent.name + "_" + args.dataset_size)
     plots_dir = None if args.no_plots else target_dir / "plots"
 
-    radar_types = ["stable", "jitter", "stagger", "dwell_and_switch", "sliding"] if args.radar_type == "all" else [args.radar_type]
-    error_levels = ["clean", "error_lv1", "error_lv2", "error_lv3"] if args.error_level == "all" else [args.error_level]
+    radar_types = list(BENCHMARK_RADAR_TYPES) if args.radar_type == "all" else [args.radar_type]
+    error_levels = list(BENCHMARK_ERROR_LEVELS) if args.error_level == "all" else [args.error_level]
 
     # Load Model (with LoRA fused if weights_dir provided)
     tfm = TimesFMLoRAEngine.load_for_inference(weights_dir=args.weights_dir)
@@ -230,8 +240,8 @@ def main():
 
     for rtype in radar_types:
         for elevel in error_levels:
-            folder_name = f"1000x128_{elevel}"
-            dataset_dir = DEFAULT_DATASETS_ROOT / args.profile_mode / rtype / folder_name
+            folder_name = f"{args.dataset_size}_{elevel}"
+            dataset_dir = args.datasets_root / args.profile_mode / rtype / folder_name
             dataset_display = f"{rtype}/{folder_name}"
 
             res = evaluate_single_dataset(

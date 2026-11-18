@@ -5,6 +5,8 @@ tactical priority weighted Huber loss across all 5 PDW channels (PRI, RF, PW, AO
 """
 
 from __future__ import annotations
+
+from dataset_generator.catalog import RADAR_TYPES as BENCHMARK_RADAR_TYPES, ERROR_LEVELS as BENCHMARK_ERROR_LEVELS, check_dataset_selection
 import argparse
 import math
 from pathlib import Path
@@ -148,6 +150,8 @@ def build_multivariate_comparison_report(
 def main():
     parser = argparse.ArgumentParser(description="PULSAR: TimesFM 3.0 Joint 5-Channel LoRA SFT Training")
     parser.add_argument("--profile-mode", choices=["fixed", "varying"], default="fixed")
+    parser.add_argument("--datasets-root", type=Path, default=DEFAULT_DATASETS_ROOT, help="Root containing fixed/ and varying/")
+    parser.add_argument("--dataset-size", default="1000x128")
     parser.add_argument("--epochs", type=int, default=3, help="Training epochs (default: 3)")
     parser.add_argument("--batch-size", type=int, default=64, help="Batch size (default: 64)")
     parser.add_argument("--lr", type=float, default=1e-4, help="Peak learning rate (default: 1e-4)")
@@ -158,8 +162,16 @@ def main():
     parser.add_argument("--horizon", type=int, default=32)
 
     args = parser.parse_args()
+    selected_radars = BENCHMARK_RADAR_TYPES if getattr(args, "radar_type", "all") == "all" else (args.radar_type,)
+    selected_levels = BENCHMARK_ERROR_LEVELS if getattr(args, "error_level", "all") == "all" else (args.error_level,)
+    check_dataset_selection(args.datasets_root, args.profile_mode, args.dataset_size, selected_radars, selected_levels)
 
-    datasets_root = DEFAULT_DATASETS_ROOT / args.profile_mode
+    data_tag = None
+    if args.datasets_root.resolve() != DEFAULT_DATASETS_ROOT.resolve() or args.dataset_size != "1000x128":
+        data_tag = args.datasets_root.parent.name + "_" + args.dataset_size
+        args.save_dir = args.save_dir / data_tag
+
+    datasets_root = args.datasets_root / args.profile_mode
 
     print("=" * 80)
     print("PULSAR: TimesFM 3.0 Joint 5-Channel Multivariate SFT Training")
@@ -178,9 +190,10 @@ def main():
     lora_engine.print_trainable_parameters()
 
     # 2. Build Unified 5-Channel DataLoaders
-    print("\nLoading unified 5-channel training (14,000 seqs) and validation (2,000 seqs)...")
+    print(f"\nLoading unified 5-channel train/validation splits from {args.dataset_size} datasets...")
     train_loader = create_unified_multivariate_dataloader(
         datasets_root=datasets_root,
+        dataset_size=args.dataset_size,
         profile_mode=args.profile_mode,
         split="train",
         context_len=args.context_len,
@@ -190,6 +203,7 @@ def main():
     )
     val_loader = create_unified_multivariate_dataloader(
         datasets_root=datasets_root,
+        dataset_size=args.dataset_size,
         profile_mode=args.profile_mode,
         split="val",
         context_len=args.context_len,
@@ -303,15 +317,16 @@ def main():
     tfm_eval = TimesFMLoRAEngine.load_for_inference(weights_dir=checkpoint_best)
 
     results_dir = DEFAULT_RESULTS_ROOT / "lora_sft" / f"multivariate_{args.profile_mode}"
+    if data_tag: results_dir = results_dir / data_tag
     plots_dir = results_dir / "plots"
 
-    radar_types = ["stable", "jitter", "stagger", "dwell_and_switch", "sliding"]
-    error_levels = ["clean", "error_lv1", "error_lv2", "error_lv3"]
+    radar_types = list(BENCHMARK_RADAR_TYPES)
+    error_levels = list(BENCHMARK_ERROR_LEVELS)
 
     test_results = []
     for rtype in radar_types:
         for elevel in error_levels:
-            folder_name = f"1000x128_{elevel}"
+            folder_name = f"{args.dataset_size}_{elevel}"
             dataset_dir = datasets_root / rtype / folder_name
             dataset_display = f"{rtype}/{folder_name}"
 
@@ -337,9 +352,12 @@ def main():
         )
 
         # 6. Generate Comparative Report
-        zs_csv = DEFAULT_RESULTS_ROOT / "zero_shot" / f"multivariate_{args.profile_mode}" / "metrics.csv"
+        zs_dir = DEFAULT_RESULTS_ROOT / "zero_shot" / f"multivariate_{args.profile_mode}"
+        if data_tag: zs_dir = zs_dir / data_tag
+        zs_csv = zs_dir / "metrics.csv"
         lora_csv = results_dir / "metrics.csv"
         comparisons_dir = DEFAULT_RESULTS_ROOT / "comparisons"
+        if data_tag: comparisons_dir = comparisons_dir / data_tag
         comparisons_dir.mkdir(parents=True, exist_ok=True)
         comp_md = comparisons_dir / f"comparison_zero_shot_vs_lora_multivariate_{args.profile_mode}.md"
         build_multivariate_comparison_report(zs_csv, lora_csv, comp_md)

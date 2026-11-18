@@ -10,13 +10,12 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
 import yaml
+from dataset_generator.catalog import RADAR_TYPES, ERROR_LEVELS
 
 from foundation_models.common.windowing import WINDOW_SEED, file_sha256, select_start
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATASETS_ROOT = PROJECT_ROOT / "datasets" / "single_radar"
-RADAR_TYPES = ("stable", "jitter", "stagger", "dwell_and_switch", "sliding")
-ERROR_LEVELS = ("clean", "error_lv1", "error_lv2", "error_lv3")
 CHANNELS = ("PRI", "Frequency", "PW", "AOA", "Amplitude")
 TOLERANCES = {"PRI": 10.0, "Frequency": 2.0, "PW": 0.1, "AOA": 2.0, "Amplitude": 2.0}
 UNITS = {"PRI": "us", "Frequency": "MHz", "PW": "us", "AOA": "deg", "Amplitude": "dBm"}
@@ -38,12 +37,12 @@ class LoadedSplit:
     skipped_short: int
 
 
-def conditions(profile_mode: str, dataset_size: str = "1000x128") -> Iterator[tuple[str, str, Path]]:
+def conditions(profile_mode: str, dataset_size: str = "1000x128", datasets_root: Path = DATASETS_ROOT) -> Iterator[tuple[str, str, Path]]:
     if profile_mode not in ("fixed", "varying"):
         raise ValueError(f"Unknown profile mode: {profile_mode}")
     for radar_type in RADAR_TYPES:
         for error_level in ERROR_LEVELS:
-            yield radar_type, error_level, DATASETS_ROOT / profile_mode / radar_type / f"{dataset_size}_{error_level}"
+            yield radar_type, error_level, datasets_root / profile_mode / radar_type / f"{dataset_size}_{error_level}"
 
 
 def _sequence_frames(split_dir: Path, limit: int | None) -> list[tuple[str, pd.DataFrame]]:
@@ -371,17 +370,18 @@ def create_unified_pdw_dataloader(
     batch_size: int = 64,
     shuffle: bool = True,
     max_seqs_per_dataset: Optional[int] = None,
+    dataset_size: str = "1000x128",
 ) -> DataLoader:
     """Builds a unified DataLoader combining sequences across all radar types and error levels."""
     if radar_types is None:
-        radar_types = ["stable", "jitter", "stagger", "dwell_and_switch", "sliding"]
+        radar_types = list(RADAR_TYPES)
     if error_levels is None:
-        error_levels = ["clean", "error_lv1", "error_lv2", "error_lv3"]
+        error_levels = list(ERROR_LEVELS)
 
     all_sequences = []
     for rtype in radar_types:
         for elevel in error_levels:
-            folder_name = f"1000x128_{elevel}"
+            folder_name = f"{dataset_size}_{elevel}"
             dataset_dir = datasets_root / rtype / folder_name
             if dataset_dir.exists():
                 seqs = load_dataset_sequences(
@@ -391,6 +391,8 @@ def create_unified_pdw_dataloader(
                     target_param=target_param,
                 )
                 all_sequences.extend(seqs)
+            else:
+                raise FileNotFoundError(f"Missing selected dataset: {dataset_dir}")
 
     dataset = PDWSequenceDataset(all_sequences, context_len=context_len, horizon_len=horizon_len)
     return DataLoader(
@@ -550,17 +552,18 @@ def create_unified_multivariate_dataloader(
     batch_size: int = 64,
     shuffle: bool = True,
     max_seqs_per_dataset: Optional[int] = None,
+    dataset_size: str = "1000x128",
 ) -> DataLoader:
     """Builds a unified DataLoader combining 5-channel sequences across all datasets."""
     if radar_types is None:
-        radar_types = ["stable", "jitter", "stagger", "dwell_and_switch", "sliding"]
+        radar_types = list(RADAR_TYPES)
     if error_levels is None:
-        error_levels = ["clean", "error_lv1", "error_lv2", "error_lv3"]
+        error_levels = list(ERROR_LEVELS)
 
     all_sequences = []
     for rtype in radar_types:
         for elevel in error_levels:
-            folder_name = f"1000x128_{elevel}"
+            folder_name = f"{dataset_size}_{elevel}"
             dataset_dir = datasets_root / rtype / folder_name
             if dataset_dir.exists():
                 seqs = load_multivariate_dataset_sequences(
@@ -569,6 +572,8 @@ def create_unified_multivariate_dataloader(
                     max_seqs=max_seqs_per_dataset,
                 )
                 all_sequences.extend(seqs)
+            else:
+                raise FileNotFoundError(f"Missing selected dataset: {dataset_dir}")
 
     dataset = MultivariatePDWDataset(all_sequences, context_len=context_len, horizon_len=horizon_len)
     return DataLoader(

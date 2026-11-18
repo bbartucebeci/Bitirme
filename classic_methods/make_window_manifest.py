@@ -38,6 +38,7 @@ from classic_methods.common import (
 def main():
     parser = argparse.ArgumentParser(description="Build the random-context-start window manifest")
     parser.add_argument("--dataset-size", default=DEFAULT_DATASET_SIZE)
+    parser.add_argument("--datasets-root", type=Path, default=DEFAULT_DATASETS_ROOT)
     parser.add_argument("--context-lens", type=int, nargs="+", default=[96, 256, 512, 992])
     parser.add_argument("--horizon", type=int, default=32)
     parser.add_argument("--seed", type=int, default=DEFAULT_WINDOW_SEED)
@@ -52,7 +53,7 @@ def main():
     for prof in args.profiles:
         for rtype in RADAR_TYPES:
             for level in ERROR_LEVELS:
-                ddir = DEFAULT_DATASETS_ROOT / prof / rtype / f"{args.dataset_size}_{level}"
+                ddir = args.datasets_root / prof / rtype / f"{args.dataset_size}_{level}"
                 seqs = load_dataset_sequences(ddir, split="test", max_seqs=args.max_test_seqs)
                 for sid, ctx_vals, _, _ in seqs:
                     n = len(ctx_vals)

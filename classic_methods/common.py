@@ -24,8 +24,9 @@ CURRENT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CURRENT_DIR.parent
 DEFAULT_DATASETS_ROOT = PROJECT_ROOT / "datasets" / "single_radar"
 
-RADAR_TYPES = ["stable", "jitter", "stagger", "dwell_and_switch", "sliding"]
-ERROR_LEVELS = ["clean", "error_lv1", "error_lv2", "error_lv3"]
+from dataset_generator.catalog import RADAR_TYPES as _RADAR_TYPES, ERROR_LEVELS as _ERROR_LEVELS
+RADAR_TYPES = list(_RADAR_TYPES)
+ERROR_LEVELS = list(_ERROR_LEVELS)
 
 # Dataset folder size tag "<sequence_count>x<pulses_per_sequence>" (folder = f"{size}_{level}").
 DEFAULT_DATASET_SIZE = "1000x1024"

@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 import yaml
+from dataset_generator.catalog import RADAR_TYPES, ERROR_LEVELS
 
 from foundation_models.common.windowing import (
     WINDOW_SEED,
@@ -19,14 +20,13 @@ from foundation_models.common.windowing import (
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATASETS_ROOT = PROJECT_ROOT / "datasets" / "single_radar"
-RADAR_TYPES = ("stable", "jitter", "stagger", "dwell_and_switch", "sliding")
-ERROR_LEVELS = ("clean", "error_lv1", "error_lv2", "error_lv3")
 CONTEXT_LENS = (96, 256, 512, 992)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build a verified Chronos/classical test-window manifest")
     parser.add_argument("--dataset-size", default="1000x1024")
+    parser.add_argument("--datasets-root", type=Path, default=DATASETS_ROOT, help="Root containing fixed/ and varying/")
     parser.add_argument("--context-lens", type=int, nargs="+", default=CONTEXT_LENS)
     parser.add_argument("--horizon", type=int, default=32)
     parser.add_argument("--seed", type=int, default=WINDOW_SEED)
@@ -48,7 +48,7 @@ def main() -> None:
     for profile in args.profiles:
         for radar_type in args.radar_types:
             for level in args.error_levels:
-                dataset_dir = DATASETS_ROOT / profile / radar_type / f"{args.dataset_size}_{level}"
+                dataset_dir = args.datasets_root / profile / radar_type / f"{args.dataset_size}_{level}"
                 with (dataset_dir / "metadata.yaml").open(encoding="utf-8") as handle:
                     metadata = yaml.safe_load(handle)
                 if int(metadata["expected_pulses_per_sequence"]) != expected_pulses:

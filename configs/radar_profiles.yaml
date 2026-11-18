@@ -13,21 +13,39 @@ fixed_profiles:
     freq_hopping_values: [8950.0, 9000.0, 9050.0, 9100.0] # Carrier pool for hopping/agility
     pw_mean_us: 1.5
     amp_mean_dbm: -55.0
-    aoa_mean_deg: 180.0
+    aoa_mean_deg: 45.0
   stable:
     pri_us: 1000.0
   jitter:
     pri_mean_us: 1000.0
     pri_jitter_std_us: 50.0            # 5% Gaussian jitter
   stagger:
-    stagger_pris_us: [850.0, 1000.0, 1150.0]
+    level_count: 32
+    pri_min_us: 750.0
+    pri_max_us: 1250.0
+    level_order: [0, 17, 5, 26, 11, 30, 3, 21, 14, 8, 28, 1, 19, 10, 24, 6, 31, 15, 4, 23, 12, 27, 2, 18, 9, 29, 16, 7, 25, 13, 22, 20]
   dwell_and_switch:
-    dwell_pris_us: [850.0, 1150.0]
-    pulses_per_dwell: 8
+    dwell_pris_us: [850.0, 1075.0, 925.0, 1150.0, 1000.0]
+    pulses_per_dwell: 32
   sliding:
     pri_start_us: 850.0
     pri_end_us: 1150.0
     pulses_per_slide: 16
+  sinusoidal:
+    pri_mean_us: 1000.0
+    amplitude_us: 150.0
+    period_pulses: 7.2391
+  triangular_sliding:
+    pri_min_us: 850.0
+    pri_max_us: 1150.0
+    steps_per_leg: 10
+  markov_agile:
+    pri_levels_us: [850.0, 950.0, 1050.0, 1150.0] # A, B, C, D
+    transition_matrix: # rows: current state; columns: next state (A–D)
+      - [0.10, 0.70, 0.10, 0.10]
+      - [0.10, 0.10, 0.70, 0.10]
+      - [0.10, 0.10, 0.10, 0.70]
+      - [0.70, 0.10, 0.10, 0.10]
 
 # --- Varying Profile Continuous Sampling Ranges ---
 # Used when --profile-mode varying is specified.
@@ -70,14 +88,14 @@ varying_profile_sampling:
         low: 0.04
         high: 0.08
     stagger:
-      outer_fraction:
+      level_count:
+        distribution: "discrete_uniform"
+        low: 16
+        high: 32
+      span_fraction:
         distribution: "uniform"
-        low: 0.12
-        high: 0.18
-      inner_fraction:
-        distribution: "uniform"
-        low: 0.03
-        high: 0.07
+        low: 0.24
+        high: 0.30
     dwell_and_switch:
       outer_fraction:
         distribution: "uniform"
@@ -85,7 +103,7 @@ varying_profile_sampling:
         high: 0.18
       pulses_per_dwell:
         distribution: "choice"
-        values: [8, 10, 12]
+        values: [32, 48, 64]
     sliding:
       span_fraction:
         distribution: "uniform"
@@ -94,6 +112,32 @@ varying_profile_sampling:
       pulses_per_slide:
         distribution: "choice"
         values: [12, 16, 20]
+    sinusoidal:
+      span_fraction:
+        distribution: "uniform"
+        low: 0.12
+        high: 0.18
+      period_pulses:
+        distribution: "uniform"
+        low: 6.5
+        high: 9.5
+      minimum_repeat_period: 1025
+    triangular_sliding:
+      span_fraction:
+        distribution: "uniform"
+        low: 0.12
+        high: 0.18
+      steps_per_leg: 10
+    markov_agile:
+      span_fraction:
+        distribution: "uniform"
+        low: 0.12
+        high: 0.18
+      transition_matrix:
+        - [0.10, 0.70, 0.10, 0.10]
+        - [0.10, 0.10, 0.70, 0.10]
+        - [0.10, 0.10, 0.10, 0.70]
+        - [0.70, 0.10, 0.10, 0.10]
 
 # --- Interleaved Multi-Radar Scenario Parameters ---
 interleaved_scenario:

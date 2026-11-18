@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataset_generator.catalog import RADAR_TYPES as BENCHMARK_RADAR_TYPES, ERROR_LEVELS as BENCHMARK_ERROR_LEVELS, check_dataset_selection
+
 import argparse
 from pathlib import Path
 import time
@@ -122,6 +124,8 @@ def main():
     parser.add_argument("--model-id", type=str, default="theforecastingcompany/t0-gamma")
     parser.add_argument("--radar-type", type=str, default="all")
     parser.add_argument("--profile-mode", choices=["fixed", "varying"], default="fixed")
+    parser.add_argument("--datasets-root", type=Path, default=DEFAULT_DATASETS_ROOT, help="Root containing fixed/ and varying/")
+    parser.add_argument("--dataset-size", default="1000x128")
     parser.add_argument("--error-level", type=str, default="all")
     parser.add_argument("--target-param", type=str, default="PRI")
     parser.add_argument("--context-len", type=int, default=96)
@@ -134,6 +138,10 @@ def main():
     parser.add_argument("--no-plots", action="store_true")
 
     args = parser.parse_args()
+    selected_radars = BENCHMARK_RADAR_TYPES if getattr(args, "radar_type", "all") == "all" else (args.radar_type,)
+    selected_levels = BENCHMARK_ERROR_LEVELS if getattr(args, "error_level", "all") == "all" else (args.error_level,)
+    check_dataset_selection(args.datasets_root, args.profile_mode, args.dataset_size, selected_radars, selected_levels)
+
 
     param_key = "PRI" if args.target_param == "Measured_Delta_TOA" else args.target_param
     spec = PARAM_SPECS.get(param_key, {"name": param_key, "slug": param_key.lower(), "unit": "units", "default_tol": 1.0, "scale": 1.0})
@@ -147,9 +155,11 @@ def main():
     else:
         target_dir = args.results_dir
 
+    if args.datasets_root.resolve() != DEFAULT_DATASETS_ROOT.resolve() or args.dataset_size != "1000x128":
+        target_dir = target_dir / (args.datasets_root.parent.name + "_" + args.dataset_size)
     plots_dir = None if args.no_plots else target_dir / "plots"
-    radar_types = ["stable", "jitter", "stagger", "dwell_and_switch", "sliding"] if args.radar_type == "all" else [args.radar_type]
-    error_levels = ["clean", "error_lv1", "error_lv2", "error_lv3"] if args.error_level == "all" else [args.error_level]
+    radar_types = list(BENCHMARK_RADAR_TYPES) if args.radar_type == "all" else [args.radar_type]
+    error_levels = list(BENCHMARK_ERROR_LEVELS) if args.error_level == "all" else [args.error_level]
 
     model = T0GammaForecaster.load_for_inference(model_id=args.model_id)
 
@@ -164,8 +174,8 @@ def main():
         for elevel in error_levels:
             # Discover the actual folder name (supports both 1000x128 and smoke-test 10x128)
             dataset_dir = None
-            for pattern in [f"1000x128_{elevel}", f"10x128_{elevel}"]:
-                candidate = DEFAULT_DATASETS_ROOT / args.profile_mode / rtype / pattern
+            for pattern in [f"{args.dataset_size}_{elevel}"]:
+                candidate = args.datasets_root / args.profile_mode / rtype / pattern
                 if candidate.exists():
                     dataset_dir = candidate
                     break

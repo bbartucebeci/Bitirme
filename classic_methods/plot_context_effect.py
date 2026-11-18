@@ -154,6 +154,8 @@ def main():
     parser.add_argument("--profile-mode", default="varying")
     parser.add_argument("--error-level", default="error_lv2")
     parser.add_argument("--dataset-size", default="1000x1024")
+    parser.add_argument("--datasets-root", type=Path, default=DEFAULT_DATASETS_ROOT)
+    parser.add_argument("--radar-types", nargs="+", choices=RADAR_TYPES, default=RADAR_TYPES)
     parser.add_argument("--context-lens", type=int, nargs="+", default=[96, 256, 512, 992])
     parser.add_argument("--horizon", type=int, default=32)
     parser.add_argument("--max-test-seqs", type=int, default=200)
@@ -166,10 +168,10 @@ def main():
     out_dir = args.out_dir or (PROJECT_ROOT / "results" / "classic_1024" /
                                f"context_effect_{args.profile_mode}_{args.error_level}")
     Ls, H = args.context_lens, args.horizon
-    ddirs = {law: DEFAULT_DATASETS_ROOT / args.profile_mode / law / f"{args.dataset_size}_{args.error_level}"
-             for law in RADAR_TYPES}
+    ddirs = {law: args.datasets_root / args.profile_mode / law / f"{args.dataset_size}_{args.error_level}"
+             for law in args.radar_types}
 
-    jobs = [(slug, law, L) for law in RADAR_TYPES for slug in METHODS for L in Ls]
+    jobs = [(slug, law, L) for law in args.radar_types for slug in METHODS for L in Ls]
     jobs.sort(key=lambda j: -j[2] * (2.5 if j[0] == "arima" else 1.0))
     with ProcessPoolExecutor(max_workers=args.workers) as ex:
         futs = {ex.submit(run_job, slug, str(ddirs[law]), L, H, args.max_test_seqs, args.example): (slug, law, L)
@@ -180,7 +182,7 @@ def main():
             print(f"done {law:<17} {slug:<22} L={L}", flush=True)
 
     all_rows = []
-    for law in RADAR_TYPES:
+    for law in args.radar_types:
         results, summary = {}, {}
         for slug in METHODS:
             for L in Ls:

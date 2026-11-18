@@ -146,6 +146,8 @@ def plot(agg: pd.DataFrame, out_dir: Path, Ls) -> None:
         for j, m in enumerate(METHOD_LABELS):
             ax = axes[i, j]
             for r in RADAR_TYPES:
+                if r not in set(agg.radar_type):
+                    continue
                 color, marker = LAW_STYLE[r]
                 y = [pl.get((prof, m, r, L), np.nan) for L in Ls]
                 ax.plot(Ls, y, color=color, marker=marker, linewidth=2, markersize=8,
@@ -178,11 +180,43 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out-dir", type=Path, default=PROJECT_ROOT / "results" / "classic_1024")
     parser.add_argument("--context-lens", type=int, nargs="+", default=[96, 256, 512, 992])
+    parser.add_argument("--legacy-overview", action="store_true", help="Use the old cross-radar overview for historical results only")
     args = parser.parse_args()
     agg = aggregate(args.out_dir / "raw")
+    if not args.legacy_overview:
+        write_radar_reports(agg, args.out_dir)
+        return
     write_tables(agg, args.out_dir, args.context_lens)
     plot(agg, args.out_dir, args.context_lens)
     print((args.out_dir / "summary.md").read_text(encoding="utf-8"))
+
+
+def write_radar_reports(agg: pd.DataFrame, out_dir: Path) -> None:
+    """Keep each radar and error level separate; never average across radar laws."""
+    for law, data in agg.groupby("radar_type", sort=False):
+        target = out_dir / "by_radar" / law
+        target.mkdir(parents=True, exist_ok=True)
+        data.round(4).to_csv(target / "metrics.csv", index=False)
+        lines = [f"# Context-length comparison: {law}", "",
+                 "Each row is a separate profile, error level, method and context length. No cross-radar or cross-error averaging.", "",
+                 data.to_markdown(index=False), ""]
+        (target / "report.md").write_text("\n".join(lines), encoding="utf-8")
+        for profile, profile_data in data.groupby("profile"):
+            levels = [level for level in ERROR_LEVELS if level in set(profile_data.error_level)]
+            fig, axes = plt.subplots(2, 4, figsize=(17, 8), squeeze=False)
+            for ax, level in zip(axes.flat, levels):
+                subset = profile_data[profile_data.error_level == level]
+                for method, values in subset.groupby("method"):
+                    values = values.sort_values("context_len")
+                    ax.plot(values.context_len, values.mae_us, marker="o", label=METHOD_LABELS.get(method, method))
+                ax.set_title(level); ax.set_xlabel("Context length"); ax.set_ylabel("MAE (µs)")
+                ax.grid(alpha=.25); ax.legend(fontsize=8)
+            for ax in list(axes.flat)[len(levels):]:ax.set_visible(False)
+            fig.suptitle(f"{law}: {profile} profile")
+            fig.tight_layout()
+            fig.savefig(target / f"{profile}.png", dpi=130)
+            plt.close(fig)
+    print(f"[SAVED] Per-radar reports: {out_dir / 'by_radar'}")
 
 
 if __name__ == "__main__":

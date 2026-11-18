@@ -41,12 +41,13 @@ def audit_coverage(
     window_mode: str = "first",
     window_seed: int = WINDOW_SEED,
     window_manifest: dict | None = None,
+    datasets_root: Path = DATASETS_ROOT,
 ) -> pd.DataFrame:
     """Check every selected test split before loading model weights."""
     rows = []
     for rtype in ((radar_type,) if radar_type else RADAR_TYPES):
         for level in ((error_level,) if error_level else ERROR_LEVELS):
-            path = DATASETS_ROOT / profile_mode / rtype / f"{dataset_size}_{level}"
+            path = datasets_root / profile_mode / rtype / f"{dataset_size}_{level}"
             loaded = load_split(path, "test", target_param, context_len, horizon_len, max_test_seqs,
                                 window_mode, window_seed, window_manifest)
             rows.append({
@@ -166,6 +167,7 @@ def run_evaluation(
     window_mode: str = "first",
     window_seed: int = WINDOW_SEED,
     window_manifest: dict | None = None,
+    datasets_root: Path = DATASETS_ROOT,
 ) -> pd.DataFrame:
     if target_param not in (*CHANNELS, "multivariate"):
         raise ValueError(f"Unknown target parameter: {target_param}")
@@ -182,7 +184,7 @@ def run_evaluation(
     radar_types = (radar_type,) if radar_type else RADAR_TYPES
     error_levels = (error_level,) if error_level else ERROR_LEVELS
     selected = [
-        (rtype, level, DATASETS_ROOT / profile_mode / rtype / f"{dataset_size}_{level}")
+        (rtype, level, datasets_root / profile_mode / rtype / f"{dataset_size}_{level}")
         for rtype in radar_types
         for level in error_levels
     ]
@@ -229,6 +231,7 @@ def main() -> None:
     parser.add_argument("--profile-mode", choices=("fixed", "varying"), default="fixed")
     parser.add_argument("--target-param", choices=(*CHANNELS, "multivariate", "all"), default="PRI")
     parser.add_argument("--dataset-size", default="1000x128")
+    parser.add_argument("--datasets-root", type=Path, default=DATASETS_ROOT)
     parser.add_argument("--context-len", type=int, default=96)
     parser.add_argument("--horizon", type=int, default=32)
     parser.add_argument("--window-mode", choices=WINDOW_MODES, default="first")
@@ -258,7 +261,7 @@ def main() -> None:
     coverage = audit_coverage(
         args.profile_mode, tasks[0], args.dataset_size, args.context_len,
         args.horizon, args.max_test_seqs, args.radar_type, args.error_level,
-        args.window_mode, args.window_seed, manifest,
+        args.window_mode, args.window_seed, manifest, args.datasets_root,
     )
     print(coverage.to_string(index=False))
     if args.coverage_only:
@@ -270,6 +273,8 @@ def main() -> None:
     regime = "lora_sft" if args.weights_dir else "zero_shot"
     tag = experiment_tag(args.dataset_size, args.window_mode, args.context_len,
                          args.horizon, args.window_seed)
+    if args.datasets_root.resolve() != DATASETS_ROOT.resolve():
+        tag = args.datasets_root.parent.name + "_" + tag
     scope = []
     if args.radar_type:
         scope.append(args.radar_type)
@@ -282,7 +287,8 @@ def main() -> None:
     for task in tasks:
         mode = f"multivariate_{args.profile_mode}" if task == "multivariate" else f"univariate_{args.profile_mode}/{task.lower()}"
         legacy = (args.dataset_size == "1000x128" and args.window_mode == "first"
-                  and args.context_len == 96 and args.horizon == 32 and not args.clean_context)
+                  and args.context_len == 96 and args.horizon == 32 and not args.clean_context
+                  and args.datasets_root.resolve() == DATASETS_ROOT.resolve())
         result_dir = RESULTS_ROOT / regime / mode
         if not legacy:
             result_dir = result_dir / (tag + ("_cleaned" if args.clean_context else ""))
@@ -292,6 +298,7 @@ def main() -> None:
             result_dir, args.radar_type, args.error_level,
             not args.no_plots, clean_context=args.clean_context,
             window_mode=args.window_mode, window_seed=args.window_seed, window_manifest=manifest,
+            datasets_root=args.datasets_root,
         )
 
 

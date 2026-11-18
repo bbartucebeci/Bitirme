@@ -14,7 +14,8 @@ class Radar:
                  pw_mean: float = 1.0, amp_mean: float = -50.0, aoa_mean: float = 90.0,
                  scan_period: float = 0.0, aoa_drift_rate: float = 0.0, stretch_pw_on_multipath: bool = False,
                  clock_bias: Optional[float] = None, clock_offset: Optional[float] = None, clock_drift: Optional[float] = None,
-                 jitter_k: Optional[float] = None, jitter_std: Optional[float] = None, **kwargs):
+                 jitter_k: Optional[float] = None, jitter_std: Optional[float] = None,
+                 pattern_phase: int = 0, **kwargs):
         """
         Base Radar Class.
         :param pw_mean: Pulse width in microseconds.
@@ -42,6 +43,7 @@ class Radar:
         self.scan_period = scan_period
         self.scan_phase = np.random.uniform(0, 360.0) if scan_period > 0 else 0.0
         self.aoa_drift_rate = aoa_drift_rate
+        self.pattern_phase = int(pattern_phase)
         self.clock_bias = getattr(self, "clock_bias", 0.0)
         self.clock_offset = getattr(self, "clock_offset", 0.0)
         self.clock_drift = getattr(self, "clock_drift", 0.0)
@@ -302,13 +304,16 @@ class StaggerRadar(Radar):
         super().__init__(radar_id, freq_mean, **kwargs)
         self.stagger_pris = stagger_pris
 
+    def source_pris(self, count: int) -> np.ndarray:
+        pattern = np.asarray(self.stagger_pris, dtype=float)
+        return pattern[(np.arange(count) + self.pattern_phase) % len(pattern)]
+
     def generate_pdws(self, duration: float, start_time: float = 0.0, 
                       toa_noise_std: float = 0.0, freq_noise_std: float = 0.0,
                       pw_noise_std: float = 0.1, amp_noise_std: float = 2.0, aoa_noise_std: float = 1.0) -> pd.DataFrame:
         avg_pri = np.mean(self.stagger_pris)
         num_pulses_est = int(np.ceil(duration / avg_pri)) + len(self.stagger_pris)
-        cycles = np.tile(self.stagger_pris, int(np.ceil(num_pulses_est / len(self.stagger_pris))))
-        pris = cycles[:num_pulses_est]
+        pris = self.source_pris(num_pulses_est)
         toas = start_time + np.cumsum(pris) - pris[0]
         return self._finalize_df(toas, pris, duration, start_time, toa_noise_std, freq_noise_std, pw_noise_std, amp_noise_std, aoa_noise_std)
 
@@ -325,19 +330,17 @@ class DwellAndSwitchRadar(Radar):
         self.dwell_pris = dwell_pris
         self.pulses_per_dwell = pulses_per_dwell
 
+    def source_pris(self, count: int) -> np.ndarray:
+        pattern = np.repeat(np.asarray(self.dwell_pris, dtype=float), self.pulses_per_dwell)
+        return pattern[(np.arange(count) + self.pattern_phase) % len(pattern)]
+
     def generate_pdws(self, duration: float, start_time: float = 0.0, 
                       toa_noise_std: float = 0.0, freq_noise_std: float = 0.0,
                       pw_noise_std: float = 0.1, amp_noise_std: float = 2.0, aoa_noise_std: float = 1.0) -> pd.DataFrame:
         avg_pri = np.mean(self.dwell_pris)
         num_pulses_est = int(np.ceil(duration / avg_pri)) + self.pulses_per_dwell * len(self.dwell_pris)
         
-        # Create dwell pattern
-        pattern = []
-        for pri in self.dwell_pris:
-            pattern.extend([pri] * self.pulses_per_dwell)
-            
-        cycles = np.tile(pattern, int(np.ceil(num_pulses_est / len(pattern))))
-        pris = cycles[:num_pulses_est]
+        pris = self.source_pris(num_pulses_est)
         toas = start_time + np.cumsum(pris) - pris[0]
         return self._finalize_df(toas, pris, duration, start_time, toa_noise_std, freq_noise_std, pw_noise_std, amp_noise_std, aoa_noise_std)
 
@@ -355,16 +358,100 @@ class SlidingRadar(Radar):
         self.pri_end = pri_end
         self.pulses_per_slide = pulses_per_slide
 
+    def source_pris(self, count: int) -> np.ndarray:
+        pattern = np.linspace(self.pri_start, self.pri_end, self.pulses_per_slide)
+        return pattern[(np.arange(count) + self.pattern_phase) % len(pattern)]
+
     def generate_pdws(self, duration: float, start_time: float = 0.0, 
                       toa_noise_std: float = 0.0, freq_noise_std: float = 0.0,
                       pw_noise_std: float = 0.1, amp_noise_std: float = 2.0, aoa_noise_std: float = 1.0) -> pd.DataFrame:
         avg_pri = min(self.pri_start, self.pri_end)
         num_pulses_est = int(np.ceil(duration / avg_pri)) + self.pulses_per_slide
-        slide_pattern = np.linspace(self.pri_start, self.pri_end, self.pulses_per_slide)
-        cycles = np.tile(slide_pattern, int(np.ceil(num_pulses_est / self.pulses_per_slide)))
-        pris = cycles[:num_pulses_est]
+        pris = self.source_pris(num_pulses_est)
         toas = start_time + np.cumsum(pris) - pris[0]
         return self._finalize_df(toas, pris, duration, start_time, toa_noise_std, freq_noise_std, pw_noise_std, amp_noise_std, aoa_noise_std)
+
+
+# ---------------------------------------------------------------------------
+class SourceLawRadar(Radar):
+    """New source laws enter the existing clock/POI/receiver pipeline unchanged.
+
+    These new types use the base Radar clock defaults (zero). Existing classes'
+    clock settings and the shared clock function are not changed.
+    """
+
+    def generate_pdws(self, duration: float, start_time: float = 0.0,
+                      toa_noise_std: float = 0.0, freq_noise_std: float = 0.0,
+                      pw_noise_std: float = 0.1, amp_noise_std: float = 2.0,
+                      aoa_noise_std: float = 1.0) -> pd.DataFrame:
+        # The lower bound guarantees sufficient source events, at any phase/state.
+        count = int(np.ceil(duration / self.minimum_pri)) + 2
+        pris = self.source_pris(count)
+        toas = start_time + np.cumsum(pris) - pris[0]
+        return self._finalize_df(toas, pris, duration, start_time, toa_noise_std,
+                                 freq_noise_std, pw_noise_std, amp_noise_std, aoa_noise_std)
+
+
+class SinusoidalRadar(SourceLawRadar):
+    def __init__(self, radar_id: str, pri_mean: float, amplitude: float,
+                 period: float, freq_mean: float, phase_rad: float = 0.0, **kwargs):
+        super().__init__(radar_id, freq_mean, **kwargs)
+        if not 0 < amplitude < pri_mean or not np.isfinite(period) or period <= 0:
+            raise ValueError("Sinusoidal PRI requires 0 < amplitude < mean and positive finite period")
+        self.pri_mean, self.amplitude, self.period = pri_mean, amplitude, period
+        self.phase_rad = phase_rad
+        self.minimum_pri = pri_mean - amplitude
+
+    def source_pris(self, count: int) -> np.ndarray:
+        return self.pri_mean + self.amplitude * np.sin(2 * np.pi * np.arange(count) / self.period + self.phase_rad)
+
+
+class TriangularSlidingRadar(SourceLawRadar):
+    def __init__(self, radar_id: str, pri_min: float, pri_max: float,
+                 freq_mean: float, steps_per_leg: int = 10, **kwargs):
+        super().__init__(radar_id, freq_mean, **kwargs)
+        if not 0 < pri_min < pri_max or steps_per_leg < 1:
+            raise ValueError("Triangular PRI requires positive ordered bounds and positive steps")
+        self.minimum_pri = pri_min
+        self.pattern = np.r_[np.linspace(pri_min, pri_max, steps_per_leg, endpoint=False),
+                             np.linspace(pri_max, pri_min, steps_per_leg, endpoint=False)]
+
+    def source_pris(self, count: int) -> np.ndarray:
+        return self.pattern[(np.arange(count) + self.pattern_phase) % len(self.pattern)]
+
+
+class MarkovAgileRadar(SourceLawRadar):
+    """Four PRI states with an explicit row-current / column-next transition matrix."""
+
+    def __init__(self, radar_id: str, pri_levels: List[float], freq_mean: float,
+                 transition_matrix: Optional[List[List[float]]] = None, initial_state: int = 0,
+                 source_seed: int = 0, **kwargs):
+        super().__init__(radar_id, freq_mean, **kwargs)
+        self.levels = np.asarray(pri_levels, dtype=float)
+        if transition_matrix is None:
+            transition_matrix = [[.7 if j == (i + 1) % 4 else .1 for j in range(4)] for i in range(4)]
+        self.transition_matrix = np.asarray(transition_matrix, dtype=float)
+        if (len(self.levels) != 4 or not np.isfinite(self.levels).all() or
+                (self.levels <= 0).any() or self.transition_matrix.shape != (4, 4) or
+                not np.isfinite(self.transition_matrix).all() or (self.transition_matrix < 0).any() or
+                not np.allclose(self.transition_matrix.sum(axis=1), 1.0, rtol=0, atol=1e-12) or
+                not np.allclose(self.transition_matrix.sum(axis=0), 1.0, rtol=0, atol=1e-12) or
+                not 0 <= initial_state < len(self.levels)):
+            raise ValueError("Invalid Markov levels, transition probabilities or initial state")
+        self.initial_state, self.source_seed = initial_state, source_seed
+        self.minimum_pri = float(self.levels.min())
+
+    def source_pris(self, count: int) -> np.ndarray:
+        # Reconstruct the same source prefix if the capture duration is retried.
+        rng = np.random.default_rng(self.source_seed)
+        states = np.empty(count, dtype=int)
+        if count:
+            states[0] = self.initial_state
+            cumulative = np.cumsum(self.transition_matrix, axis=1)
+            cumulative[:, -1] = 1.0
+            for i, draw in enumerate(rng.random(count - 1), start=1):
+                states[i] = np.searchsorted(cumulative[states[i - 1]], draw, side="right")
+        return self.levels[states]
 
 
 # ---------------------------------------------------------------------------

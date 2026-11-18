@@ -5,6 +5,8 @@ simultaneously on 20 fixed single-radar datasets (4,000 test sequences total).
 """
 
 from __future__ import annotations
+
+from dataset_generator.catalog import RADAR_TYPES as BENCHMARK_RADAR_TYPES, ERROR_LEVELS as BENCHMARK_ERROR_LEVELS, check_dataset_selection
 import argparse
 from pathlib import Path
 import time
@@ -183,6 +185,8 @@ def export_multivariate_benchmark_results(
 def main():
     parser = argparse.ArgumentParser(description="PULSAR: TimesFM 3.0 Joint 5-Channel Multivariate Evaluation")
     parser.add_argument("--profile-mode", choices=["fixed", "varying"], default="fixed")
+    parser.add_argument("--datasets-root", type=Path, default=DEFAULT_DATASETS_ROOT, help="Root containing fixed/ and varying/")
+    parser.add_argument("--dataset-size", default="1000x128")
     parser.add_argument("--weights-dir", type=Path, default=None, help="Path to LoRA checkpoint directory")
     parser.add_argument("--context-len", type=int, default=96)
     parser.add_argument("--horizon", type=int, default=32)
@@ -190,9 +194,15 @@ def main():
     parser.add_argument("--no-plots", action="store_true")
 
     args = parser.parse_args()
+    selected_radars = BENCHMARK_RADAR_TYPES if getattr(args, "radar_type", "all") == "all" else (args.radar_type,)
+    selected_levels = BENCHMARK_ERROR_LEVELS if getattr(args, "error_level", "all") == "all" else (args.error_level,)
+    check_dataset_selection(args.datasets_root, args.profile_mode, args.dataset_size, selected_radars, selected_levels)
+
 
     regime = "lora_sft" if args.weights_dir else "zero_shot"
     output_dir = DEFAULT_RESULTS_ROOT / regime / f"multivariate_{args.profile_mode}"
+    if args.datasets_root.resolve() != DEFAULT_DATASETS_ROOT.resolve() or args.dataset_size != "1000x128":
+        output_dir = output_dir / (args.datasets_root.parent.name + "_" + args.dataset_size)
     plots_dir = None if args.no_plots else output_dir / "plots"
 
     print("=" * 80)
@@ -205,16 +215,16 @@ def main():
 
     tfm = TimesFMLoRAEngine.load_for_inference(weights_dir=args.weights_dir)
 
-    datasets_root = DEFAULT_DATASETS_ROOT / args.profile_mode
-    radar_types = ["stable", "jitter", "stagger", "dwell_and_switch", "sliding"]
-    error_levels = ["clean", "error_lv1", "error_lv2", "error_lv3"]
+    datasets_root = args.datasets_root / args.profile_mode
+    radar_types = list(BENCHMARK_RADAR_TYPES)
+    error_levels = list(BENCHMARK_ERROR_LEVELS)
 
     results = []
     t_start = time.time()
 
     for rtype in radar_types:
         for elevel in error_levels:
-            folder_name = f"1000x128_{elevel}"
+            folder_name = f"{args.dataset_size}_{elevel}"
             dataset_dir = datasets_root / rtype / folder_name
             dataset_display = f"{rtype}/{folder_name}"
 

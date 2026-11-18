@@ -34,11 +34,12 @@ def _load_training_split(
     error_levels: tuple[str, ...],
     window_mode: str = "first",
     window_seed: int = WINDOW_SEED,
+    datasets_root: Path = DATASETS_ROOT,
 ) -> list[np.ndarray]:
     all_series = []
     for radar_type in radar_types:
         for error_level in error_levels:
-            dataset_dir = DATASETS_ROOT / profile_mode / radar_type / f"{dataset_size}_{error_level}"
+            dataset_dir = datasets_root / profile_mode / radar_type / f"{dataset_size}_{error_level}"
             loaded = load_split(dataset_dir, split, target_param, context_len, horizon_len, limit,
                                 window_mode, window_seed)
             print(f"[DATA] {split} {profile_mode}/{radar_type}/{error_level}: "
@@ -56,6 +57,7 @@ def main() -> None:
     parser.add_argument("--profile-mode", choices=("fixed", "varying"), default="fixed")
     parser.add_argument("--target-param", choices=(*CHANNELS, "multivariate"), default="PRI")
     parser.add_argument("--dataset-size", default="1000x128")
+    parser.add_argument("--datasets-root", type=Path, default=DATASETS_ROOT)
     parser.add_argument("--context-len", type=int, default=96)
     parser.add_argument("--horizon", type=int, default=32)
     parser.add_argument("--window-mode", choices=WINDOW_MODES, default="first")
@@ -106,21 +108,26 @@ def main() -> None:
         args.context_len, args.horizon, args.max_train_seqs_per_dataset,
         radar_types, error_levels,
         args.window_mode, args.window_seed,
+        datasets_root=args.datasets_root,
     )
     val_series = _load_training_split(
         args.profile_mode, args.dataset_size, "val", args.target_param,
         args.context_len, args.horizon, args.max_val_seqs_per_dataset,
         radar_types, error_levels,
         args.window_mode, args.window_seed,
+        datasets_root=args.datasets_root,
     )
     steps = args.steps or args.epochs * math.ceil(len(train_series) / args.batch_size)
     print(f"[DATA] {len(train_series)} train, {len(val_series)} validation sequences; {steps} steps")
 
     output_dir = PROJECT_ROOT / "models" / "lora_sft" / "chronos2" / args.profile_mode / args.target_param.lower()
     legacy = (args.dataset_size == "1000x128" and args.window_mode == "first"
-              and args.context_len == 96 and args.horizon == 32)
+              and args.context_len == 96 and args.horizon == 32
+              and args.datasets_root.resolve() == DATASETS_ROOT.resolve())
     tag = experiment_tag(args.dataset_size, args.window_mode, args.context_len,
                          args.horizon, args.window_seed)
+    if args.datasets_root.resolve() != DATASETS_ROOT.resolve():
+        tag = args.datasets_root.parent.name + "_" + tag
     scope = []
     if args.radar_type:
         scope.append(args.radar_type)
@@ -171,6 +178,7 @@ def main() -> None:
             result_dir, args.radar_type, args.error_level,
             not args.no_plots,
             window_mode=args.window_mode, window_seed=args.window_seed, window_manifest=manifest,
+            datasets_root=args.datasets_root,
         )
 
 

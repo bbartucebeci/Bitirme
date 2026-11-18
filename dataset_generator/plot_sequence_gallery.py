@@ -1,9 +1,4 @@
-"""Plot 40 independent single-radar test sequences across the benchmark matrix.
-
-Each of the five measured parameters gets one fixed-profile and one
-varying-profile figure. The dataset CSVs are read without modification.
-"""
-
+"""Read-only galleries: one radar/profile/channel per figure, all selected error levels."""
 from __future__ import annotations
 
 import argparse
@@ -11,18 +6,16 @@ import json
 from pathlib import Path
 
 import matplotlib
-
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.ticker import MaxNLocator
 import numpy as np
 import pandas as pd
+import yaml
 
+from dataset_generator.catalog import RADAR_TYPES, ERROR_LEVELS
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-RADAR_TYPES = ("stable", "jitter", "stagger", "dwell_and_switch", "sliding")
-ERROR_LEVELS = ("clean", "error_lv1", "error_lv2", "error_lv3")
 PROFILES = ("fixed", "varying")
 CHANNELS = (
     ("PRI", "Measured_Delta_TOA", "Interval (µs)"),
@@ -31,137 +24,113 @@ CHANNELS = (
     ("Amplitude", "Amplitude", "Amplitude (dBm)"),
     ("AOA", "AOA", "AOA (degrees)"),
 )
-MIN_AXIS_SPAN = {"PRI": 10.0, "Frequency": 2.0, "PW": 0.05, "Amplitude": 1.0, "AOA": 2.0}
+MIN_AXIS_SPAN = {"PRI":10., "Frequency":2., "PW":.05, "Amplitude":1., "AOA":2.}
 
 
-def load_sequence(path: Path, pulse_count: int) -> pd.DataFrame:
-    if not path.is_file():
-        raise FileNotFoundError(path)
+def load_sequence(path: Path, pulse_count: int, start: int = 0) -> pd.DataFrame:
+    if pulse_count <= 0 or start < 0:
+        raise ValueError("Pulse count must be positive and start nonnegative")
     frame = pd.read_csv(path).sort_values("pulse_index").reset_index(drop=True)
     required = {"Radar_ID", "PRI", "Measured_Delta_TOA", "pulse_index", *(item[1] for item in CHANNELS)}
-    missing = required - set(frame.columns)
-    if missing:
-        raise ValueError(f"{path}: missing columns {sorted(missing)}")
-    # Match the forecasting loader's treatment of the 129-row captures.
-    if len(frame) == 129 and float(frame.loc[0, "Measured_Delta_TOA"]) == 0.0:
-        frame = frame.iloc[1:].reset_index(drop=True)
-    if len(frame) < pulse_count:
-        raise ValueError(f"{path}: only {len(frame)} observed pulses after anchor removal")
-    return frame.iloc[:pulse_count].copy()
+    if required - set(frame.columns):
+        raise ValueError(f"{path}: missing columns {sorted(required-set(frame.columns))}")
+    # Match forecasting loaders at any length, including 1025-row captures.
+    if len(frame)>1 and float(frame.loc[0,"Measured_Delta_TOA"])==0.:
+        frame=frame.iloc[1:].reset_index(drop=True)
+    if len(frame)<start+pulse_count:
+        raise ValueError(f"{path}: requested [{start}:{start+pulse_count}], only {len(frame)} intervals after anchor removal")
+    frame=frame.iloc[start:start+pulse_count].copy()
+    if not np.isfinite(frame[["PRI",*(item[1] for item in CHANNELS)]].to_numpy(dtype=float)).all():
+        raise ValueError(f"{path}: non-finite plot values")
+    return frame
 
 
-def plot_profile(
-    profile: str,
-    channel: str,
-    value_column: str,
-    unit_label: str,
-    selected: dict[tuple[str, str, str], tuple[str, pd.DataFrame]],
-    output_dir: Path,
-    dpi: int,
-) -> Path:
-    fig, axes = plt.subplots(4, 5, figsize=(18, 11.2), sharex=True)
-    for row, level in enumerate(ERROR_LEVELS):
-        for col, radar in enumerate(RADAR_TYPES):
-            axis = axes[row, col]
-            sequence_id, frame = selected[(profile, radar, level)]
-            x = np.arange(1, len(frame) + 1)
-            genuine = frame["Radar_ID"].eq("R_SINGLE").to_numpy()
-            values = frame[value_column].to_numpy(dtype=float)
-            axis.plot(x, values, color="#1775a5", linewidth=1.15, marker=".", markersize=2.2)
-            if channel == "PRI":
-                source_pri = frame["PRI"].to_numpy(dtype=float)
-                axis.plot(
-                    x, np.where(genuine, source_pri, np.nan),
-                    color="#e27929", linewidth=1.1, linestyle="--",
-                )
-            if (~genuine).any():
-                axis.scatter(
-                    x[~genuine], values[~genuine], color="#b51f37",
-                    marker="x", s=18, linewidth=1.2, zorder=3,
-                )
-            lower = float(np.nanmin(values))
-            upper = float(np.nanmax(values))
-            if not np.isfinite((lower, upper)).all():
-                raise ValueError(f"{profile}/{radar}/{level}/{channel}: non-finite plotted range")
-            if upper - lower < MIN_AXIS_SPAN[channel]:
-                center = (lower + upper) / 2
-                half_span = MIN_AXIS_SPAN[channel] / 2
-                axis.set_ylim(center - half_span, center + half_span)
-            axis.ticklabel_format(axis="y", style="plain", useOffset=False)
-            axis.yaxis.set_major_locator(MaxNLocator(nbins=4))
-            axis.text(
-                0.03, 0.95, sequence_id, transform=axis.transAxes,
-                ha="left", va="top", fontsize=7,
-                bbox={"facecolor": "white", "alpha": 0.8, "edgecolor": "none", "pad": 1.5},
-            )
-            axis.grid(alpha=0.18)
-            axis.tick_params(labelsize=7)
-            if row == 0:
-                axis.set_title(radar.replace("_", " "), fontsize=10)
-            if col == 0:
-                axis.set_ylabel(f"{level}\n{unit_label}", fontsize=8)
-            if row == len(ERROR_LEVELS) - 1:
-                axis.set_xlabel("Observed pulse position", fontsize=8)
-
-    observed_label = "Observed ΔTOA" if channel == "PRI" else f"Recorded {channel}"
-    handles = [Line2D([0], [0], color="#1775a5", linewidth=1.5, label=observed_label)]
-    if channel == "PRI":
-        handles.append(Line2D([0], [0], color="#e27929", linestyle="--", label="Source PRI (genuine pulses)"))
-    handles.append(Line2D([0], [0], color="#b51f37", marker="x", linestyle="None", label="Non-emitter pulse"))
-    fig.suptitle(f"{profile.title()} profile · {channel} · 20 distinct test sequences", fontsize=16, y=0.99)
-    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.965), ncol=len(handles), frameon=False)
-    fig.text(0.5, 0.92, "Each panel has its own vertical scale; the initial timing anchor is excluded.",
-             ha="center", fontsize=9)
-    fig.subplots_adjust(left=0.075, right=0.99, top=0.865, bottom=0.07, hspace=0.35, wspace=0.31)
-    output_path = output_dir / f"{profile}_{channel.lower()}.png"
-    fig.savefig(output_path, dpi=dpi)
-    plt.close(fig)
-    return output_path
+def plot_profile(profile,radar,channel,value_column,unit_label,selected,levels,output_dir,dpi):
+    columns=min(4,len(levels)); rows=(len(levels)+columns-1)//columns
+    fig,axes=plt.subplots(rows,columns,figsize=(4.8*columns,3.6*rows),sharex=True,squeeze=False)
+    has_non_emitter=False
+    for axis,level in zip(axes.flat,levels):
+        sequence_id,frame=selected[(profile,radar,level)]
+        x=frame.pulse_index.to_numpy(); genuine=frame.Radar_ID.eq("R_SINGLE").to_numpy()
+        values=frame[value_column].to_numpy(dtype=float)
+        axis.plot(x,values,color="#1775a5",linewidth=1.,marker=".",markersize=1.8)
+        bounds=values
+        if channel=="PRI":
+            source=frame.PRI.to_numpy(dtype=float)
+            axis.plot(x,np.where(genuine,source,np.nan),color="#e27929",linewidth=1.1,linestyle="--")
+            bounds=np.r_[values,source[genuine]]
+        if (~genuine).any():
+            has_non_emitter=True
+            axis.scatter(x[~genuine],values[~genuine],color="#b51f37",marker="x",s=18,zorder=3)
+        lower,upper=float(np.min(bounds)),float(np.max(bounds))
+        if upper-lower<MIN_AXIS_SPAN[channel]:
+            center=(lower+upper)/2; half=MIN_AXIS_SPAN[channel]/2
+            axis.set_ylim(center-half,center+half)
+        axis.ticklabel_format(axis="y",style="plain",useOffset=False)
+        axis.yaxis.set_major_locator(MaxNLocator(nbins=5))
+        axis.set_title(f"{level} · {sequence_id}",fontsize=11)
+        axis.set_xlabel("Observed pulse index (anchor excluded)",fontsize=9)
+        axis.set_ylabel(unit_label,fontsize=9)
+        axis.grid(alpha=.18); axis.tick_params(labelsize=8)
+    for axis in list(axes.flat)[len(levels):]:axis.set_visible(False)
+    observed="Observed ΔTOA" if channel=="PRI" else f"Recorded {channel}"
+    handles=[Line2D([0],[0],color="#1775a5",label=observed)]
+    if channel=="PRI":handles.append(Line2D([0],[0],color="#e27929",linestyle="--",label="Source PRI at retained pulses"))
+    if has_non_emitter:handles.append(Line2D([0],[0],color="#b51f37",marker="x",linestyle="None",label="Non-emitter pulse"))
+    fig.suptitle(f"{radar.replace('_',' ')} · {profile} profile · {channel}",fontsize=16,y=.99)
+    fig.legend(handles=handles,loc="upper center",bbox_to_anchor=(.5,.95),ncol=len(handles),frameon=False)
+    fig.text(.5,.895,"Each error-level panel has its own vertical scale.",ha="center",fontsize=9)
+    fig.tight_layout(rect=(0,0,1,.855))
+    destination=output_dir/radar/f"{profile}_{channel.lower()}.png"
+    destination.parent.mkdir(parents=True,exist_ok=True)
+    fig.savefig(destination,dpi=dpi); plt.close(fig)
+    return destination
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset-size", default="1000x128")
-    parser.add_argument("--first-test-id", type=int, default=800)
-    parser.add_argument("--pulses", type=int, default=128)
-    parser.add_argument("--dpi", type=int, default=160)
-    parser.add_argument("--output-dir", type=Path, default=PROJECT_ROOT / "results" / "dataset_gallery")
-    args = parser.parse_args()
-    if args.first_test_id < 0 or args.pulses <= 0 or args.dpi <= 0:
-        parser.error("first test ID must be nonnegative; pulses and dpi must be positive")
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--datasets-root",type=Path,required=True,help="Directory containing fixed/ and varying/")
+    parser.add_argument("--dataset-size",default="1000x1024")
+    parser.add_argument("--profiles",nargs="+",choices=PROFILES,default=PROFILES)
+    parser.add_argument("--radar-types",nargs="+",choices=RADAR_TYPES,default=RADAR_TYPES)
+    parser.add_argument("--error-levels",nargs="+",choices=ERROR_LEVELS,default=ERROR_LEVELS)
+    parser.add_argument("--channels",nargs="+",choices=[item[0] for item in CHANNELS],default=[item[0] for item in CHANNELS])
+    parser.add_argument("--first-test-id",type=int,help="Same sequence ID in every condition; default: first test ID from metadata")
+    parser.add_argument("--pulses",type=int,default=1024)
+    parser.add_argument("--start",type=int,default=0,help="Zero-based start after dropping the anchor")
+    parser.add_argument("--dpi",type=int,default=160)
+    parser.add_argument("--output-dir",type=Path,required=True,help="New gallery directory; input CSVs are never modified")
+    args=parser.parse_args()
+    if args.first_test_id is not None and args.first_test_id<0:parser.error("Test ID must be nonnegative")
+    if args.pulses<=0 or args.start<0 or args.dpi<=0:parser.error("Pulses/dpi must be positive; start nonnegative")
+    if args.output_dir.exists() and any(args.output_dir.iterdir()):parser.error(f"Output directory is not empty: {args.output_dir}")
+    selected,manifest={},[]
+    # Validate all inputs before creating output; never invoke dataset generation.
+    for profile in args.profiles:
+        for radar in args.radar_types:
+            for level in args.error_levels:
+                folder=args.datasets_root/profile/radar/f"{args.dataset_size}_{level}"
+                with (folder/"metadata.yaml").open(encoding="utf-8") as handle:metadata=yaml.safe_load(handle)
+                first=metadata["split"]["train"]["sequence_count"]+metadata["split"]["val"]["sequence_count"]
+                sid=args.first_test_id if args.first_test_id is not None else first
+                if not first<=sid<first+metadata["split"]["test"]["sequence_count"]:raise ValueError(f"{folder}: seq_{sid:04d} is not in the test split")
+                if (metadata["radar_type"],metadata["profile_mode"],metadata["error_level"])!=(radar,profile,level):raise ValueError(f"{folder}: metadata identity mismatch")
+                if args.start+args.pulses>metadata["expected_pulses_per_sequence"]:raise ValueError(f"{folder}: window exceeds metadata length")
+                sequence_id=f"seq_{sid:04d}"; path=folder/"test"/f"{sequence_id}.csv"
+                frame=load_sequence(path,args.pulses,args.start)
+                selected[(profile,radar,level)]=(sequence_id,frame)
+                manifest.append({"profile":profile,"radar_type":radar,"error_level":level,"sequence_id":sequence_id,
+                                 "source_csv":str(path.resolve()),"start_after_anchor":args.start,"plotted_intervals":len(frame)})
+    args.output_dir.mkdir(parents=True,exist_ok=True)
+    count=0
+    for profile in args.profiles:
+        for radar in args.radar_types:
+            for channel,column,unit in CHANNELS:
+                if channel in args.channels:
+                    path=plot_profile(profile,radar,channel,column,unit,selected,tuple(args.error_levels),args.output_dir,args.dpi)
+                    count+=1; print(f"[SAVED] {path}")
+    (args.output_dir/"selection.json").write_text(json.dumps(manifest,indent=2)+"\n",encoding="utf-8")
+    print(f"[DONE] {count} figures from {len(manifest)} selected captures; input CSVs unchanged")
 
-    selected: dict[tuple[str, str, str], tuple[str, pd.DataFrame]] = {}
-    manifest = []
-    for profile in PROFILES:
-        for level in ERROR_LEVELS:
-            for radar in RADAR_TYPES:
-                sequence_id = f"seq_{args.first_test_id + len(manifest):04d}"
-                relative_path = (
-                    Path("datasets") / "single_radar" / profile / radar
-                    / f"{args.dataset_size}_{level}" / "test" / f"{sequence_id}.csv"
-                )
-                frame = load_sequence(PROJECT_ROOT / relative_path, args.pulses)
-                selected[(profile, radar, level)] = (sequence_id, frame)
-                manifest.append({
-                    "profile": profile,
-                    "radar_type": radar,
-                    "error_level": level,
-                    "sequence_id": sequence_id,
-                    "source_csv": relative_path.as_posix(),
-                    "plotted_pulses": len(frame),
-                    "genuine_pulses": int(frame["Radar_ID"].eq("R_SINGLE").sum()),
-                    "non_emitter_pulses": int(frame["Radar_ID"].ne("R_SINGLE").sum()),
-                })
 
-    args.output_dir.mkdir(parents=True, exist_ok=True)
-    for profile in PROFILES:
-        for channel, value_column, unit_label in CHANNELS:
-            path = plot_profile(profile, channel, value_column, unit_label, selected, args.output_dir, args.dpi)
-            print(f"[SAVED] {path}")
-    manifest_path = args.output_dir / "selection.json"
-    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-    print(f"[SAVED] {manifest_path} ({len(manifest)} distinct sequences)")
-
-
-if __name__ == "__main__":
-    main()
+if __name__=="__main__":main()

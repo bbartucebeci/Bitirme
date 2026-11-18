@@ -44,6 +44,7 @@ from classic_methods.common import (
     load_window_manifest,
     window_key,
 )
+from foundation_models.common.windowing import file_sha256
 
 METHOD_SLUGS = ["kalman_filter", "exponential_smoothing", "arima"]
 # Rough relative cost, used only to start the slowest jobs first.
@@ -69,14 +70,18 @@ def _init_worker(manifest_path: str):
     _WINDOWS = load_window_manifest(Path(manifest_path))
 
 
-def run_job(slug, profile, rtype, level, L, H, dataset_size, max_test_seqs, out_csv):
+def run_job(slug, profile, rtype, level, L, H, dataset_size, max_test_seqs, out_csv, datasets_root=DEFAULT_DATASETS_ROOT):
     fn = _predict_fn(slug)
     tol = PARAM_SPECS["PRI"]["default_tol"]
-    ddir = DEFAULT_DATASETS_ROOT / profile / rtype / f"{dataset_size}_{level}"
+    ddir = Path(datasets_root) / profile / rtype / f"{dataset_size}_{level}"
     seqs = load_dataset_sequences(ddir, split="test", max_seqs=max_test_seqs, target_param="PRI")
     rows = []
     t_job = time.perf_counter()
     for seq_id, ctx_vals, tgt_vals, mask_vals in seqs:
+        if "sequence_sha256" in _WINDOWS:
+            sequence_key = f"{profile}/{rtype}/{level}/{seq_id}"
+            if _WINDOWS["sequence_sha256"].get(sequence_key) != file_sha256(ddir / "test" / f"{seq_id}.csv"):
+                raise ValueError(f"{sequence_key}: test CSV differs from the window manifest")
         if len(ctx_vals) <= H + 8:
             continue
         start = int(_WINDOWS["windows"][window_key(profile, rtype, level, seq_id, L)])
@@ -107,11 +112,14 @@ def main():
     parser.add_argument("--context-lens", type=int, nargs="+", default=[96, 256, 512, 992])
     parser.add_argument("--horizon", type=int, default=32)
     parser.add_argument("--dataset-size", default=DEFAULT_DATASET_SIZE)
+    parser.add_argument("--datasets-root", type=Path, default=DEFAULT_DATASETS_ROOT)
     parser.add_argument("--max-test-seqs", type=int, default=200)
     parser.add_argument("--window-manifest", type=Path, default=PROJECT_ROOT / "results" / "windows_1024.json")
     parser.add_argument("--out-dir", type=Path, default=PROJECT_ROOT / "results" / "classic_1024")
     parser.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 2))
     args = parser.parse_args()
+    if args.datasets_root.resolve() != DEFAULT_DATASETS_ROOT.resolve() and args.out_dir == PROJECT_ROOT / "results" / "classic_1024":
+        args.out_dir = args.out_dir / args.datasets_root.parent.name
 
     meta = load_window_manifest(args.window_manifest)["meta"]
     assert int(meta["horizon_len"]) == args.horizon, "manifest horizon mismatch"
@@ -134,7 +142,7 @@ def main():
     with ProcessPoolExecutor(max_workers=args.workers, initializer=_init_worker,
                              initargs=(str(args.window_manifest),)) as ex:
         futs = [ex.submit(run_job, slug, prof, rtype, level, L, args.horizon, args.dataset_size,
-                          args.max_test_seqs, out) for slug, prof, rtype, level, L, out in jobs]
+                          args.max_test_seqs, out, args.datasets_root) for slug, prof, rtype, level, L, out in jobs]
         for i, fut in enumerate(as_completed(futs), 1):
             slug, prof, rtype, level, L, n, dt = fut.result()
             print(f"[{i}/{len(jobs)}] {slug:<22} {prof:<7} {rtype:<17} {level:<10} L={L:<4} "
