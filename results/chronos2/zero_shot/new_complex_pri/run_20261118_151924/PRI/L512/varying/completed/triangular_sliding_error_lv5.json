@@ -1,0 +1,16 @@
+{
+  "task": "PRI",
+  "context_len": 512,
+  "horizon": 32,
+  "profile": "varying",
+  "radar_type": "triangular_sliding",
+  "error_level": "error_lv5",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 0.3796320999972522,
+  "mae": 29.784085569381713,
+  "rmse": 34.421013464927675,
+  "hit_rate_pct": 22.5,
+  "valid_pulses_evaluated": 6400
+}

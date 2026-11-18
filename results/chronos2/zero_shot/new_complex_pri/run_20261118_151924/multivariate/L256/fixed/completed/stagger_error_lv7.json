@@ -1,0 +1,19 @@
+{
+  "task": "multivariate",
+  "context_len": 256,
+  "horizon": 32,
+  "profile": "fixed",
+  "radar_type": "stagger",
+  "error_level": "error_lv7",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 1.3034153999469709,
+  "mae_pri": 138.983825,
+  "rmse_pri": 164.73895500000003,
+  "hit_rate_pri": 4.1071,
+  "mae_frequency": 0.40454,
+  "rmse_frequency": 0.504105,
+  "hit_rate_frequency": 99.96880000000002,
+  "valid_pulses_evaluated": 6400
+}

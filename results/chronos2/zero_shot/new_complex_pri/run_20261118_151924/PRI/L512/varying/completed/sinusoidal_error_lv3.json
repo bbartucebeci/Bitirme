@@ -1,0 +1,16 @@
+{
+  "task": "PRI",
+  "context_len": 512,
+  "horizon": 32,
+  "profile": "varying",
+  "radar_type": "sinusoidal",
+  "error_level": "error_lv3",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 0.4238197000231594,
+  "mae": 40.09018035888672,
+  "rmse": 48.80155752897262,
+  "hit_rate_pct": 24.453125,
+  "valid_pulses_evaluated": 6400
+}

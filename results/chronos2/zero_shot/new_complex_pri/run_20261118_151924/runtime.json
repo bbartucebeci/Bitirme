@@ -1,0 +1,12 @@
+{
+  "started_utc": "2026-11-18T12:22:16.278158+00:00",
+  "device_requested": "cuda",
+  "batch_size": 16,
+  "torch": "2.12.1+cu130",
+  "cuda_available": true,
+  "chronos_forecasting": "2.3.2",
+  "git_revision": "e7088ee59b10d6ced457ba3f820e6ee1b4164137",
+  "device_actual": "cuda:0",
+  "model_commit": null,
+  "gpu_name": "NVIDIA GeForce RTX 5060"
+}

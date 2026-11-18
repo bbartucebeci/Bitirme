@@ -1,0 +1,16 @@
+{
+  "task": "Frequency",
+  "context_len": 256,
+  "horizon": 32,
+  "profile": "varying",
+  "radar_type": "dwell_and_switch",
+  "error_level": "error_lv3",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 0.39114710010471754,
+  "mae": 0.8078938293457031,
+  "rmse": 0.9992228466272354,
+  "hit_rate_pct": 95.546875,
+  "valid_pulses_evaluated": 6400
+}

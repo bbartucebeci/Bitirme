@@ -1,0 +1,16 @@
+{
+  "task": "Frequency",
+  "context_len": 992,
+  "horizon": 32,
+  "profile": "varying",
+  "radar_type": "jitter",
+  "error_level": "error_lv5",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 0.5035508999426384,
+  "mae": 0.39796157836914064,
+  "rmse": 0.49365185216069224,
+  "hit_rate_pct": 99.96875,
+  "valid_pulses_evaluated": 6400
+}

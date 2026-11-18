@@ -1,0 +1,16 @@
+{
+  "task": "Frequency",
+  "context_len": 512,
+  "horizon": 32,
+  "profile": "varying",
+  "radar_type": "markov_agile",
+  "error_level": "error_lv3",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 0.40451830002712086,
+  "mae": 0.8153875732421875,
+  "rmse": 1.0133198192715644,
+  "hit_rate_pct": 95.34375,
+  "valid_pulses_evaluated": 6400
+}

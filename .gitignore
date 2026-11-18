@@ -6,12 +6,18 @@ __pycache__/
 /results/chronos2/**/1000x1024_*/
 *.docx
 datasets/
-/outputs/
+/outputs/*
+!/outputs/new_complex_pri/
+!/outputs/new_complex_pri/**/*.csv
 /results/chronos2/zero_shot/old_complex_pri/
-/results/chronos2/zero_shot/new_complex_pri/
-/results/dataset_gallery/new_complex_pri/
 /results/dataset_gallery/old_complex_pri/selection.json
 /models/lora_sft/chronos2/
 interleaved datasets/
 Screenshot*.png
 models/distillation/*.pt
+
+# Development checks and publication previews remain local.
+/outputs/new_complex_pri/**/validation.json
+/outputs/new_complex_pri/**/preview.png
+/results/chronos2/zero_shot/new_complex_pri/**/coverage.csv
+/results/chronos2/zero_shot/new_complex_pri/**/name_migration.json

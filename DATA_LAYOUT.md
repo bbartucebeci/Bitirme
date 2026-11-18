@@ -19,14 +19,15 @@ report, so it is not described as fully audited.
 
 | Artifact | Current data | Previous data |
 |---|---|---|
-| Dataset galleries | `results/dataset_gallery/new_complex_pri/` (local) | [old_complex_pri](results/dataset_gallery/old_complex_pri/README.md) (previously published) |
-| Chronos-2 zero-shot | `results/chronos2/zero_shot/new_complex_pri/` (local) | `results/chronos2/zero_shot/old_complex_pri/` (local) |
-| MAE comparison tables and plots | `outputs/new_complex_pri/` (local) | `outputs/old_complex_pri/` (local) |
+| Dataset galleries | [new_complex_pri](results/dataset_gallery/new_complex_pri/README.md) | [old_complex_pri](results/dataset_gallery/old_complex_pri/README.md) (previously published) |
+| Chronos-2 zero-shot | [new_complex_pri](results/chronos2/zero_shot/new_complex_pri/README.md) | `results/chronos2/zero_shot/old_complex_pri/` (local) |
+| MAE comparison tables and plots | [new_complex_pri](outputs/new_complex_pri/README.md) | `outputs/old_complex_pri/` (local) |
 
-Raw datasets and local experiment metrics, predictions, workbooks, plots and
-smoke outputs are Git-ignored. The previously published historical gallery is
-renamed using its original Git image contents; locally regenerated versions of
-those images are excluded from this publication.
+Raw dataset CSVs remain local and Git-ignored. Current `new_complex_pri` galleries,
+Chronos-2 experiment results, MAE tables and comparison plots are published.
+Development smoke outputs, validation reports, migration audit records and
+publication previews remain local. Historical experiment results remain local.
+The historical gallery retains its original published image contents.
 
 PNG filenames also carry the family name. A forecast file such as
 `new_complex_pri_stagger_error_lv2.png` therefore remains identifiable when

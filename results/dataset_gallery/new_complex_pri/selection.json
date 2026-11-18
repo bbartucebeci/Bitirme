@@ -1,0 +1,1282 @@
+[
+  {
+    "profile": "fixed",
+    "radar_type": "stable",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stable\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stable",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stable\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stable",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stable\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stable",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stable\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stable",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stable\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stable",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stable\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stable",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stable\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stable",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stable\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "jitter",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\jitter\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "jitter",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\jitter\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "jitter",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\jitter\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "jitter",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\jitter\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "jitter",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\jitter\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "jitter",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\jitter\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "jitter",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\jitter\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "jitter",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\jitter\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stagger",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stagger\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stagger",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stagger\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stagger",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stagger\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stagger",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stagger\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stagger",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stagger\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stagger",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stagger\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stagger",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stagger\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "stagger",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\stagger\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "dwell_and_switch",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\dwell_and_switch\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\dwell_and_switch\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\dwell_and_switch\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\dwell_and_switch\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\dwell_and_switch\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\dwell_and_switch\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\dwell_and_switch\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\dwell_and_switch\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sliding",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sliding\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sliding",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sliding\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sliding",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sliding\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sliding",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sliding\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sliding",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sliding\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sliding",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sliding\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sliding",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sliding\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sliding",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sliding\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sinusoidal",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sinusoidal\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sinusoidal",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sinusoidal\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sinusoidal",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sinusoidal\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sinusoidal",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sinusoidal\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sinusoidal",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sinusoidal\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sinusoidal",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sinusoidal\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sinusoidal",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sinusoidal\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "sinusoidal",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\sinusoidal\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "triangular_sliding",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\triangular_sliding\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "triangular_sliding",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\triangular_sliding\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "triangular_sliding",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\triangular_sliding\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "triangular_sliding",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\triangular_sliding\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "triangular_sliding",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\triangular_sliding\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "triangular_sliding",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\triangular_sliding\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "triangular_sliding",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\triangular_sliding\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "triangular_sliding",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\triangular_sliding\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "markov_agile",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\markov_agile\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "markov_agile",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\markov_agile\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "markov_agile",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\markov_agile\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "markov_agile",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\markov_agile\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "markov_agile",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\markov_agile\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "markov_agile",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\markov_agile\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "markov_agile",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\markov_agile\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "fixed",
+    "radar_type": "markov_agile",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\fixed\\markov_agile\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stable",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stable\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stable",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stable\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stable",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stable\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stable",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stable\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stable",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stable\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stable",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stable\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stable",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stable\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stable",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stable\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "jitter",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\jitter\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "jitter",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\jitter\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "jitter",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\jitter\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "jitter",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\jitter\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "jitter",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\jitter\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "jitter",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\jitter\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "jitter",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\jitter\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "jitter",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\jitter\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stagger",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stagger\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stagger",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stagger\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stagger",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stagger\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stagger",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stagger\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stagger",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stagger\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stagger",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stagger\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stagger",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stagger\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "stagger",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\stagger\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "dwell_and_switch",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\dwell_and_switch\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\dwell_and_switch\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\dwell_and_switch\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\dwell_and_switch\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\dwell_and_switch\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\dwell_and_switch\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\dwell_and_switch\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "dwell_and_switch",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\dwell_and_switch\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sliding",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sliding\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sliding",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sliding\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sliding",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sliding\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sliding",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sliding\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sliding",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sliding\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sliding",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sliding\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sliding",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sliding\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sliding",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sliding\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sinusoidal",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sinusoidal\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sinusoidal",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sinusoidal\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sinusoidal",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sinusoidal\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sinusoidal",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sinusoidal\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sinusoidal",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sinusoidal\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sinusoidal",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sinusoidal\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sinusoidal",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sinusoidal\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "sinusoidal",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\sinusoidal\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "triangular_sliding",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\triangular_sliding\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "triangular_sliding",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\triangular_sliding\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "triangular_sliding",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\triangular_sliding\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "triangular_sliding",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\triangular_sliding\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "triangular_sliding",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\triangular_sliding\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "triangular_sliding",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\triangular_sliding\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "triangular_sliding",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\triangular_sliding\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "triangular_sliding",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\triangular_sliding\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "markov_agile",
+    "error_level": "clean",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\markov_agile\\1000x1056_clean\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "markov_agile",
+    "error_level": "error_lv1",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\markov_agile\\1000x1056_error_lv1\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "markov_agile",
+    "error_level": "error_lv2",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\markov_agile\\1000x1056_error_lv2\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "markov_agile",
+    "error_level": "error_lv3",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\markov_agile\\1000x1056_error_lv3\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "markov_agile",
+    "error_level": "error_lv4",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\markov_agile\\1000x1056_error_lv4\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "markov_agile",
+    "error_level": "error_lv5",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\markov_agile\\1000x1056_error_lv5\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "markov_agile",
+    "error_level": "error_lv6",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\markov_agile\\1000x1056_error_lv6\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  },
+  {
+    "profile": "varying",
+    "radar_type": "markov_agile",
+    "error_level": "error_lv7",
+    "sequence_id": "seq_0800",
+    "dataset_family": "new_complex_pri",
+    "source_csv": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar\\varying\\markov_agile\\1000x1056_error_lv7\\test\\seq_0800.csv",
+    "start_after_anchor": 928,
+    "plotted_intervals": 128
+  }
+]

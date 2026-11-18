@@ -1,0 +1,16 @@
+{
+  "task": "PRI",
+  "context_len": 96,
+  "horizon": 32,
+  "profile": "varying",
+  "radar_type": "jitter",
+  "error_level": "error_lv1",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 0.46538810001220554,
+  "mae": 49.41046875953674,
+  "rmse": 61.1869016456604,
+  "hit_rate_pct": 13.03125,
+  "valid_pulses_evaluated": 6400
+}

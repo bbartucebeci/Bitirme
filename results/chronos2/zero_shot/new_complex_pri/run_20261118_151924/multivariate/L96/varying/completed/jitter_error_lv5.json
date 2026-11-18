@@ -1,0 +1,19 @@
+{
+  "task": "multivariate",
+  "context_len": 96,
+  "horizon": 32,
+  "profile": "varying",
+  "radar_type": "jitter",
+  "error_level": "error_lv5",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 1.1480200000223704,
+  "mae_pri": 49.0251,
+  "rmse_pri": 61.299454999999995,
+  "hit_rate_pri": 13.640999999999998,
+  "mae_frequency": 0.402505,
+  "rmse_frequency": 0.49896,
+  "hit_rate_frequency": 99.98440000000001,
+  "valid_pulses_evaluated": 6400
+}

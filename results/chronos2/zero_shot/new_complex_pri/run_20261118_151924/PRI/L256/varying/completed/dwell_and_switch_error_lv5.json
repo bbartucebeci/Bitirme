@@ -1,0 +1,16 @@
+{
+  "task": "PRI",
+  "context_len": 256,
+  "horizon": 32,
+  "profile": "varying",
+  "radar_type": "dwell_and_switch",
+  "error_level": "error_lv5",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 0.3485590000054799,
+  "mae": 63.769539985656735,
+  "rmse": 80.76469938576221,
+  "hit_rate_pct": 37.09375,
+  "valid_pulses_evaluated": 6400
+}

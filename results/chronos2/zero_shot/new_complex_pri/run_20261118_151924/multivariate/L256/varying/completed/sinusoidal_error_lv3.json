@@ -1,0 +1,19 @@
+{
+  "task": "multivariate",
+  "context_len": 256,
+  "horizon": 32,
+  "profile": "varying",
+  "radar_type": "sinusoidal",
+  "error_level": "error_lv3",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 1.2454793000069913,
+  "mae_pri": 36.113055,
+  "rmse_pri": 44.773680000000006,
+  "hit_rate_pri": 26.781100000000002,
+  "mae_frequency": 0.807645,
+  "rmse_frequency": 1.007215,
+  "hit_rate_frequency": 95.09485000000001,
+  "valid_pulses_evaluated": 6400
+}

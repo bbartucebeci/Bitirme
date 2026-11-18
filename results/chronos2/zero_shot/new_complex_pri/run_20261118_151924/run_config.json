@@ -1,0 +1,50 @@
+{
+  "protocol_version": 1,
+  "regime": "zero_shot",
+  "datasets_root": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar",
+  "dataset_size": "1000x1056",
+  "profiles": [
+    "fixed",
+    "varying"
+  ],
+  "radar_types": [
+    "stable",
+    "jitter",
+    "stagger",
+    "dwell_and_switch",
+    "sliding",
+    "sinusoidal",
+    "triangular_sliding",
+    "markov_agile"
+  ],
+  "error_levels": [
+    "clean",
+    "error_lv1",
+    "error_lv2",
+    "error_lv3",
+    "error_lv4",
+    "error_lv5",
+    "error_lv6",
+    "error_lv7"
+  ],
+  "tasks": [
+    "PRI",
+    "Frequency",
+    "multivariate"
+  ],
+  "context_lens": [
+    96,
+    256,
+    512,
+    992
+  ],
+  "horizon": 32,
+  "window_mode": "boundary",
+  "window_seed": 20261116,
+  "max_test_seqs": null,
+  "plot_sequence_id": "seq_0800",
+  "model_id": "amazon/chronos-2",
+  "plots": true,
+  "code_sha256": "a20764ba5ada3abafc37d51c8e972b631a024e376c219fa79cb2085cc5291518",
+  "dataset_family": "new_complex_pri"
+}

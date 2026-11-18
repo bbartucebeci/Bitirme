@@ -1,0 +1,16 @@
+{
+  "task": "PRI",
+  "context_len": 256,
+  "horizon": 32,
+  "profile": "fixed",
+  "radar_type": "markov_agile",
+  "error_level": "error_lv2",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 0.3489201000193134,
+  "mae": 99.0420824432373,
+  "rmse": 112.80984203338623,
+  "hit_rate_pct": 1.328125,
+  "valid_pulses_evaluated": 6400
+}

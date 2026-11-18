@@ -1,0 +1,19 @@
+{
+  "task": "multivariate",
+  "context_len": 992,
+  "horizon": 32,
+  "profile": "fixed",
+  "radar_type": "sliding",
+  "error_level": "error_lv5",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 2.390437199996086,
+  "mae_pri": 52.734429999999996,
+  "rmse_pri": 73.59111000000001,
+  "hit_rate_pri": 15.21895,
+  "mae_frequency": 0.396885,
+  "rmse_frequency": 0.49296499999999993,
+  "hit_rate_frequency": 99.96880000000002,
+  "valid_pulses_evaluated": 6400
+}

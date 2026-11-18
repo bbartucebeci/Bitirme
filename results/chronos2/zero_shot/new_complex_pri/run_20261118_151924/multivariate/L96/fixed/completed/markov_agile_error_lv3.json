@@ -1,0 +1,19 @@
+{
+  "task": "multivariate",
+  "context_len": 96,
+  "horizon": 32,
+  "profile": "fixed",
+  "radar_type": "markov_agile",
+  "error_level": "error_lv3",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 1.119933299953118,
+  "mae_pri": 101.19767,
+  "rmse_pri": 114.57797999999998,
+  "hit_rate_pri": 0.6092,
+  "mae_frequency": 0.796155,
+  "rmse_frequency": 0.9912049999999999,
+  "hit_rate_frequency": 95.39209999999999,
+  "valid_pulses_evaluated": 6400
+}

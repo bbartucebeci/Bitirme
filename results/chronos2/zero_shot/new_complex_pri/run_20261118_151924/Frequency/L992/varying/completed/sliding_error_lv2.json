@@ -1,0 +1,16 @@
+{
+  "task": "Frequency",
+  "context_len": 992,
+  "horizon": 32,
+  "profile": "varying",
+  "radar_type": "sliding",
+  "error_level": "error_lv2",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 0.5143952999205794,
+  "mae": 0.3983964538574219,
+  "rmse": 0.495690828114748,
+  "hit_rate_pct": 100.0,
+  "valid_pulses_evaluated": 6400
+}

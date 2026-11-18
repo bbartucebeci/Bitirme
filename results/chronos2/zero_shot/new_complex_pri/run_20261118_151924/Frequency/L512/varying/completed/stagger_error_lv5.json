@@ -1,0 +1,16 @@
+{
+  "task": "Frequency",
+  "context_len": 512,
+  "horizon": 32,
+  "profile": "varying",
+  "radar_type": "stagger",
+  "error_level": "error_lv5",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 0.40027890002238564,
+  "mae": 0.39526611328125,
+  "rmse": 0.49439703598618506,
+  "hit_rate_pct": 100.0,
+  "valid_pulses_evaluated": 6400
+}

@@ -1,0 +1,71 @@
+# new_complex_pri: Chronos-2 zero-shot: PRI, varying, L=992, H=32
+
+MAE/RMSE/hit rate are means of per-sequence emitter-only scores, matching the existing evaluator.
+PRI gate: ±10 µs. Frequency gate: ±2 MHz. Multivariate input: all five PDW channels.
+
+| radar_type         | error_level   |   num_sequences |   skipped_short |   skipped_no_emitter |        mae |       rmse |   hit_rate_pct |   valid_pulses_evaluated |
+|:-------------------|:--------------|----------------:|----------------:|---------------------:|-----------:|-----------:|---------------:|-------------------------:|
+| stable             | clean         |             200 |               0 |                    0 |   0        |   0        |     100        |                     6400 |
+| stable             | error_lv1     |             200 |               0 |                    0 |   0.051577 |   0.084243 |      99.9844   |                     6400 |
+| stable             | error_lv2     |             200 |               0 |                    0 |   0.138941 |   0.154811 |     100        |                     6400 |
+| stable             | error_lv3     |             200 |               0 |                    0 |   0.226114 |   0.244282 |     100        |                     6400 |
+| stable             | error_lv4     |             200 |               0 |                    0 |   0.274594 |   1.1293   |      99.9375   |                     6400 |
+| stable             | error_lv5     |             200 |               0 |                    0 |   0.496367 |   0.526388 |     100        |                     6400 |
+| stable             | error_lv6     |             200 |               0 |                    0 |   2.32425  |   2.43001  |      99.9531   |                     6400 |
+| stable             | error_lv7     |             200 |               0 |                    0 |   5.4006   |   5.84885  |      94.9062   |                     6400 |
+| jitter             | clean         |             200 |               0 |                    0 |  47.8758   |  59.4364   |      13.9375   |                     6400 |
+| jitter             | error_lv1     |             200 |               0 |                    0 |  48.4152   |  60.1043   |      14.1719   |                     6400 |
+| jitter             | error_lv2     |             200 |               0 |                    0 |  48.4226   |  60.1742   |      13.9531   |                     6400 |
+| jitter             | error_lv3     |             200 |               0 |                    0 |  48.4598   |  60.2806   |      13.7344   |                     6400 |
+| jitter             | error_lv4     |             200 |               0 |                    0 |  47.5096   |  59.4454   |      14.5156   |                     6400 |
+| jitter             | error_lv5     |             200 |               0 |                    0 |  47.7183   |  59.2806   |      13.1094   |                     6400 |
+| jitter             | error_lv6     |             200 |               0 |                    0 |  47.6353   |  59.1485   |      13.5625   |                     6400 |
+| jitter             | error_lv7     |             200 |               0 |                    0 |  48.533    |  60.5236   |      13.4219   |                     6400 |
+| stagger            | clean         |             200 |               0 |                    0 |   4.81165  |   6.01975  |      89.6406   |                     6400 |
+| stagger            | error_lv1     |             200 |               0 |                    0 |  33.8685   |  42.5239   |      47.5938   |                     6400 |
+| stagger            | error_lv2     |             200 |               0 |                    0 |  63.3279   |  80.7898   |      21.7812   |                     6400 |
+| stagger            | error_lv3     |             200 |               0 |                    0 |  91.851    | 115.763    |      10.5      |                     6400 |
+| stagger            | error_lv4     |             200 |               0 |                    0 |  34.5425   |  43.6263   |      48.8594   |                     6400 |
+| stagger            | error_lv5     |             200 |               0 |                    0 | 120.408    | 146.029    |       5.35938  |                     6400 |
+| stagger            | error_lv6     |             200 |               0 |                    0 | 143.204    | 166.854    |       3.60938  |                     6400 |
+| stagger            | error_lv7     |             200 |               0 |                    0 | 155.758    | 185.154    |       3.375    |                     6400 |
+| dwell_and_switch   | clean         |             200 |               0 |                    0 |   1.59684  |   1.90263  |      99.8594   |                     6400 |
+| dwell_and_switch   | error_lv1     |             200 |               0 |                    0 |   5.26359  |  14.0438   |      94.4375   |                     6400 |
+| dwell_and_switch   | error_lv2     |             200 |               0 |                    0 |   9.56535  |  24.0821   |      87.2031   |                     6400 |
+| dwell_and_switch   | error_lv3     |             200 |               0 |                    0 |  12.4613   |  28.3616   |      80.8438   |                     6400 |
+| dwell_and_switch   | error_lv4     |             200 |               0 |                    0 |   5.04591  |  13.0612   |      95.0469   |                     6400 |
+| dwell_and_switch   | error_lv5     |             200 |               0 |                    0 |  16.8092   |  33.2192   |      72.8438   |                     6400 |
+| dwell_and_switch   | error_lv6     |             200 |               0 |                    0 |  33.2872   |  50.3396   |      37.7031   |                     6400 |
+| dwell_and_switch   | error_lv7     |             200 |               0 |                    0 |  52.8677   |  66.6171   |      20.2188   |                     6400 |
+| sliding            | clean         |             200 |               0 |                    0 |   1.5379   |   1.94214  |     100        |                     6400 |
+| sliding            | error_lv1     |             200 |               0 |                    0 |   7.98771  |  13.3255   |      84.5781   |                     6400 |
+| sliding            | error_lv2     |             200 |               0 |                    0 |  15.5386   |  28.9218   |      64.1719   |                     6400 |
+| sliding            | error_lv3     |             200 |               0 |                    0 |  25.5876   |  43.6248   |      42.2188   |                     6400 |
+| sliding            | error_lv4     |             200 |               0 |                    0 |   6.43679  |  11.05     |      87.3125   |                     6400 |
+| sliding            | error_lv5     |             200 |               0 |                    0 |  41.8309   |  62.5227   |      22.7031   |                     6400 |
+| sliding            | error_lv6     |             200 |               0 |                    0 |  76.9725   |  92.1146   |       8.21875  |                     6400 |
+| sliding            | error_lv7     |             200 |               0 |                    0 |  84.2541   |  97.9547   |       6.125    |                     6400 |
+| sinusoidal         | clean         |             200 |               0 |                    0 |   1.98332  |   2.39611  |      99.9688   |                     6400 |
+| sinusoidal         | error_lv1     |             200 |               0 |                    0 |  21.2026   |  24.1956   |      36.9844   |                     6400 |
+| sinusoidal         | error_lv2     |             200 |               0 |                    0 |  27.666    |  32.9099   |      30.5156   |                     6400 |
+| sinusoidal         | error_lv3     |             200 |               0 |                    0 |  38.9316   |  47.4564   |      22.2031   |                     6400 |
+| sinusoidal         | error_lv4     |             200 |               0 |                    0 |  22.9446   |  26.179    |      36.0469   |                     6400 |
+| sinusoidal         | error_lv5     |             200 |               0 |                    0 |  53.5459   |  65.6687   |      14.2031   |                     6400 |
+| sinusoidal         | error_lv6     |             200 |               0 |                    0 |  92.7069   | 106.447    |       5.85938  |                     6400 |
+| sinusoidal         | error_lv7     |             200 |               0 |                    0 |  98.4969   | 112.034    |       4.54688  |                     6400 |
+| triangular_sliding | clean         |             200 |               0 |                    0 |   1.55732  |   2.24791  |      99.6875   |                     6400 |
+| triangular_sliding | error_lv1     |             200 |               0 |                    0 |   8.01164  |   8.83537  |      72.6094   |                     6400 |
+| triangular_sliding | error_lv2     |             200 |               0 |                    0 |  13.6319   |  15.268    |      46.1562   |                     6400 |
+| triangular_sliding | error_lv3     |             200 |               0 |                    0 |  18.3304   |  21.2273   |      35.2031   |                     6400 |
+| triangular_sliding | error_lv4     |             200 |               0 |                    0 |   7.38656  |   8.38059  |      77.2656   |                     6400 |
+| triangular_sliding | error_lv5     |             200 |               0 |                    0 |  27.3166   |  32.0451   |      25        |                     6400 |
+| triangular_sliding | error_lv6     |             200 |               0 |                    0 |  55.3388   |  65.7403   |      11.625    |                     6400 |
+| triangular_sliding | error_lv7     |             200 |               0 |                    0 |  78.9694   |  92.5642   |       6.8125   |                     6400 |
+| markov_agile       | clean         |             200 |               0 |                    0 |  98.4346   | 112.754    |       2.67188  |                     6400 |
+| markov_agile       | error_lv1     |             200 |               0 |                    0 |  99.0236   | 112.008    |       0.859375 |                     6400 |
+| markov_agile       | error_lv2     |             200 |               0 |                    0 |  99.323    | 112.923    |       0.9375   |                     6400 |
+| markov_agile       | error_lv3     |             200 |               0 |                    0 |  99.0895   | 112.477    |       0.4375   |                     6400 |
+| markov_agile       | error_lv4     |             200 |               0 |                    0 |  99.1605   | 112.166    |       0.859375 |                     6400 |
+| markov_agile       | error_lv5     |             200 |               0 |                    0 |  99.5164   | 112.432    |       0.28125  |                     6400 |
+| markov_agile       | error_lv6     |             200 |               0 |                    0 |  99.717    | 111.908    |       0.25     |                     6400 |
+| markov_agile       | error_lv7     |             200 |               0 |                    0 | 100.437    | 117.385    |       5.875    |                     6400 |

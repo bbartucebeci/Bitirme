@@ -1,0 +1,16 @@
+{
+  "task": "PRI",
+  "context_len": 256,
+  "horizon": 32,
+  "profile": "fixed",
+  "radar_type": "stagger",
+  "error_level": "error_lv7",
+  "num_sequences": 200,
+  "skipped_short": 0,
+  "skipped_no_emitter": 0,
+  "inference_seconds": 0.39221539997379296,
+  "mae": 142.06748046875,
+  "rmse": 169.2529680633545,
+  "hit_rate_pct": 3.828125,
+  "valid_pulses_evaluated": 6400
+}
