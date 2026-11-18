@@ -7,6 +7,10 @@ __pycache__/
 *.docx
 datasets/
 /outputs/
+/results/chronos2/zero_shot/old_complex_pri/
+/results/chronos2/zero_shot/new_complex_pri/
+/results/dataset_gallery/new_complex_pri/
+/results/dataset_gallery/old_complex_pri/selection.json
 /models/lora_sft/chronos2/
 interleaved datasets/
 Screenshot*.png

@@ -3,7 +3,16 @@
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-COMPLEX_DATASETS_ROOT = PROJECT_ROOT / "datasets" / "complex_pri_v1"
+OLD_COMPLEX_PRI = "old_complex_pri"
+NEW_COMPLEX_PRI = "new_complex_pri"
+SCHEMA_V2 = "consecutive_future_v2"
+COMPLEX_DATASETS_ROOT = PROJECT_ROOT / "datasets" / OLD_COMPLEX_PRI
+NEW_COMPLEX_DATASETS_ROOT = PROJECT_ROOT / "datasets" / NEW_COMPLEX_PRI
+
+
+def family_for_schema(schema: str) -> str:
+    """Public artifact label; the stored schema identifier remains versioned."""
+    return NEW_COMPLEX_PRI if schema == SCHEMA_V2 else OLD_COMPLEX_PRI
 RADAR_TYPES = (
     "stable", "jitter", "stagger", "dwell_and_switch", "sliding",
     "sinusoidal", "triangular_sliding", "markov_agile",

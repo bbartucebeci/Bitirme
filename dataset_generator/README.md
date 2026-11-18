@@ -1,5 +1,8 @@
 # Complex PRI single-radar benchmark
 
+Current data/results are named **new_complex_pri**; the previous production data
+are **old_complex_pri**. [Canonical paths and published outputs](../DATA_LAYOUT.md).
+
 The replacement **observed context + consecutive-source future** protocol is
 documented in [CONSECUTIVE_FUTURE.md](CONSECUTIVE_FUTURE.md), including the dataset
 inventory, single-copy storage, generation commands and boundary-aware loaders.
@@ -45,7 +48,7 @@ Losses are Bernoulli draws, not quotas imposed on each sequence.
 
 ## Output and reproducibility
 
-The generator defaults to the separate `datasets/complex_pri_v1` output root.
+The generator defaults to the separate `datasets/old_complex_pri` output root.
 Nonempty single-radar destinations are rejected before CLI generation starts.
 Use `--radar-type all_single` for this benchmark, not the interleaved `all` mode.
 Generation keeps the existing seed 20261020 and the CRC32 per-sequence seed key.
@@ -118,4 +121,4 @@ python -B -m dataset_generator.plot_sequence_gallery --datasets-root <production
 
 All selected inputs are checked before output is created. CSVs are only read;
 the plotter does not invoke generation and refuses a nonempty output directory.
-The published production gallery is [here](../results/dataset_gallery/complex_pri_1024/README.md).
+The published production gallery is [here](../results/dataset_gallery/old_complex_pri/README.md).

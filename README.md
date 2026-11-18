@@ -1,5 +1,8 @@
 # PULSAR: Pulse-Level Synthetic Radar Benchmark & ESM Time-Series Forecasting
 
+**Current dataset: new_complex_pri.** Historical data/results are labeled
+**old_complex_pri**. [Data layout and experiment commands](DATA_LAYOUT.md).
+
 [![Project Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen)](#)
 [![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue)](#)
 [![Architecture](https://img.shields.io/badge/Domain-Electronic%20Warfare%20%2F%20ESM%20%2F%20ELINT-red)](#)

@@ -45,7 +45,7 @@ No full dataset generation, model training, model download, commit or push was r
 | Kalman runner smoke | 64 jobs / 128 forecasts; every forecast has 32 valid targets, no shortened contexts |
 | Independent CLI repeat | All 16 files of varying Markov / Level 7 match byte-for-byte |
 | Existing receiver regression | Original and modified five-radar scenario yield 980 exactly identical PDW rows at default phase |
-| Existing data | Original 40 dataset folders retained; production `datasets/complex_pri_v1` absent |
+| Existing data | Original 40 dataset folders retained; production `datasets/old_complex_pri` absent |
 
 The CSV audit checks exact split IDs, row counts, finite values, positive PRI/PW,
 strict TOA order, Delta-TOA equality, metadata, generation seeds, profile ranges and

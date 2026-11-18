@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 import yaml
-from dataset_generator.catalog import RADAR_TYPES, ERROR_LEVELS
+from dataset_generator.catalog import RADAR_TYPES, ERROR_LEVELS, COMPLEX_DATASETS_ROOT, family_for_schema
 from dataset_generator.sequence_io import read_sequence_frame, is_boundary_dataset, boundary_start
 
 from foundation_models.common.windowing import (
@@ -20,7 +20,7 @@ from foundation_models.common.windowing import (
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DATASETS_ROOT = PROJECT_ROOT / "datasets" / "single_radar"
+DATASETS_ROOT = COMPLEX_DATASETS_ROOT / "single_radar"
 CONTEXT_LENS = (96, 256, 512, 992)
 
 
@@ -36,8 +36,10 @@ def main() -> None:
     parser.add_argument("--radar-types", nargs="+", choices=RADAR_TYPES, default=RADAR_TYPES)
     parser.add_argument("--error-levels", nargs="+", choices=ERROR_LEVELS, default=ERROR_LEVELS)
     parser.add_argument("--max-test-seqs", type=int, default=200)
-    parser.add_argument("--output", type=Path, default=PROJECT_ROOT / "datasets" / "windows_1024_lab.json")
+    parser.add_argument("--output", type=Path, help="Default: a named manifest beside the selected dataset root")
     args = parser.parse_args()
+    if args.output is None:
+        args.output=args.datasets_root.parent/f"windows_{args.window_mode}_{args.dataset_size}.json"
     if args.max_test_seqs <= 0 or args.horizon <= 0 or any(length <= 0 for length in args.context_lens):
         parser.error("Window sizes and --max-test-seqs must be positive")
 
@@ -86,6 +88,7 @@ def main() -> None:
         "meta": {
             "seed": args.seed,
             "window_mode": args.window_mode,
+            "dataset_family": family_for_schema(metadata.get("schema_version","complex_pri_v1")),
             "dataset_size": args.dataset_size,
             "context_lens": args.context_lens,
             "horizon_len": args.horizon,

@@ -1,4 +1,9 @@
-# Consecutive future dataset protocol (v2)
+# new_complex_pri: consecutive-source future protocol
+
+`new_complex_pri` is the public data/output family name. The stored schema ID
+remains `consecutive_future_v2` for file-format compatibility. See
+[DATA_LAYOUT.md](../DATA_LAYOUT.md) for the previous `old_complex_pri` collection
+and the canonical result/table locations.
 
 The active replacement protocol uses 1024 **observed context intervals** and
 up to 32 consecutive transmitted future pulses. PRI laws, clock functions,
@@ -76,10 +81,10 @@ large maximum and slice its future prefixes, rather than regenerate for each H.
 
 | Root | Role |
 |---|---|
-| `datasets/complex_pri_full_20261117_230416` | Previous 1000x1024 production data with losses in the horizon; retained locally as the old protocol |
+| `datasets/old_complex_pri` | Previous 1000x1024 production data with losses in the horizon; retained locally as the old protocol |
 | `datasets/single_radar` | Older experiment data; not the new benchmark source |
-| `datasets/consecutive_future_v2/smoke/C1024_H32` | New 10-sequence-per-condition smoke collection |
-| `datasets/consecutive_future_v2/production/C1024_H32` | Locally generated 1000-sequence-per-condition production collection |
+| `datasets/new_complex_pri/smoke/C1024_H32` | New 10-sequence-per-condition smoke collection |
+| `datasets/new_complex_pri/production/C1024_H32` | Locally generated 1000-sequence-per-condition production collection |
 
 The generator uses a fresh root for each v2 collection and rejects nonempty
 roots, so protocols or partial runs cannot be silently merged. `collection.json`
@@ -114,7 +119,7 @@ From the repository root, with the generator environment:
 ```powershell
 & "$env:USERPROFILE\bitirme-generator-venv\Scripts\python.exe" -B `
     -m dataset_generator.generate_datasets `
-    --protocol consecutive_future_v2 --context-intervals 1024 --max-horizon 32 `
+    --protocol new_complex_pri --context-intervals 1024 --max-horizon 32 `
     --radar-type all_single --profile-mode both --error-level all `
     --freq-mode constant --smoke-test
 ```
@@ -127,9 +132,9 @@ With the Chronos environment, validate all source records and loader contracts:
 ```powershell
 & "$env:USERPROFILE\bitirme-chronos2-venv\Scripts\python.exe" -B `
     -m dataset_generator.validate_datasets `
-    --datasets-root datasets/consecutive_future_v2/smoke/C1024_H32/single_radar `
+    --datasets-root datasets/new_complex_pri/smoke/C1024_H32/single_radar `
     --dataset-size 10x1056 --check-loaders `
-    --report datasets/consecutive_future_v2/smoke/C1024_H32/validation_report.json
+    --report datasets/new_complex_pri/smoke/C1024_H32/validation_report.json
 ```
 
 For Chronos on the new protocol, explicitly use `--dataset-size 1000x1056`
@@ -155,8 +160,8 @@ if ((git branch --show-current).Trim() -ne 'long-seq-1024') {
     throw 'Aktif branch long-seq-1024 olmalı.'
 }
 
-$chronosDataRoot = Join-Path (Get-Location) 'datasets\consecutive_future_v2\production\C1024_H32\single_radar'
-$chronosOutput = Join-Path (Get-Location) ("results\chronos2\zero_shot\consecutive_future_v2\run_" + (Get-Date -Format 'yyyyMMdd_HHmmss'))
+$chronosDataRoot = Join-Path (Get-Location) 'datasets\new_complex_pri\production\C1024_H32\single_radar'
+$chronosOutput = Join-Path (Get-Location) ("results\chronos2\zero_shot\new_complex_pri\run_" + (Get-Date -Format 'yyyyMMdd_HHmmss'))
 
 & "$env:USERPROFILE\bitirme-chronos2-venv\Scripts\python.exe" -u -B `
     -m foundation_models.chronos2.run_zero_shot `

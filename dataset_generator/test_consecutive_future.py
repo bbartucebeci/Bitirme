@@ -194,5 +194,34 @@ class ConsecutiveFutureTest(unittest.TestCase):
             with patch("sys.argv",argv+["--resume"]):main()
             self.assertEqual(len(pipeline.contexts),2)
 
+    def test_public_dataset_name_selects_new_root_without_changing_schema(self):
+        from dataset_generator import generate_datasets as generator
+        named_root=self.root/"datasets/new_complex_pri"
+        argv=["generate_datasets","--protocol","new_complex_pri","--radar-type","markov_agile",
+              "--profile-mode","fixed","--error-level","clean","--smoke-test",
+              "--context-intervals","64","--max-horizon","8"]
+        with patch.object(generator,"NEW_COMPLEX_DATASETS_ROOT",named_root),patch("sys.argv",argv):
+            generator.main()
+        collection=named_root/"smoke/C64_H8"
+        info=json.loads((collection/"collection.json").read_text())
+        self.assertEqual(info["dataset_family"],"new_complex_pri")
+        self.assertEqual(info["schema_version"],SCHEMA_V2)
+        self.assertEqual(info["status"],"complete")
+        metadata=yaml.safe_load((collection/"single_radar/fixed/markov_agile/10x72_clean/metadata.yaml").read_text())
+        self.assertEqual(metadata["dataset_family"],"new_complex_pri")
+        self.assertEqual(metadata["context_intervals"],64)
+        self.assertEqual(metadata["max_horizon"],8)
+
+    def test_table_output_defaults_do_not_overwrite_existing_named_outputs(self):
+        from foundation_models.chronos2 import compare_context_mae as tables
+        for mode,family in (("boundary","new_complex_pri"),("tail","old_complex_pri")):
+            source=self.root/"results"/family/"run_test";source.mkdir(parents=True)
+            (source/"run_config.json").write_text(json.dumps({"window_mode":mode}))
+            destination=self.root/"outputs"/family/"mae_comparison/run_test";destination.mkdir(parents=True)
+            sentinel=destination/"keep.txt";sentinel.write_text("preserve")
+            with patch.object(tables,"ROOT",self.root),patch("sys.argv",["compare_context_mae","--source",str(source)]):
+                with self.assertRaisesRegex(FileExistsError,family):tables.main()
+            self.assertEqual(sentinel.read_text(),"preserve")
+
 
 if __name__=="__main__":unittest.main()

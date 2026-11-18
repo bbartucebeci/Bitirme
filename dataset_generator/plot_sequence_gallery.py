@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from dataset_generator.catalog import RADAR_TYPES, ERROR_LEVELS
+from dataset_generator.catalog import RADAR_TYPES, ERROR_LEVELS, PROJECT_ROOT, family_for_schema
 from dataset_generator.sequence_io import read_sequence_frame
 
 PROFILES = ("fixed", "varying")
@@ -81,11 +81,12 @@ def plot_profile(profile,radar,channel,value_column,unit_label,selected,levels,o
     handles=[Line2D([0],[0],color="#1775a5",label=observed)]
     if channel=="PRI":handles.append(Line2D([0],[0],color="#e27929",linestyle="--",label="Source PRI at retained pulses"))
     if has_non_emitter:handles.append(Line2D([0],[0],color="#b51f37",marker="x",linestyle="None",label="Non-emitter pulse"))
-    fig.suptitle(f"{radar.replace('_',' ')} · {profile} profile · {channel}",fontsize=16,y=.99)
+    family=frame.attrs.get("dataset_family","old_complex_pri")
+    fig.suptitle(f"{family} · {radar.replace('_',' ')} · {profile} profile · {channel}",fontsize=16,y=.99)
     fig.legend(handles=handles,loc="upper center",bbox_to_anchor=(.5,.95),ncol=len(handles),frameon=False)
     fig.text(.5,.895,"Each error-level panel has its own vertical scale.",ha="center",fontsize=9)
     fig.tight_layout(rect=(0,0,1,.855))
-    destination=output_dir/radar/f"{profile}_{channel.lower()}.png"
+    destination=output_dir/radar/f"{family}_{profile}_{channel.lower()}.png"
     destination.parent.mkdir(parents=True,exist_ok=True)
     fig.savefig(destination,dpi=dpi); plt.close(fig)
     return destination
@@ -103,10 +104,14 @@ def main():
     parser.add_argument("--pulses",type=int,default=1024)
     parser.add_argument("--start",type=int,default=0,help="Zero-based start after dropping the anchor")
     parser.add_argument("--dpi",type=int,default=160)
-    parser.add_argument("--output-dir",type=Path,required=True,help="New gallery directory; input CSVs are never modified")
+    parser.add_argument("--output-dir",type=Path,help="Default: results/dataset_gallery/<dataset_family>; requires an empty directory")
     args=parser.parse_args()
     if args.first_test_id is not None and args.first_test_id<0:parser.error("Test ID must be nonnegative")
     if args.pulses<=0 or args.start<0 or args.dpi<=0:parser.error("Pulses/dpi must be positive; start nonnegative")
+    first_metadata=args.datasets_root/args.profiles[0]/args.radar_types[0]/f"{args.dataset_size}_{args.error_levels[0]}"/"metadata.yaml"
+    first_schema=yaml.safe_load(first_metadata.read_text(encoding="utf-8")).get("schema_version","complex_pri_v1")
+    family=family_for_schema(first_schema)
+    if args.output_dir is None:args.output_dir=PROJECT_ROOT/"results"/"dataset_gallery"/family
     if args.output_dir.exists() and any(args.output_dir.iterdir()):parser.error(f"Output directory is not empty: {args.output_dir}")
     selected,manifest={},[]
     # Validate all inputs before creating output; never invoke dataset generation.
@@ -119,12 +124,14 @@ def main():
                 sid=args.first_test_id if args.first_test_id is not None else first
                 if not first<=sid<first+metadata["split"]["test"]["sequence_count"]:raise ValueError(f"{folder}: seq_{sid:04d} is not in the test split")
                 if (metadata["radar_type"],metadata["profile_mode"],metadata["error_level"])!=(radar,profile,level):raise ValueError(f"{folder}: metadata identity mismatch")
+                if family_for_schema(metadata.get("schema_version","complex_pri_v1"))!=family:raise ValueError("Cannot mix dataset families in one gallery")
                 if args.start+args.pulses>metadata["expected_pulses_per_sequence"]:raise ValueError(f"{folder}: window exceeds metadata length")
                 sequence_id=f"seq_{sid:04d}"; path=folder/"test"/f"{sequence_id}.csv"
                 frame=load_sequence(path,args.pulses,args.start)
+                frame.attrs["dataset_family"]=family
                 selected[(profile,radar,level)]=(sequence_id,frame)
                 manifest.append({"profile":profile,"radar_type":radar,"error_level":level,"sequence_id":sequence_id,
-                                 "source_csv":str(path.resolve()),"start_after_anchor":args.start,"plotted_intervals":len(frame)})
+                                 "dataset_family":family,"source_csv":str(path.resolve()),"start_after_anchor":args.start,"plotted_intervals":len(frame)})
     args.output_dir.mkdir(parents=True,exist_ok=True)
     count=0
     for profile in args.profiles:
@@ -134,6 +141,13 @@ def main():
                     path=plot_profile(profile,radar,channel,column,unit,selected,tuple(args.error_levels),args.output_dir,args.dpi)
                     count+=1; print(f"[SAVED] {path}")
     (args.output_dir/"selection.json").write_text(json.dumps(manifest,indent=2)+"\n",encoding="utf-8")
+    links=[f"| {radar} | "+", ".join(f"[{profile} {channel}]({radar}/{family}_{profile}_{channel.lower()}.png)" for profile in args.profiles for channel,_,_ in CHANNELS if channel in args.channels)+" |" for radar in args.radar_types]
+    text=[f"# {family}: dataset gallery","",f"Dataset size: {args.dataset_size}. Start after anchor: {args.start}. Plotted intervals: {args.pulses}.",
+          "These are dataset observations and source values, not model forecasts.",
+          "The dotted line, when present, starts the consecutive-source future.","",
+          "| Radar | Figures |","|---|---|",*links,"",
+          "Each figure contains the selected error levels. Additional channel figures are in each radar directory.",""]
+    (args.output_dir/"README.md").write_text("\n".join(text),encoding="utf-8")
     print(f"[DONE] {count} figures from {len(manifest)} selected captures; input CSVs unchanged")
 
 

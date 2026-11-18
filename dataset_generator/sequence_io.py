@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-SCHEMA_V2 = "consecutive_future_v2"
+from dataset_generator.catalog import SCHEMA_V2
 SOURCE_COLUMNS = ["source_pulse_id", "poi_keep", "global_keep", "observed_keep", "sequence_index", "segment"]
 
 

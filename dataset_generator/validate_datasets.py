@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from dataset_generator.catalog import COMPLEX_DATASETS_ROOT, RADAR_TYPES, ERROR_LEVELS
+from dataset_generator.catalog import COMPLEX_DATASETS_ROOT, RADAR_TYPES, ERROR_LEVELS, family_for_schema
 from dataset_generator.generate_datasets import OUTPUT_COLUMNS, validate_profile
 from dataset_generator.sequence_io import SCHEMA_V2, SOURCE_COLUMNS, read_sequence_frame, is_boundary_dataset
 
@@ -149,6 +149,7 @@ def validate_tree(root: Path, dataset_size: str, radar_types=RADAR_TYPES) -> dic
     summary["bytes_on_disk"]=bytes_total
     require(len(schemas)==1,"Mixed dataset protocols in one collection")
     summary["schema_version"]=next(iter(schemas))
+    summary["dataset_family"]=family_for_schema(summary["schema_version"])
     summary["restored_horizon_pulses"]=restored
     summary["checks"][2]="per-sequence storage; compare combined CSV only for historical datasets"
     if SCHEMA_V2 in schemas:

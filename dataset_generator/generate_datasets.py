@@ -48,7 +48,8 @@ from radar_generator import (
 )
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
-from dataset_generator.catalog import COMPLEX_DATASETS_ROOT, RADAR_TYPES, ERROR_LEVELS, sinusoidal_repeat_period
+from dataset_generator.catalog import (COMPLEX_DATASETS_ROOT, NEW_COMPLEX_DATASETS_ROOT, NEW_COMPLEX_PRI,
+                                       RADAR_TYPES, ERROR_LEVELS, sinusoidal_repeat_period, family_for_schema)
 from dataset_generator.sequence_io import SCHEMA_V2
 
 RADAR_CLASSES = {
@@ -640,6 +641,7 @@ def build_single_dataset(
         "effective_freq_mode": next(iter(profiles_dict.values()))["freq_mode"],
         "seed": seed,
         "schema_version": SCHEMA_V2 if protocol == SCHEMA_V2 else "complex_pri_v1",
+        "dataset_family": family_for_schema(SCHEMA_V2 if protocol == SCHEMA_V2 else "complex_pri_v1"),
         "storage_layout": "source_stream_per_sequence" if protocol == SCHEMA_V2 else "per_sequence_csv",
         "profile_definition": profiles_cfg["fixed_profiles"] if profile_mode == "fixed" else profiles_cfg["varying_profile_sampling"],
         "profile_config_sha256": hashlib.sha256(json.dumps(profiles_cfg, sort_keys=True).encode()).hexdigest(),
@@ -796,8 +798,8 @@ def main():
         help="Random seed for reproducibility",
     )
     parser.add_argument(
-        "--protocol", choices=("observed", SCHEMA_V2), default="observed",
-        help="Opt-in versioned context/consecutive-source-future protocol",
+        "--protocol", choices=("observed", NEW_COMPLEX_PRI, SCHEMA_V2), default="observed",
+        help="new_complex_pri selects consecutive-source future; the old schema name remains an alias",
     )
     parser.add_argument("--context-intervals", type=int, default=1024)
     parser.add_argument("--max-horizon", type=int, default=32)
@@ -808,12 +810,14 @@ def main():
     default=128,
     )
     args = parser.parse_args()
+    if args.protocol == NEW_COMPLEX_PRI:
+        args.protocol = SCHEMA_V2
     if min(args.context_intervals, args.max_horizon) <= 0:
         parser.error("Context and horizon must be positive")
     if args.protocol == SCHEMA_V2 and args.radar_type in ("interleaved", "all"):
         parser.error("consecutive_future_v2 is scoped to single-radar datasets; use all_single")
     if args.output_dir is None:
-        args.output_dir = (PROJECT_ROOT/"datasets"/SCHEMA_V2/("smoke" if args.smoke_test else "production")/
+        args.output_dir = (NEW_COMPLEX_DATASETS_ROOT/("smoke" if args.smoke_test else "production")/
                            f"C{args.context_intervals}_H{args.max_horizon}" if args.protocol == SCHEMA_V2
                            else COMPLEX_DATASETS_ROOT)
 
@@ -837,7 +841,7 @@ def main():
     if args.protocol == SCHEMA_V2:
         if args.output_dir.exists() and any(args.output_dir.iterdir()):
             parser.error(f"A v2 collection requires a fresh output root; do not mix runs or protocols: {args.output_dir}")
-        collection = {"schema_version":SCHEMA_V2,"status":"building",
+        collection = {"schema_version":SCHEMA_V2,"dataset_family":NEW_COMPLEX_PRI,"status":"building",
                       "created_utc":datetime.now(timezone.utc).isoformat(),
                       "purpose":"smoke" if args.smoke_test else "production",
                       "dataset_size":f"{sequence_count}x{pulses_per_sequence}",

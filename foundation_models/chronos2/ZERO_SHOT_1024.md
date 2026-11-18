@@ -54,8 +54,8 @@ if ((git branch --show-current).Trim() -ne 'long-seq-1024') {
     throw 'Aktif branch long-seq-1024 olmalı.'
 }
 
-$chronosDataRoot = Join-Path (Get-Location) 'datasets\complex_pri_full_20261117_230416\single_radar'
-$chronosOutput = Join-Path (Get-Location) ("results\chronos2\zero_shot\complex_pri_1024\run_" + (Get-Date -Format 'yyyyMMdd_HHmmss'))
+$chronosDataRoot = Join-Path (Get-Location) 'datasets\old_complex_pri\single_radar'
+$chronosOutput = Join-Path (Get-Location) ("results\chronos2\zero_shot\old_complex_pri\run_" + (Get-Date -Format 'yyyyMMdd_HHmmss'))
 
 & "$env:USERPROFILE\bitirme-chronos2-venv\Scripts\python.exe" -B `
     -m foundation_models.chronos2.run_zero_shot `
@@ -156,7 +156,7 @@ example JSONs and PNGs were generated; a second invocation verified resume.
 These are smoke results, not the full 200-sequence benchmark.
 
 The full default preflight also passed against
-`datasets/complex_pri_full_20261117_230416/single_radar`: 128 datasets,
+`datasets/old_complex_pri/single_radar`: 128 datasets,
 200 test sequences each, 25600 selected sequences. The full inference matrix
 was not started. Smoke artifacts are under the ignored local directory
 `datasets/chronos2_zero_shot_integration_20261118`; the coverage manifest is

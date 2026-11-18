@@ -1,8 +1,10 @@
 # Chronos-2 single-radar benchmark
 
-For the current **complex PRI, 1024-interval, zero-shot-only experiment**, use
-[`run_zero_shot.py`](run_zero_shot.py) and follow
-[`ZERO_SHOT_1024.md`](ZERO_SHOT_1024.md). This evaluates eight radar types,
+For the current **new_complex_pri zero-shot experiment**, use
+[`run_zero_shot.py`](run_zero_shot.py) with `--window-mode boundary` and follow
+[the current protocol guide](../../dataset_generator/CONSECUTIVE_FUTURE.md).
+The historical **old_complex_pri** experiment is documented in
+[`ZERO_SHOT_1024.md`](ZERO_SHOT_1024.md). Both evaluate eight radar types,
 eight error levels, both profiles, PRI/Frequency univariate and five-channel
 multivariate inputs at L=96/256/512/992, H=32. It does not run fine-tuning.
 The legacy `run_all` workflow documented below also trains adapters; it is

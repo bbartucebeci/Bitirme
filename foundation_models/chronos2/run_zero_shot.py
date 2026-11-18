@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from dataset_generator.catalog import RADAR_TYPES, ERROR_LEVELS, PROJECT_ROOT
+from dataset_generator.catalog import RADAR_TYPES, ERROR_LEVELS, PROJECT_ROOT, NEW_COMPLEX_PRI, OLD_COMPLEX_PRI, family_for_schema
 from dataset_generator.sequence_io import SCHEMA_V2, read_sequence_frame, is_boundary_dataset, boundary_start
 from foundation_models.chronos2.adapter import MODEL_ID, load_pipeline, predict_median
 from foundation_models.common.dataset import CHANNELS, load_split
@@ -43,6 +43,7 @@ def code_fingerprint() -> str:
         digest.update(name.encode())
         digest.update((PROJECT_ROOT / "foundation_models" / name).read_bytes())
     digest.update((PROJECT_ROOT/"dataset_generator"/"sequence_io.py").read_bytes())
+    digest.update((PROJECT_ROOT/"dataset_generator"/"catalog.py").read_bytes())
     return digest.hexdigest()
 
 
@@ -110,7 +111,8 @@ def prepare_inputs(root: Path, size: str, profiles, radar_types, levels, lengths
         raise ValueError("A run cannot mix dataset protocols")
     manifest = {
         "meta": {"dataset_size": size, "split": "test", "context_lens": list(lengths),
-                 "horizon_len": horizon, "seed": seed, "window_mode": mode,"schema_version":next(iter(schemas))},
+                 "horizon_len": horizon, "seed": seed, "window_mode": mode,"schema_version":next(iter(schemas)),
+                 "dataset_family":family_for_schema(next(iter(schemas)))},
         "windows": windows, "sequence_lengths": sequence_lengths, "sequence_sha256": hashes,
         "metadata_sha256": metadata_hashes, "plot_sequences": examples,
     }
@@ -192,8 +194,9 @@ def evaluate_one(pipeline, folder: Path, profile: str, radar: str, level: str,
     pd.DataFrame(sequence_rows).to_csv(per_sequence, index=False)
     write_json(output / "examples" / f"{name}.json", example)
     if plots:
-        title = f"Chronos-2 zero-shot | {task} | {profile}/{radar}/{level} | L={length}, H={horizon} | {example_id}"
-        plot_forecast(output / "plots" / f"{name}.png", example, task, title)
+        family=manifest.get("meta",{}).get("dataset_family",family_for_schema(manifest.get("meta",{}).get("schema_version","complex_pri_v1")))
+        title = f"Chronos-2 zero-shot [{family}] | {task} | {profile}/{radar}/{level} | L={length}, H={horizon} | {example_id}"
+        plot_forecast(output / "plots" / f"{family}_{name}.png", example, task, title)
     # Completion marker is written last so interrupted jobs are not silently resumed.
     write_json(output / "completed" / f"{name}.json", row)
     return row
@@ -224,7 +227,7 @@ def export_reports(rows: list[dict], output: Path, config: dict) -> pd.DataFrame
         group.to_csv(folder / "metrics.csv", index=False)
         (folder / "report.md").write_text(f"# {radar}: {task}\n\n"+group.round(6).to_markdown(index=False)+"\n",encoding="utf-8")
     protocol = ["# Chronos-2 complex PRI zero-shot experiment", "",
-                f"Completed conditions: {len(frame)}. Mode: {config['window_mode']}. Horizon: {config['horizon']}.",
+                f"Dataset: {config.get('dataset_family', NEW_COMPLEX_PRI if config['window_mode']=='boundary' else OLD_COMPLEX_PRI)}. Completed conditions: {len(frame)}. Mode: {config['window_mode']}. Horizon: {config['horizon']}.",
                 "No fitting or training data are used. Only test CSVs are scored; input files are never modified.",
                 "Tail mode shares the final targets; boundary mode shares the first H consecutive source pulses after the stored context boundary.",
                 "PRI input is observed Delta-TOA; PRI target is source PRI, following the repository definition.",
@@ -268,11 +271,11 @@ def main() -> None:
     if (Path(args.model_id)/"adapter_config.json").is_file():
         parser.error("Zero-shot requires a base model, not a fine-tuned adapter")
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_UTC")
-    protocol_tag=SCHEMA_V2 if args.window_mode=="boundary" else "complex_pri_1024"
+    protocol_tag=NEW_COMPLEX_PRI if args.window_mode=="boundary" else OLD_COMPLEX_PRI
     output = (args.output_dir or PROJECT_ROOT/"results"/"chronos2"/"zero_shot"/protocol_tag/f"{root.parent.name}_{stamp}").resolve()
     if output == root or root in output.parents or output in root.parents:
         parser.error("Output must be outside the single_radar input tree")
-    config = {"protocol_version":1, "regime":"zero_shot", "datasets_root":str(root),
+    config = {"protocol_version":1, "regime":"zero_shot", "datasets_root":str(root),"dataset_family":protocol_tag,
               "dataset_size":args.dataset_size,"profiles":list(args.profiles),"radar_types":list(args.radar_types),
               "error_levels":list(args.error_levels),"tasks":list(args.tasks),"context_lens":list(args.context_lens),
               "horizon":args.horizon,"window_mode":args.window_mode,"window_seed":args.window_seed,
@@ -324,7 +327,7 @@ def main() -> None:
                 if args.resume and marker.is_file():
                     row = json.loads(marker.read_text())
                     required = [scope/"per_sequence"/f"{radar}_{level}.csv",scope/"examples"/f"{radar}_{level}.json"]
-                    if not args.no_plots:required.append(scope/"plots"/f"{radar}_{level}.png")
+                    if not args.no_plots:required.append(scope/"plots"/f"{protocol_tag}_{radar}_{level}.png")
                     if not all(path.is_file() for path in required):
                         raise ValueError(f"{marker}: incomplete saved condition")
                     print(f"[RESUME] {task}/L{length}/{profile}/{radar}/{level}",flush=True)
