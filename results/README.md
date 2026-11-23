@@ -8,6 +8,8 @@ for target definitions and local dataset locations.
 |---|---|---|
 | Dataset example PNGs | [new_complex_pri](dataset_gallery/new_complex_pri/README.md) | [old_complex_pri](dataset_gallery/old_complex_pri/README.md) (previously published) |
 | Chronos-2 zero-shot forecasts and metrics | [new_complex_pri](chronos2/zero_shot/new_complex_pri/README.md) | `chronos2/zero_shot/old_complex_pri/` (local) |
+| Chronos-2 LoRA SFT forecasts and metrics | [new_complex_pri SFT](chronos2/lora_sft/new_complex_pri/README.md) | - |
+| Chronos-2 SFT versus zero-shot MAE | [32 comparison plots](../outputs/new_complex_pri/sft_vs_zero_shot/run_20261119_184059/README.md) | - |
 | L=96/256/512/992 MAE tables | [new_complex_pri](../outputs/new_complex_pri/README.md) | `outputs/old_complex_pri/` at repository root (local) |
 
 Current new_complex_pri experiment outputs are published; raw datasets and

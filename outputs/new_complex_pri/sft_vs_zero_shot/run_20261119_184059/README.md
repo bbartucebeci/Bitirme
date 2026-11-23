@@ -1,0 +1,38 @@
+# new_complex_pri: zero-shot vs LoRA SFT
+
+Same test CSV hashes, context/target windows, metrics and 200 sequences per condition.
+H=32. Each L, target, profile and input task is plotted separately.
+Negative SFT minus zero-shot MAE means SFT improved. No radar/error averages.
+
+- [fixed, PRI, PRI, L=96](L96/new_complex_pri_fixed_pri_pri_L96.png)
+- [fixed, Frequency, Frequency, L=96](L96/new_complex_pri_fixed_frequency_frequency_L96.png)
+- [fixed, multivariate, PRI, L=96](L96/new_complex_pri_fixed_multivariate_pri_L96.png)
+- [fixed, multivariate, Frequency, L=96](L96/new_complex_pri_fixed_multivariate_frequency_L96.png)
+- [varying, PRI, PRI, L=96](L96/new_complex_pri_varying_pri_pri_L96.png)
+- [varying, Frequency, Frequency, L=96](L96/new_complex_pri_varying_frequency_frequency_L96.png)
+- [varying, multivariate, PRI, L=96](L96/new_complex_pri_varying_multivariate_pri_L96.png)
+- [varying, multivariate, Frequency, L=96](L96/new_complex_pri_varying_multivariate_frequency_L96.png)
+- [fixed, PRI, PRI, L=256](L256/new_complex_pri_fixed_pri_pri_L256.png)
+- [fixed, Frequency, Frequency, L=256](L256/new_complex_pri_fixed_frequency_frequency_L256.png)
+- [fixed, multivariate, PRI, L=256](L256/new_complex_pri_fixed_multivariate_pri_L256.png)
+- [fixed, multivariate, Frequency, L=256](L256/new_complex_pri_fixed_multivariate_frequency_L256.png)
+- [varying, PRI, PRI, L=256](L256/new_complex_pri_varying_pri_pri_L256.png)
+- [varying, Frequency, Frequency, L=256](L256/new_complex_pri_varying_frequency_frequency_L256.png)
+- [varying, multivariate, PRI, L=256](L256/new_complex_pri_varying_multivariate_pri_L256.png)
+- [varying, multivariate, Frequency, L=256](L256/new_complex_pri_varying_multivariate_frequency_L256.png)
+- [fixed, PRI, PRI, L=512](L512/new_complex_pri_fixed_pri_pri_L512.png)
+- [fixed, Frequency, Frequency, L=512](L512/new_complex_pri_fixed_frequency_frequency_L512.png)
+- [fixed, multivariate, PRI, L=512](L512/new_complex_pri_fixed_multivariate_pri_L512.png)
+- [fixed, multivariate, Frequency, L=512](L512/new_complex_pri_fixed_multivariate_frequency_L512.png)
+- [varying, PRI, PRI, L=512](L512/new_complex_pri_varying_pri_pri_L512.png)
+- [varying, Frequency, Frequency, L=512](L512/new_complex_pri_varying_frequency_frequency_L512.png)
+- [varying, multivariate, PRI, L=512](L512/new_complex_pri_varying_multivariate_pri_L512.png)
+- [varying, multivariate, Frequency, L=512](L512/new_complex_pri_varying_multivariate_frequency_L512.png)
+- [fixed, PRI, PRI, L=992](L992/new_complex_pri_fixed_pri_pri_L992.png)
+- [fixed, Frequency, Frequency, L=992](L992/new_complex_pri_fixed_frequency_frequency_L992.png)
+- [fixed, multivariate, PRI, L=992](L992/new_complex_pri_fixed_multivariate_pri_L992.png)
+- [fixed, multivariate, Frequency, L=992](L992/new_complex_pri_fixed_multivariate_frequency_L992.png)
+- [varying, PRI, PRI, L=992](L992/new_complex_pri_varying_pri_pri_L992.png)
+- [varying, Frequency, Frequency, L=992](L992/new_complex_pri_varying_frequency_frequency_L992.png)
+- [varying, multivariate, PRI, L=992](L992/new_complex_pri_varying_multivariate_pri_L992.png)
+- [varying, multivariate, Frequency, L=992](L992/new_complex_pri_varying_multivariate_frequency_L992.png)

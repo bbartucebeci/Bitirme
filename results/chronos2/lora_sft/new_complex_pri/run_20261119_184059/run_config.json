@@ -1,0 +1,62 @@
+{
+  "dataset_size": "1000x1056",
+  "profiles": [
+    "fixed",
+    "varying"
+  ],
+  "tasks": [
+    "PRI",
+    "Frequency",
+    "multivariate"
+  ],
+  "context_lens": [
+    96,
+    256,
+    512,
+    992
+  ],
+  "radar_types": [
+    "stable",
+    "jitter",
+    "stagger",
+    "dwell_and_switch",
+    "sliding",
+    "sinusoidal",
+    "triangular_sliding",
+    "markov_agile"
+  ],
+  "error_levels": [
+    "clean",
+    "error_lv1",
+    "error_lv2",
+    "error_lv3",
+    "error_lv4",
+    "error_lv5",
+    "error_lv6",
+    "error_lv7"
+  ],
+  "horizon": 32,
+  "epochs": 3,
+  "steps": null,
+  "train_batch_size": 20,
+  "eval_steps": 500,
+  "lr": 1e-05,
+  "lora_r": 16,
+  "lora_alpha": 32,
+  "seed": 20261020,
+  "window_seed": 20261116,
+  "model_id": "amazon/chronos-2",
+  "plot_sequence_id": "seq_0800",
+  "max_train_seqs_per_dataset": null,
+  "max_val_seqs_per_dataset": null,
+  "max_test_seqs": null,
+  "smoke_test": false,
+  "regime": "lora_sft",
+  "dataset_family": "new_complex_pri",
+  "window_mode": "boundary",
+  "datasets_root": "C:\\Users\\User\\Desktop\\D\u00c7\\datasets\\new_complex_pri\\production\\C1024_H32\\single_radar",
+  "checkpoint_root": "C:\\Users\\User\\Desktop\\D\u00c7\\models\\lora_sft\\chronos2\\new_complex_pri\\run_20261119_184059",
+  "zero_shot_run": "C:\\Users\\User\\Desktop\\D\u00c7\\results\\chronos2\\zero_shot\\new_complex_pri\\run_20261118_151924",
+  "code_sha256": "127d911896b304b498f6c68f56d65a41a1db98430721f6579103eefbc573ce20",
+  "plots": true
+}

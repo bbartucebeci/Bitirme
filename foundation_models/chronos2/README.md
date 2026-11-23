@@ -1,5 +1,11 @@
 # Chronos-2 single-radar benchmark
 
+For **new_complex_pri LoRA SFT**, use [`run_sft.py`](run_sft.py) and follow
+[`SFT_1024.md`](SFT_1024.md). It trains a separate adapter per profile/task/L,
+uses the same boundary targets as the completed zero-shot run, and pools radar
+types and error levels during fitting. The legacy training CLI below is not
+the entry point for this protocol.
+
 For the current **new_complex_pri zero-shot experiment**, use
 [`run_zero_shot.py`](run_zero_shot.py) with `--window-mode boundary` and follow
 [the current protocol guide](../../dataset_generator/CONSECUTIVE_FUTURE.md).

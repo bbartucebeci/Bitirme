@@ -1,5 +1,19 @@
 # new_complex_pri: Chronos-2 MAE tables and comparisons
 
+## Completed LoRA SFT results
+
+SFT run: `run_20261119_184059`, evaluated on the same test CSVs and boundary
+windows as the zero-shot run below. Both cover 1,536 conditions, 200 sequences
+per condition, L=96/256/512/992 and H=32.
+
+- [SFT Excel workbook](lora_sft/mae_comparison/run_20261119_184059/new_complex_pri_chronos2_lora_sft_mae.xlsx)
+- [SFT MAE tables across L](lora_sft/mae_comparison/run_20261119_184059/MAE_comparison.md)
+- [SFT fixed/varying and uni/multivariate comparisons](lora_sft/comparisons/run_20261119_184059/README.md)
+- [SFT versus zero-shot: 32 plots](sft_vs_zero_shot/run_20261119_184059/README.md)
+- [SFT final metrics and forecast plots](../../results/chronos2/lora_sft/new_complex_pri/README.md)
+
+## Zero-shot results
+
 Current dataset protocol: 1024 observed context intervals followed by 32
 consecutive transmitted future pulses. Context losses remain active.
 

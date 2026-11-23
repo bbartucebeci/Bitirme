@@ -21,3 +21,7 @@ models/distillation/*.pt
 /outputs/new_complex_pri/**/preview.png
 /results/chronos2/zero_shot/new_complex_pri/**/coverage.csv
 /results/chronos2/zero_shot/new_complex_pri/**/name_migration.json
+/results/chronos2/lora_sft/new_complex_pri/**/coverage.csv
+/results/chronos2/lora_sft/new_complex_pri/**/training/
+/results/chronos2/lora_sft/new_complex_pri/**/examples/
+/results/chronos2/lora_sft/new_complex_pri/**/completed/

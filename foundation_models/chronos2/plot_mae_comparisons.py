@@ -20,7 +20,8 @@ from dataset_generator.catalog import PROJECT_ROOT, NEW_COMPLEX_PRI, RADAR_TYPES
 
 CONTEXTS = (96, 256, 512, 992)
 KINDS = ("fixed_vs_varying", "univariate_vs_multivariate")
-TITLES = {"fixed_vs_varying":"Fixed vs varying", "univariate_vs_multivariate":"Univariate vs multivariate"}
+TITLES = {"fixed_vs_varying":"Fixed vs varying", "univariate_vs_multivariate":"Univariate vs multivariate",
+          "zero_shot_vs_sft":"Zero-shot vs LoRA SFT"}
 RADAR_LABELS = {"stable":"Stable", "jitter":"Gaussian jitter", "stagger":"Stagger",
                 "dwell_and_switch":"Dwell and switch", "sliding":"Sliding", "sinusoidal":"Sinusoidal",
                 "triangular_sliding":"Triangular sliding", "markov_agile":"Markov agile"}
@@ -120,7 +121,8 @@ def plot_comparison(path: Path, rows: list[dict]) -> None:
         axis.set_ylabel(f"MAE ({'µs' if first['target']=='PRI' else 'MHz'})", fontsize=10)
         axis.set_xlabel("Error level", fontsize=10)
         axis.grid(axis="both", linestyle=":", alpha=.3)
-    fig.suptitle(f"{NEW_COMPLEX_PRI}: Chronos-2 zero-shot {first['target']} MAE\n"
+    label = first.get('regime_label', 'zero-shot')
+    fig.suptitle(f"{NEW_COMPLEX_PRI}: Chronos-2 {label} {first['target']} MAE\n"
                  f"{TITLES[first['comparison']]} · {first['held_setting']} · L={first['context_len']}, H=32",
                  fontsize=17, fontweight="bold", y=.985)
     handles, labels = axes.flat[0].get_legend_handles_labels()
@@ -135,7 +137,7 @@ def plot_comparison(path: Path, rows: list[dict]) -> None:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source", type=Path, required=True, help="Completed new_complex_pri zero-shot run")
+    parser.add_argument("--source", type=Path, required=True, help="Completed new_complex_pri zero-shot or LoRA SFT run")
     parser.add_argument("--output-dir", type=Path, help="Default: outputs/new_complex_pri/comparisons/<run>")
     args = parser.parse_args()
     run = args.source.resolve()
@@ -143,15 +145,21 @@ def main():
     manifest = json.loads((run/"test_windows.json").read_text(encoding="utf-8"))
     if (config["window_mode"] != "boundary" or config.get("dataset_family") != NEW_COMPLEX_PRI
             or config["dataset_size"] != "1000x1056" or config["horizon"] != 32
-            or config["regime"] != "zero_shot" or config["max_test_seqs"] is not None
+            or config["regime"] not in ("zero_shot", "lora_sft") or config["max_test_seqs"] is not None
+            or config.get("smoke_test", False) or config.get("max_train_seqs_per_dataset") is not None
+            or config.get("max_val_seqs_per_dataset") is not None
             or manifest["meta"]["schema_version"] != SCHEMA_V2):
-        parser.error("This comparison is scoped to the full new_complex_pri boundary zero-shot experiment")
+        parser.error("This comparison requires a full new_complex_pri boundary zero-shot or LoRA SFT experiment")
     for name, expected in (("context_lens",CONTEXTS),("profiles",("fixed","varying")),
                            ("tasks",("PRI","Frequency","multivariate")),
                            ("radar_types",RADAR_TYPES),("error_levels",ERROR_LEVELS)):
         if len(config[name]) != len(expected) or set(config[name]) != set(expected):
             parser.error(f"Unexpected {name}: {config[name]}")
-    output = (args.output_dir or PROJECT_ROOT/"outputs"/NEW_COMPLEX_PRI/"comparisons"/run.name).resolve()
+    label = 'LoRA SFT' if config['regime'] == 'lora_sft' else 'zero-shot'
+    base = PROJECT_ROOT/"outputs"/NEW_COMPLEX_PRI
+    if config['regime'] == 'lora_sft':
+        base = base/'lora_sft'
+    output = (args.output_dir or base/"comparisons"/run.name).resolve()
     if output == run or output in run.parents:
         parser.error("Output cannot replace the source run or its parent directories")
     if output.exists() and any(output.iterdir()):
@@ -165,7 +173,7 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     all_rows, plots = [], []
     readme = [f"# {NEW_COMPLEX_PRI}: fixed/varying and univariate/multivariate MAE", "",
-              "Chronos-2 zero-shot, H=32, 200 test sequences per condition. Source run: `"+run.name+"`.",
+              f"Chronos-2 {label}, H=32, 200 test sequences per condition. Source run: `"+run.name+"`.",
               "Each figure belongs to one L and one target. Its eight panels show individual radar types; x-axis categories are clean and error_lv1–error_lv7.",
               "Fixed/varying comparisons hold input mode constant. Univariate/multivariate comparisons hold profile constant.",
               "Multivariate means five input channels, scored here for PRI or Frequency. PRI uses µs; Frequency uses MHz.",
@@ -180,6 +188,8 @@ def main():
                 links = []
                 for length in CONTEXTS:
                     rows = [pair_condition(lookup,kind,target,held,length,radar,level) for radar in RADAR_TYPES for level in ERROR_LEVELS]
+                    for row in rows:
+                        row['regime_label'] = label
                     name = f"{NEW_COMPLEX_PRI}_{kind}_{target.lower()}_{held}_L{length}"
                     png = output/kind/f"L{length}"/f"{name}.png"
                     plot_comparison(png, rows)

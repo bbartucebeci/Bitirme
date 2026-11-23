@@ -29,21 +29,30 @@ def digest(path):
 def main():
     global SOURCE,OUT
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--source',type=Path,required=True,help='Completed Chronos zero-shot run directory')
+    parser.add_argument('--source',type=Path,required=True,help='Completed Chronos zero-shot or LoRA SFT run directory')
     parser.add_argument('--output-dir',type=Path,help='Default: outputs/<dataset_family>/mae_comparison/<run_name>')
     args=parser.parse_args()
     SOURCE=args.source.resolve()
     config = json.loads((SOURCE/'run_config.json').read_text())
     schema='consecutive_future_v2' if config['window_mode']=='boundary' else 'complex_pri_v1'
     family=family_for_schema(schema)
-    OUT=(args.output_dir or ROOT/'outputs'/family/'mae_comparison'/SOURCE.name).resolve()
+    regime = config.get('regime', 'zero_shot')
+    if regime not in ('zero_shot', 'lora_sft'):
+        raise ValueError(f'Unsupported experiment regime: {regime}')
+    label = 'LoRA SFT' if regime == 'lora_sft' else 'zero-shot'
+    base = ROOT/'outputs'/family
+    if regime == 'lora_sft':
+        base = base/'lora_sft'
+    OUT=(args.output_dir or base/'mae_comparison'/SOURCE.name).resolve()
     if OUT.exists() and any(OUT.iterdir()):
         raise FileExistsError(f'Use a fresh output folder: {OUT}')
     OUT.mkdir(parents=True,exist_ok=True)
     original_hash = digest(SOURCE/'metrics.csv')
     with (SOURCE/'metrics.csv').open(newline='') as stream:
         source = list(csv.DictReader(stream))
-    assert config['regime'] == 'zero_shot' and config['context_lens'] == CONTEXTS
+    assert config['regime'] in ('zero_shot', 'lora_sft') and config['context_lens'] == CONTEXTS
+    assert not config.get('smoke_test', False)
+    assert config.get('max_train_seqs_per_dataset') is None and config.get('max_val_seqs_per_dataset') is None
     assert config['horizon'] == 32 and config['max_test_seqs'] is None
     assert set(config['tasks'])=={'PRI','Frequency','multivariate'}
     assert set(config['profiles'])=={'fixed','varying'}
@@ -98,7 +107,7 @@ def main():
             views.append((profile, mode, target, unit, rows))
 
     protocol='consecutive future v2' if boundary else 'observed future v1'
-    md = [f'# {family}: Chronos-2 zero-shot MAE karşılaştırması', '',f'Protokol: {protocol}.', '',
+    md = [f'# {family}: Chronos-2 {label} MAE karşılaştırması', '',f'Protokol: {protocol}.', '',
           'L = 96, 256, 512, **992**. H = 32. Her hücre 200 test sekansının MAE ortalamasıdır.',
           ('Her context uzunluğu 1024 gözlenen context aralığından sonraki aynı 32 ardışık kaynak darbesini tahmin eder.' if boundary else 'Her context uzunluğu aynı son 32 hedef konumunu tahmin eder.')+' PRI birimi µs, frekans birimi MHz.',
           'Multivariate model beş giriş kanalı kullanır. Burada yalnızca PRI ve frekans MAE gösterilir.',
@@ -122,7 +131,7 @@ def main():
             writer.writerows(rows)
         fig, ax = plt.subplots(figsize=(13.8, 20.8))
         ax.axis('off')
-        fig.suptitle(f'Chronos-2 [{family}]: {profile}, {mode.lower()}, {target}',
+        fig.suptitle(f'Chronos-2 {label} [{family}]: {profile}, {mode.lower()}, {target}',
                      fontsize=17, fontweight='bold', x=.04, ha='left', y=.99)
         ax.set_title(f'MAE ({unit})   H=32   200 test sequences per row   Green: lowest MAE in row',
                      fontsize=11, loc='left', pad=15)
@@ -148,7 +157,7 @@ def main():
         fig.savefig(pngs/f'{name}.png', dpi=140)
         plt.close(fig)
     (OUT/'MAE_comparison.md').write_text('\n'.join(md)+'\n', encoding='utf-8')
-    write_xlsx(profile_rows,family)
+    write_xlsx(profile_rows,family,regime)
     assert digest(SOURCE/'metrics.csv') == original_hash
     audit = {'source_metrics_sha256': original_hash, 'source_conditions': len(source),
              'mae_values_checked_against_per_sequence_files': checked,
@@ -160,7 +169,7 @@ def main():
     print(json.dumps(audit))
 
 
-def write_xlsx(profile_rows,protocol):
+def write_xlsx(profile_rows,protocol,regime='zero_shot'):
     """Write the static comparison without requiring optional Excel packages."""
     ns = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
     def cell(ref, value, style):
@@ -183,7 +192,8 @@ def write_xlsx(profile_rows,protocol):
     sheets = []
     for profile, rows in profile_rows.items():
         last = len(rows)+5
-        body = row(2, [f'Chronos-2 zero-shot MAE: {profile} ({protocol})'], 3, 28)
+        label = 'LoRA SFT' if regime == 'lora_sft' else 'zero-shot'
+        body = row(2, [f'Chronos-2 {label} MAE: {profile} ({protocol})'], 3, 28)
         body += row(3, ['H=32. 200 test sequences per condition. L=96/256/512/992. Lowest MAE per row highlighted.'])
         body += row(5, HEADERS, 1, 25)
         body += ''.join(row(i, values) for i, values in enumerate(rows, 6))
@@ -196,7 +206,7 @@ def write_xlsx(profile_rows,protocol):
           <conditionalFormatting sqref="E6:H{last}"><cfRule type="expression" dxfId="0" priority="1"><formula>E6=MIN($E6:$H6)</formula></cfRule></conditionalFormatting>
           <pageMargins left="0.3" right="0.3" top="0.4" bottom="0.4" header="0.2" footer="0.2"/>
         </worksheet>''')
-    destination = OUT/f'{protocol}_chronos2_zero_shot_mae.xlsx'
+    destination = OUT/f'{protocol}_chronos2_{regime}_mae.xlsx'
     assert not destination.exists(), destination
     with zipfile.ZipFile(destination, 'w', zipfile.ZIP_DEFLATED) as book:
         content = ['<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>',

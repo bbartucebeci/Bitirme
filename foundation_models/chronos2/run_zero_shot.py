@@ -147,7 +147,7 @@ def plot_forecast(path: Path, example: dict, task: str, title: str) -> None:
 def evaluate_one(pipeline, folder: Path, profile: str, radar: str, level: str,
                  task: str, length: int, horizon: int, batch_size: int,
                  limit: int | None, mode: str, seed: int, manifest: dict,
-                 output: Path, plots: bool = True) -> dict:
+                 output: Path, plots: bool = True, regime: str = "zero_shot") -> dict:
     condition = f"{profile}/{radar}/{level}"
     if file_sha256(folder / "metadata.yaml") != manifest["metadata_sha256"][condition]:
         raise ValueError(f"{folder}: metadata changed after preflight")
@@ -195,7 +195,8 @@ def evaluate_one(pipeline, folder: Path, profile: str, radar: str, level: str,
     write_json(output / "examples" / f"{name}.json", example)
     if plots:
         family=manifest.get("meta",{}).get("dataset_family",family_for_schema(manifest.get("meta",{}).get("schema_version","complex_pri_v1")))
-        title = f"Chronos-2 zero-shot [{family}] | {task} | {profile}/{radar}/{level} | L={length}, H={horizon} | {example_id}"
+        label = "LoRA SFT" if regime == "lora_sft" else "zero-shot"
+        title = f"Chronos-2 {label} [{family}] | {task} | {profile}/{radar}/{level} | L={length}, H={horizon} | {example_id}"
         plot_forecast(output / "plots" / f"{family}_{name}.png", example, task, title)
     # Completion marker is written last so interrupted jobs are not silently resumed.
     write_json(output / "completed" / f"{name}.json", row)
@@ -203,6 +204,7 @@ def evaluate_one(pipeline, folder: Path, profile: str, radar: str, level: str,
 
 
 def export_reports(rows: list[dict], output: Path, config: dict) -> pd.DataFrame:
+    label = "LoRA SFT" if config.get("regime") == "lora_sft" else "zero-shot"
     frame = pd.DataFrame(rows)
     frame.to_csv(output / "metrics.csv", index=False)
     links = []
@@ -215,7 +217,7 @@ def export_reports(rows: list[dict], output: Path, config: dict) -> pd.DataFrame
         columns += ["valid_pulses_evaluated"]
         table = group[columns]
         table.to_csv(folder / "metrics.csv", index=False)
-        text = [f"# Chronos-2 zero-shot: {task}, {profile}, L={length}, H={config['horizon']}", "",
+        text = [f"# Chronos-2 {label}: {task}, {profile}, L={length}, H={config['horizon']}", "",
                 "MAE/RMSE/hit rate are means of per-sequence emitter-only scores, matching the existing evaluator.",
                 "PRI gate: ±10 µs. Frequency gate: ±2 MHz. Multivariate input: all five PDW channels.", "",
                 table.round(6).to_markdown(index=False), ""]
@@ -226,9 +228,10 @@ def export_reports(rows: list[dict], output: Path, config: dict) -> pd.DataFrame
         folder.mkdir(parents=True, exist_ok=True)
         group.to_csv(folder / "metrics.csv", index=False)
         (folder / "report.md").write_text(f"# {radar}: {task}\n\n"+group.round(6).to_markdown(index=False)+"\n",encoding="utf-8")
-    protocol = ["# Chronos-2 complex PRI zero-shot experiment", "",
+    protocol = [f"# Chronos-2 complex PRI {label} experiment", "",
                 f"Dataset: {config.get('dataset_family', NEW_COMPLEX_PRI if config['window_mode']=='boundary' else OLD_COMPLEX_PRI)}. Completed conditions: {len(frame)}. Mode: {config['window_mode']}. Horizon: {config['horizon']}.",
-                "No fitting or training data are used. Only test CSVs are scored; input files are never modified.",
+                ("Adapters are fitted on train only, selected by validation loss, and scored on test only. Input files are never modified."
+                 if label == "LoRA SFT" else "No fitting or training data are used. Only test CSVs are scored; input files are never modified."),
                 "Tail mode shares the final targets; boundary mode shares the first H consecutive source pulses after the stored context boundary.",
                 "PRI input is observed Delta-TOA; PRI target is source PRI, following the repository definition.",
                 "Frequency input/target retain the repository's measured Frequency definition.",
